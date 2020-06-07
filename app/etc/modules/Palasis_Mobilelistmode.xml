@@ -1,0 +1,8 @@
+<config>
+	<modules>
+		<Palasis_Mobilelistmode>
+			<active>true</active>
+			<codePool>local</codePool>
+		</Palasis_Mobilelistmode>
+	</modules>
+</config>
