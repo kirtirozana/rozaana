@@ -1,0 +1,45 @@
+/**
+ * Qty Switcher for Magento adds buttons to every qty input field for easier adjustments on tablets and smartphones
+ *
+ * @author      Tobias Schifftner <ts@ambimax.de>, ambimax® GmbH
+ * @copyright   2016 ambimax® GmbH
+ * @website     https://www.ambimax.de
+ * @licence     MIT
+ */
+
+/** Button Style **/
+/*
+.button.qty-minus,
+.button.qty-plus {
+    box-shadow: rgb(255, 255, 255) 0px 1px 0px 0px inset;
+    background: linear-gradient(rgb(255, 255, 255) 5%, rgb(246, 246, 246) 100%) rgb(255, 255, 255);
+    border-radius: 6px;
+    border: 1px solid rgb(220, 220, 220);
+    display: inline-block;
+    cursor: pointer; color: rgb(102, 102, 102);
+    font-family: Arial;
+    font-size: 15px;
+    font-weight: bold;
+    padding: 7px 14px;
+    text-decoration: none;
+    text-shadow: rgb(255, 255, 255) 0px 1px 0px;
+}
+*/
+
+/** Normal Products **/
+.product-view .qty-minus {
+    float:left;
+    margin-right: 7px;
+}
+
+.product-view .qty-plus {
+    float:left;
+    margin-left: 7px;
+}
+
+/** Grouped products **/
+.grouped-items-table .qty-wrapper { }
+.grouped-items-table .qty-plus {  }
+
+/** Checkout Cart **/
+.product-cart-actions .qty-plus {}

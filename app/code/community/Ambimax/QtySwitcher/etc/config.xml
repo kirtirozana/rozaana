@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Ambimax_QtySwitcher>
+            <version>1.0.0</version>
+        </Ambimax_QtySwitcher>
+    </modules>
+
+    <global>
+        <models>
+            <ambimax_qtyswitcher>
+                <class>Ambimax_QtySwitcher_Model</class>
+            </ambimax_qtyswitcher>
+        </models>
+
+        <helpers>
+            <ambimax_qtyswitcher>
+                <class>Ambimax_QtySwitcher_Helper</class>
+            </ambimax_qtyswitcher>
+        </helpers>
+    </global>
+
+    <frontend>
+        <layout>
+            <updates>
+                <ambimax_qtyswitcher>
+                    <file>ambimax/qtyswitcher.xml</file>
+                </ambimax_qtyswitcher>
+            </updates>
+        </layout>
+        <translate>
+            <modules>
+                <ambimax_qtyswitcher>
+                    <files>
+                        <default>Ambimax_QtySwitcher.csv</default>
+                    </files>
+                </ambimax_qtyswitcher>
+            </modules>
+        </translate>
+    </frontend>
+
+    <adminhtml>
+        <translate>
+            <modules>
+                <avs_ambimax_qtyswitcher>
+                    <files>
+                        <default>Ambimax_QtySwitcher.csv</default>
+                    </files>
+                </avs_ambimax_qtyswitcher>
+            </modules>
+        </translate>
+    </adminhtml>
+
+</config>

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<config>
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <system>
+                        <children>
+                            <config>
+                                <children>
+                                    <catalog>
+                                        <children>
+                                            <ambimax_qtyswitcher  translate="title" module="ambimax_qtyswitcher">
+                                                <title>ambimax® Qty Switcher</title>
+                                            </ambimax_qtyswitcher>
+                                        </children>
+
+                                    </catalog>
+                                </children>
+                            </config>
+                        </children>
+                    </system>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+</config>

@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+
+    <default>
+        <reference name="head">
+            <action method="addJs" ifconfig="catalog/ambimax_qtyswitcher/display_on_all_pages">
+                <name>ambimax/qtyswitcher/qtyswitcher.js</name>
+            </action>
+            <action method="addItem" ifconfig="catalog/ambimax_qtyswitcher/display_on_all_pages">
+                <type>js_css</type>
+                <name>ambimax/qtyswitcher/qtyswitcher.css</name>
+            </action>
+        </reference>
+
+        <block type="core/template" name="ambimax_qtyswitcher" template="ambimax/qtyswitcher/config.phtml" />
+        <reference name="before_body_end">
+            <action method="append" ifconfig="catalog/ambimax_qtyswitcher/display_on_all_pages"><block>ambimax_qtyswitcher</block></action>
+        </reference>
+    </default>
+</layout>
