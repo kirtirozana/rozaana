@@ -1,0 +1,25 @@
+<div class="page-title">
+    <h1><?php echo $this->__('Check Gift card information');?></h1>
+</div>
+<form action="<?php echo $this->getActionUrl();?>" method="post" id="mt_giftcard">
+    <div class="fieldset">
+        <ul class="form-list">
+            <li>
+                <label for="giftcard_code" class="required"><em>*</em><?php echo $this->__('Enter Gift card code');?></label>
+                <div class="input-box">
+                    <input type="text" title="<?php echo $this->__('Gift card code');?>" class="input-text required-entry" id="giftcard_code" name="code" value=""  />
+                </div>
+            </li>
+            <li>
+                <div class="input-box">
+                    <button class="button" onclick="giftCardForm.submit();"><span><span><?php echo $this->__('Check Gift Card');?></span></span></button>
+                </div>
+            </li>
+        </ul>
+    </div>
+</form>
+<script type="text/javascript">
+    //< ![CDATA[
+    var giftCardForm = new VarienForm('mt_giftcard');
+    //]]>
+</script>
