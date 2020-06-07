@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<config>
+	<modules>
+		<Uxmill_Uxbase>
+			<version>0.0.1</version>
+		</Uxmill_Uxbase>
+	</modules>
+	<global>
+		<helpers>
+			<uxbase>
+				<class>Uxmill_Uxbase_Helper</class>
+			</uxbase>
+		</helpers>
+	</global>
+</config> 

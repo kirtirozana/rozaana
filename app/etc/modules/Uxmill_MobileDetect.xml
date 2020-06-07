@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--
+  ~ Uxmill
+  ~
+  ~ NOTICE OF LICENSE
+  ~
+  ~ This source file is subject to the umxill.co license that is
+  ~ available through the world-wide-web.
+  ~
+  ~ DISCLAIMER
+  ~
+  ~ Do not edit or add to this file if you wish to upgrade this extension to newer
+  ~ version in the future.
+  ~
+  ~ @category    Uxmill
+  ~ @package     Uxmill_MobileDetect
+  ~ @copyright   Copyright (c) Uxmill (http://www.uxmill.co)
+  ~ @license     http://www.uxmill.co
+  -->
+
+<config>
+  <modules>
+    <Uxmill_MobileDetect>
+      <active>true</active>
+      <codePool>community</codePool>
+      <version>0.0.1</version>
+    </Uxmill_MobileDetect>
+  </modules>
+</config>

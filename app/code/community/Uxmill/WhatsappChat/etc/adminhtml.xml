@@ -1,0 +1,43 @@
+<!--
+  ~ Uxmill
+  ~
+  ~ NOTICE OF LICENSE
+  ~
+  ~ This source file is subject to the umxill.co license that is
+  ~ available through the world-wide-web.
+  ~
+  ~ DISCLAIMER
+  ~
+  ~ Do not edit or add to this file if you wish to upgrade this extension to newer
+  ~ version in the future.
+  ~
+  ~ @category    Uxmill
+  ~ @package     Uxmill_WhatsappChat
+  ~ @copyright   Copyright (c) Uxmill (http://www.uxmill.co)
+  ~ @license     http://www.uxmill.co
+  -->
+
+<config>
+    <acl>
+        <resources>
+            <all>
+                <title>Allow Everything</title>
+            </all>
+            <admin>
+                <children>
+                    <system>
+                        <children>
+                            <config>
+                                <children>
+                                    <whatsappchat module="whatsappchat">
+                                        <title>Uxmill Whatsapp Contact</title>
+                                    </whatsappchat>
+                                </children>
+                            </config>
+                        </children>
+                    </system>
+                    </children>
+            </admin>
+        </resources>
+    </acl>
+</config>

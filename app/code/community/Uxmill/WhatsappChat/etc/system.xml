@@ -1,0 +1,338 @@
+<?xml version="1.0"?>
+<!--
+  ~ Uxmill
+  ~
+  ~ NOTICE OF LICENSE
+  ~
+  ~ This source file is subject to the umxill.co license that is
+  ~ available through the world-wide-web.
+  ~
+  ~ DISCLAIMER
+  ~
+  ~ Do not edit or add to this file if you wish to upgrade this extension to newer
+  ~ version in the future.
+  ~
+  ~ @category    Uxmill
+  ~ @package     Uxmill_WhatsappChat
+  ~ @copyright   Copyright (c) Uxmill (http://www.uxmill.co)
+  ~ @license     http://www.uxmill.co
+  -->
+
+<config>
+    <tabs>
+        <uxmill translate="label">
+            <label>Uxmill</label>
+            <sort_order>100</sort_order>
+        </uxmill>
+    </tabs>
+    <sections>
+        <whatsappchat translate="label" module="adminhtml">
+            <label>WhatsApp Chat</label>
+            <tab>uxmill</tab>
+            <sort_order>10</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <general translate="label comment">
+                    <label>Configuration</label>
+                    <sort_order>10</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <enabled translate="label comment">
+                            <label>WhatsApp Contact</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>1</sort_order>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </enabled>
+                        <enable_in translate="label">
+                            <label>Enable WhatsApp Contact In</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>whatsappchat/source_devices</source_model>
+                            <depends>
+                                <enabled>1</enabled>
+                            </depends>
+                        </enable_in>
+                        <default_message translate="label">
+                            <label>Default Chat Message</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <enabled>1</enabled>
+                            </depends>
+                        </default_message>
+                    </fields>
+                </general>
+                <settings translate="label comment">
+                    <label>WhatsApp Contact Button Settings</label>
+                    <sort_order>20</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <button_type translate="label">
+                            <label>Button Type</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>whatsappchat/source_button</source_model>
+                            <depends>
+                                <enabled>
+                                    <fieldset>general</fieldset>
+                                    <value>1</value>
+                                </enabled>
+                            </depends>
+                        </button_type>
+                        <person_name translate="label comment">
+                            <label>Contact Person Name</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <enabled>
+                                    <fieldset>general</fieldset>
+                                    <value>1</value>
+                                </enabled>
+                                <button_type>chatbox</button_type>
+                            </depends>
+                        </person_name>
+                        <mobile_number translate="label comment">
+                            <label>Contact Mobile Number</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Enter number with country code.(+91) for india.]]></comment>
+                            <depends>
+                                <enabled>
+                                    <fieldset>general</fieldset>
+                                    <value>1</value>
+                                </enabled>
+                            </depends>
+                        </mobile_number>
+                        <chatboxtext translate="label comment">
+                            <label>Button Text</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <validate>validate-length maximum-length-25</validate>
+                            <depends>
+                                <button_type>chatbox</button_type>
+                                <enabled>
+                                    <fieldset>general</fieldset>
+                                    <value>1</value>
+                                </enabled>
+                            </depends>
+                            <comment>
+                                <![CDATA[The text will be displayed on contact button.Maximum character limit is 25 and each space will be counted as a character.]]></comment>
+                        </chatboxtext>
+                        <message translate="label">
+                            <label>Information Text on Button Click</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <button_type>chatbox</button_type>
+                                <enabled>
+                                    <fieldset>general</fieldset>
+                                    <value>1</value>
+                                </enabled>
+                            </depends>
+                        </message>
+                        <text translate="label comment">
+                            <label>Button Hover Text</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <validate>validate-length maximum-length-20</validate>
+                            <depends>
+                                <enabled>
+                                    <fieldset>general</fieldset>
+                                    <value>1</value>
+                                </enabled>
+                                <button_type>icon</button_type>
+                            </depends>
+                            <comment>
+                                <![CDATA[TThe text will get displayed when contact button will be hovered.Maximum character limit is 20 and each space will be counted as a character.]]></comment>
+                        </text>
+                        <background_color translate="label">
+                            <label>Button Background Color</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>color,required-entry</validate>
+                            <sort_order>70</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <enabled>
+                                    <fieldset>general</fieldset>
+                                    <value>1</value>
+                                </enabled>
+                                <button_type>icon</button_type>
+                            </depends>
+                        </background_color>
+                        <icon_color translate="label">
+                            <label>Icon Color</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>color,required-entry</validate>
+                            <sort_order>80</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <enabled>
+                                    <fieldset>general</fieldset>
+                                    <value>1</value>
+                                </enabled>
+                                <button_type>icon</button_type>
+                            </depends>
+                        </icon_color>
+                        <fromdate translate="label">
+                            <label>Button Display From</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>90</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <frontend_model>whatsappchat/adminhtml_date</frontend_model>
+                            <depends>
+                                <enabled>
+                                    <fieldset>general</fieldset>
+                                    <value>1</value>
+                                </enabled>
+                            </depends>
+                        </fromdate>
+                        <todate translate="label">
+                            <label>Button Display To</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <frontend_model>whatsappchat/adminhtml_date</frontend_model>
+                            <depends>
+                                <enabled>
+                                    <fieldset>general</fieldset>
+                                    <value>1</value>
+                                </enabled>
+                            </depends>
+                        </todate>
+                        <top translate="label">
+                            <label>Top Position</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>110</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[In pixel. Leave blank to unset the position.]]></comment>
+                            <depends>
+                                <enabled>
+                                    <fieldset>general</fieldset>
+                                    <value>1</value>
+                                </enabled>
+                            </depends>
+                        </top>
+                        <right translate="label">
+                            <label>Right Position</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>120</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[In pixel. Leave blank to unset the position.]]></comment>
+                            <depends>
+                                <enabled>
+                                    <fieldset>general</fieldset>
+                                    <value>1</value>
+                                </enabled>
+                            </depends>
+                        </right>
+                        <bottom translate="label">
+                            <label>Bottom Position</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>130</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[In pixel. Default 25px.]]></comment>
+                            <depends>
+                                <enabled>
+                                    <fieldset>general</fieldset>
+                                    <value>1</value>
+                                </enabled>
+                            </depends>
+                        </bottom>
+                        <left translate="label">
+                            <label>Left Position</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>140</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[In pixel. Default 25px.]]></comment>
+                            <depends>
+                                <enabled>
+                                    <fieldset>general</fieldset>
+                                    <value>1</value>
+                                </enabled>
+                            </depends>
+                        </left>
+                        <animation translate="label">
+                            <label>Button Animation Effect</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>150</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>whatsappchat/source_animation</source_model>
+                            <depends>
+                                <enabled>
+                                    <fieldset>general</fieldset>
+                                    <value>1</value>
+                                </enabled>
+                            </depends>
+                        </animation>
+                        <close translate="label comment">
+                            <label>Close Button</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>160</sort_order>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <enabled>
+                                    <fieldset>general</fieldset>
+                                    <value>1</value>
+                                </enabled>
+                            </depends>
+                        </close>
+                    </fields>
+                </settings>
+            </groups>
+        </whatsappchat>
+    </sections>
+</config>

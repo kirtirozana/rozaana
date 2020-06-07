@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!--
+  ~ Uxmill
+  ~
+  ~ NOTICE OF LICENSE
+  ~
+  ~ This source file is subject to the umxill.co license that is
+  ~ available through the world-wide-web.
+  ~
+  ~ DISCLAIMER
+  ~
+  ~ Do not edit or add to this file if you wish to upgrade this extension to newer
+  ~ version in the future.
+  ~
+  ~ @category    Uxmill
+  ~ @package     Uxmill_WhatsappChat
+  ~ @copyright   Copyright (c) Uxmill (http://www.uxmill.co)
+  ~ @license     http://www.uxmill.co
+  -->
+
+<layout version="0.1.0">
+    <default>
+        <reference name="head" before="-">
+		    <action method="addCss"><stylesheet>whatsappchat/css/whatsappchat.css</stylesheet></action>
+			<block type="whatsappchat/whatsappchat" name="whatsappchat" template="whatsappchat/whatsappchat.phtml" />
+        </reference>
+    </default>
+</layout>
