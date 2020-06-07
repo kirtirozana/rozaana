@@ -1,31 +1,51 @@
 <?php
 /**
- * Apptha
+ * +----------------------------------------------------------------------+
+ * | PHP version 5                                                        |
+ * +----------------------------------------------------------------------+
+ * | Copyright (C) 2004 MaxMind LLC                                       |
+ * +----------------------------------------------------------------------+
+ * | This library is free software; you can redistribute it and/or        |
+ * | modify it under the terms of the GNU Lesser General Public           |
+ * | License as published by the Free Software Foundation; either         |
+ * | version 2.1 of the License, or (at your option) any later version.   |
+ * |                                                                      |
+ * | This library is distributed in the hope that it will be useful,      |
+ * | but WITHOUT ANY WARRANTY; without even the implied warranty of       |
+ * | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU    |
+ * | Lesser General Public License for more details.                      |
+ * |                                                                      |
+ * | You should have received a copy of the GNU Lesser General Public     |
+ * | License along with this library; if not, write to the Free Software  |
+ * | Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 |
+ * | USA, or view it online at http://www.gnu.org/licenses/lgpl.txt.      |
+ * +----------------------------------------------------------------------+
+ * | Authors: Jim Winstead <jimw@apache.org> (original Maxmind version)   |
+ * |          Hans Lellelid <hans@xmpl.org>                               |
+ * +----------------------------------------------------------------------+
  *
- * NOTICE OF LICENSE
+ * @category Net
+ * @package  Net_GeoIP
+ * @author   Hans Lellelid <hans@xmpl.org>
+ * @license  LGPL http://www.gnu.org/licenses/lgpl.txt
+ * @link     http://pear.php.net/package/Net_GeoIp
+ * $Id: Location.php 296763 2010-03-25 00:53:44Z clockwerx $
+ */
+
+/**
+ * This class represents a location record as returned by Net_GeoIP::lookupLocation().
  *
- * This source file is subject to the EULA
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://www.apptha.com/LICENSE.txt
+ * This class is primarily a collection of values (the public properties of the class), but
+ * there is also a distance() method to calculate the km distance between two points.
  *
- * ==============================================================
- *                 MAGENTO EDITION USAGE NOTICE
- * ==============================================================
- * This package designed for Magento COMMUNITY edition
- * Apptha does not guarantee correct work of this extension
- * on any other Magento edition except Magento COMMUNITY edition.
- * Apptha does not provide extension support in case of
- * incorrect edition usage.
- * ==============================================================
- *
- * @category    Apptha
- * @package     Apptha_Marketplace
- * @version     1.9.0
- * @author      Apptha Team <developers@contus.in>
- * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
- * @license     http://www.apptha.com/LICENSE.txt
- * 
+ * @category Net
+ * @package  Net_GeoIP
+ * @author   Hans Lellelid <hans@xmpl.org>
+ * @author   Dmitri Snytkine <d.snytkine@gmail.com>
+ * @license  LGPL http://www.gnu.org/licenses/lgpl.txt
+ * @version  $Revision: 296763 $
+ * @link     http://pear.php.net/package/Net_GeoIp
+ * @see      Net_GeoIP::lookupLocation()
  */
 class Net_GeoIP_Location implements Serializable
 {

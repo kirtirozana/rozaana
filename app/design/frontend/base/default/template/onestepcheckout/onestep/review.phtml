@@ -20,13 +20,13 @@
  * ==============================================================
  *
  * @category    Apptha
- * @package     Apptha_Marketplace
- * @version     1.9.0
+ * @package     Apptha_Onestepcheckout
+ * @version     0.1.9
  * @author      Apptha Team <developers@contus.in>
- * @copyright   Copyright (c) 2015 Apptha. (http://www.apptha.com)
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
  * @license     http://www.apptha.com/LICENSE.txt
  *
- */
+ * */
 ?>
 <!---Title  of the page -->
 <div class="page-title">
@@ -35,7 +35,7 @@
 <!---End of Title -->
 <!---start of order information -->
 
-<div class="order-review apptha_checkout-review-load" id="checkout-review-load"></div>
+<div class="order-review" id="checkout-review-load"></div>
 <?php $coupon_enabled=Mage::getStoreConfig('onestepcheckout/general/Activate_apptha_discount');
  if($coupon_enabled):
 ?>
@@ -43,15 +43,13 @@
             <div id="coupon-notice" style="display: none;"></div>
             <?php $couponcode = $this->getQuote()->getCouponCode(); ?>
             <label style="font-weight:bold;"><?php echo $this->__('Coupon code:'); ?></label><br/>
-            <input class="input-text apptha_onepage_couponcode" type="text" name="couponcode" id="couponcode" onfocus="coupon_code_focus();" value="<?php echo $couponcode; ?>" />
-            <div id="coupon_err_msg" class="apptha_onepage_coupon_err_msg" style="display:none;clear: both;"><?php echo $this->__('Please enter a coupon code.'); ?></div>
+            <input class="input-text" type="text" name="couponcode" id="couponcode" onfocus="coupon_code_focus();" value="<?php echo $couponcode; ?>" />
+            <div id="coupon_err_msg"  class="validation-advice" style="display:none;clear: both;"><?php echo $this->__('Please enter a coupon code.'); ?></div>
             <button  type="button" class="button" onclick="coupon_code()"><span><span><?php echo $this->__('Apply Coupon');
 ?></span></span></button>
             
-            <button type="button" class="button apptha_coupon_remove" id="coupon_remove" onclick="couponremove();" style="<?php if($couponcode =='') {
-                echo 'display: none;'; 
-            } ?>"><span><?php
-             echo $this->__('Cancel Coupon'); ?></span></button>
+            <button type="button" class="button" id="coupon_remove" onclick="couponremove();" style="<?php if($couponcode ==
+'') { echo 'display: none;'; } ?>"><span><span><?php echo $this->__('Cancel Coupon'); ?></span></span></button>
             
             <script type="text/javascript">
 
@@ -86,7 +84,8 @@
 
                                 var response = transport.responseText.evalJSON();
 
-                                if(response.success) {                                 
+                                if(response.success) {
+                                   // summary.update(response.summary);
                                     checkout.reloadReviewBlock();
                                     couponMessage.update(response.message);
                                     couponMessage.removeClassName('error-msg');
@@ -95,7 +94,8 @@
                                     /* Show remove button */
                                     $('coupon_remove').show();
                                 }
-                                else    {                                    
+                                else    {
+                                    //summary.update(response.summary);
                                     checkout.reloadReviewBlock();
                                     couponMessage.update(response.message);
                                     couponMessage.removeClassName('success-msg');
@@ -134,8 +134,11 @@
 
                                 }
                                 var summary = $('checkout-review-load');
-                           
-                             checkout.reloadReviewBlock();                            
+
+                             //  summary.hide();
+                             //  summary.update(response.summary);
+                             checkout.reloadReviewBlock();
+                              // summary.show();
 
                                 couponNotice.hide();
                                 couponNotice.update(response.message);
@@ -154,7 +157,8 @@
 
 <?php
 // Feed back drop down
-if(Mage::getStoreConfig('onestepcheckout/feedback/enable_feedback')==1){
+if(Mage::getStoreConfig('onestepcheckout/feedback/enable_feedback')==1)
+{
 ?>
             <?php
             $feedbackValues = unserialize(Mage::getStoreConfig('onestepcheckout/feedback/feedback_values'));
@@ -166,14 +170,14 @@ if(Mage::getStoreConfig('onestepcheckout/feedback/enable_feedback')==1){
                     <option value=""><?php echo $this->__('Please choose'); ?></option>
                     <?php foreach($feedbackValues as $value => $label):
                     ?>
-                    <option value="<?php echo $label['value'];?>"><?php
-                     echo $label['value']?></option>
+                    <option value="<?php echo $label['value'];?>"><?php echo $label['value']?></option>
                     <?php endforeach;?>
                     <?php
                     // For other text
-                    if(Mage::getStoreConfig('onestepcheckout/feedback/enable_feedback_freetext')==1){
-                    ?><option value="freetext"><?php
-                     echo $this->__('Other'); ?></option>
+                    if(Mage::getStoreConfig('onestepcheckout/feedback/enable_feedback_freetext')==1)
+                    {
+                    ?>
+                    <option value="freetext"><?php echo $this->__('Other'); ?></option>
                    <?php } ?>
                </select>
             </div>
@@ -185,7 +189,8 @@ if(Mage::getStoreConfig('onestepcheckout/feedback/enable_feedback')==1){
 
 <?php
 // For other text
-if(Mage::getStoreConfig('onestepcheckout/feedback/enable_feedback_freetext')==1){
+if(Mage::getStoreConfig('onestepcheckout/feedback/enable_feedback_freetext')==1)
+{
 ?>
                <script type="text/javascript">
                         $('id_feedback').observe('change', function (event){
@@ -196,9 +201,9 @@ if(Mage::getStoreConfig('onestepcheckout/feedback/enable_feedback_freetext')==1)
                         }
                     });
                 </script>
-                <div id='id_feedback_freetext_div' class="onestepcheckout-feedback-freetext apptha_onepage_id_feedback_freetext_div"  style="display:none;">
+                <div id='id_feedback_freetext_div' class="onestepcheckout-feedback-freetext"  style="display:none;">
                     <label for="id_feedback_freetext"><?php echo $this->__('Please specify:'); ?></label><br/>
-                    <textarea id="id_feedback_freetext" class="apptha_id_feedback_freetext" name="onestepcheckout_feedback_freetext"></textarea>
+                    <textarea id="id_feedback_freetext" name="onestepcheckout_feedback_freetext"></textarea>
                 </div>
 <?php } ?>
 
@@ -209,9 +214,7 @@ if($comments_enable == 1):
 ?>
 <div class="onestepcheckout-comments">
                 <label for="id_comments"><?php echo $this->__('Comments:'); ?></label><br/>
-                <textarea id="id_comments" name="onestepcheckout_comments"><?php if(isset($_POST['onestepcheckout_comments'])) {
-                    echo $_POST['onestepcheckout_comments']; 
-                } ?></textarea>
+                <textarea id="id_comments" name="onestepcheckout_comments"><?php if(isset($_POST['onestepcheckout_comments'])) { echo $_POST['onestepcheckout_comments']; } ?></textarea>
 </div>
 <?php endif; ?>
 
@@ -222,17 +225,14 @@ if($comments_enable == 1):
  if($terms_enable == 1): ?>
             <div class="onestepcheckout-enable-terms">
                <input class="required-entry" type="checkbox" id="id_accept_terms" name="accept_terms" value="1" />
-                <label for="id_accept_terms"><?php echo $this->__('I accept the') ?> <a href="javascript:lightboxAction('terms-condition')" id="lightboxLink" title="<?php
-                 echo $this->__('Terms and Conditions'); ?>"><?php
-                  echo $this->__('Terms and Conditions'); ?></a></label> <em>*</em>
+                <label for="id_accept_terms"><?php echo $this->__('I accept the') ?> <a href="javascript:lightboxAction('terms-condition')" id="lightboxLink" title="<?php echo $this->__('Terms and Conditions'); ?>"><?php echo $this->__('Terms and Conditions'); ?></a></label> <em>*</em>
             </div>
         <?php endif; ?>
         
 <div id="checkout-review-submit">
     <?php echo $this->getChildHtml('agreements'); ?>
     <div class="button-set" id="review-buttons-container">
-    <button type="button" id="review-btn" title="<?php echo $this->__('Place Order') ?>" class="button btn-checkout" onclick="review.save();">
-    <span><span><?php echo $this->__('Place Order') ?></span></span></button>
+    <button type="button" id="review-btn" title="<?php echo $this->__('Place Order') ?>" class="button btn-checkout" onclick="review.save();"><span><span><?php echo $this->__('Place Order') ?></span></span></button>
    <div class="wait" id="review-please"  >
          
         </div>
@@ -244,20 +244,17 @@ if($comments_enable == 1):
     //<![CDATA[
       //var review;
         //shipping.reloadReviewBlock();
-       var review = new Review('co-form','<?php echo $this->getUrl('onestepcheckout/index/saveOrder', array('_secure'=>true)) ?>','<?php
-        echo $this->getUrl('checkout/onepage/success', array('_secure'=>true)) ?>', $('checkout-agreements'));
+       var review = new Review('co-form','<?php echo $this->getUrl('onestepcheckout/index/saveOrder', array('_secure'=>true)) ?>','<?php echo $this->getUrl('checkout/onepage/success', array('_secure'=>true)) ?>', $('checkout-agreements'));
     //]]>
     </script>
 <div id="product-details"></div>
 
 <?php if($terms_enable == 1): ?>
-<div id="terms-condition" class="apptha_onepage_terms-condition">
+<div id="terms-condition" >
 
     <div class="onestepcheckout-terms-popup">
         <div class="onestepcheckout-popup-wrapper-inner">
-        <p class="close"><a href="javascript:closeLink()"><img src="<?php echo $this->getSkinUrl('onestepcheckout/images/btn_window_close.gif') ?>" alt="<?php
-         echo $this->__('Close') ?>" width="16" height="16" title="<?php
-          echo $this->__('close') ?>" /></a></p>
+        <p class="close"><a href="javascript:closeLink()"><img src="<?php echo $this->getSkinUrl('onestepcheckout/images/btn_window_close.gif') ?>" alt="<?php echo $this->__('Close') ?>" width="16" height="16" title="<?php echo $this->__('close') ?>" /></a></p>
             <h1><?php echo $terms_title; ?></h1>
             <div class="onestepcheckout-toc-terms">
                 <?php echo $terms_contents; ?>

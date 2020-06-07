@@ -1,33 +1,54 @@
 <?php
 /**
- * Apptha
+ * +----------------------------------------------------------------------+
+ * | PHP version 5                                                        |
+ * +----------------------------------------------------------------------+
+ * | Copyright (C) 2004 MaxMind LLC                                       |
+ * +----------------------------------------------------------------------+
+ * | This library is free software; you can redistribute it and/or        |
+ * | modify it under the terms of the GNU Lesser General Public           |
+ * | License as published by the Free Software Foundation; either         |
+ * | version 2.1 of the License, or (at your option) any later version.   |
+ * |                                                                      |
+ * | This library is distributed in the hope that it will be useful,      |
+ * | but WITHOUT ANY WARRANTY; without even the implied warranty of       |
+ * | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU    |
+ * | Lesser General Public License for more details.                      |
+ * |                                                                      |
+ * | You should have received a copy of the GNU Lesser General Public     |
+ * | License along with this library; if not, write to the Free Software  |
+ * | Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 |
+ * | USA, or view it online at http://www.gnu.org/licenses/lgpl.txt.      |
+ * +----------------------------------------------------------------------+
+ * | Authors: Jim Winstead <jimw@apache.org> (original Maxmind version)   |
+ * |          Hans Lellelid <hans@xmpl.org>                               |
+ * +----------------------------------------------------------------------+
  *
- * NOTICE OF LICENSE
- *
- * This source file is subject to the EULA
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://www.apptha.com/LICENSE.txt
- *
- * ==============================================================
- *                 MAGENTO EDITION USAGE NOTICE
- * ==============================================================
- * This package designed for Magento COMMUNITY edition
- * Apptha does not guarantee correct work of this extension
- * on any other Magento edition except Magento COMMUNITY edition.
- * Apptha does not provide extension support in case of
- * incorrect edition usage.
- * ==============================================================
- *
- * @category    Apptha
- * @package     Apptha_Marketplace
- * @version     1.9.0
- * @author      Apptha Team <developers@contus.in>
- * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
- * @license     http://www.apptha.com/LICENSE.txt
- * 
+ * @category Net
+ * @package  Net_GeoIP
+ * @author   Hans Lellelid <hans@xmpl.org>
+ * @license  LGPL http://www.gnu.org/licenses/lgpl.txt
+ * @link     http://pear.php.net/package/Net_GeoIp
+ * $Id: DMA.php 288474 2009-09-20 13:47:13Z saltybeagle $
  */
 
+/**
+ * Static class to handle mapping of DMA codes to metro regions.
+ * 
+ * Use this class with the dmaCode property of the Net_GeoIpLocation object.
+ * 
+ * <code>
+ * $region = Net_GeoIPDMA::getMetroRegion($record->dmaCode);
+ * </code>
+ * 
+ * @category Net
+ * @package  Net_GeoIP
+ * @author   Hans Lellelid <hans@xmpl.org>
+ * @author   Dmitri Snytkine <d.snytkine@gmail.com>
+ * @license  LGPL http://www.gnu.org/licenses/lgpl.txt
+ * @version  $Revision: 288474 $
+ * @link     http://pear.php.net/package/Net_GeoIp
+ */
 class Net_GeoIP_DMA
 {
     /**

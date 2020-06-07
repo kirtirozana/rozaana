@@ -20,28 +20,31 @@
  * ==============================================================
  *
  * @category    Apptha
- * @package     Apptha_Marketplace
- * @version     1.9.0
+ * @package     Apptha_Onestepcheckout
+ * @version     0.1.9
  * @author      Apptha Team <developers@contus.in>
- * @copyright   Copyright (c) 2015 Apptha. (http://www.apptha.com)
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
  * @license     http://www.apptha.com/LICENSE.txt
  *
- */
-class Apptha_Onestepcheckout_Block_Onestep_Shipping_Method extends Mage_Checkout_Block_Onepage_Shipping_Method {
-    protected function _construct() {
-        $this->getCheckout ()->setStepData ( 'shipping_method', array (
-                'label' => Mage::helper ( 'checkout' )->__ ( 'Shipping Method' ),
-                'is_show' => $this->isShow () 
-        ) );
-        parent::_construct ();
+ * */
+class Apptha_Onestepcheckout_Block_Onestep_Shipping_Method extends Mage_Checkout_Block_Onepage_Shipping_Method
+{
+    protected function _construct()
+    {
+        $this->getCheckout()->setStepData('shipping_method', array(
+            'label'     => Mage::helper('checkout')->__('Shipping Method'),
+            'is_show'   => $this->isShow()
+        ));
+        parent::_construct();
     }
-    
+
     /**
      * Retrieve is allow and show block
      *
      * @return bool
      */
-    public function isShow() {
-        return ! $this->getQuote ()->isVirtual ();
+    public function isShow()
+    {
+        return !$this->getQuote()->isVirtual();
     }
 }

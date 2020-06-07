@@ -19,13 +19,13 @@
  * ==============================================================
  *
  * @category    Apptha
- * @package     Apptha_Marketplace
- * @version     1.9.0
+ * @package     Apptha_Onestepcheckout
+ * @version     0.1.9
  * @author      Apptha Team <developers@contus.in>
- * @copyright   Copyright (c) 2015 Apptha. (http://www.apptha.com)
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
  * @license     http://www.apptha.com/LICENSE.txt
  *
- */
+ * */
 
 var Checkout = Class.create();
 Checkout.prototype = {
@@ -594,8 +594,7 @@ function elementPosition(obj) {
 	{
 	var elem = document.getElementById(id);
 	var scrollPos = elementPosition(elem).y;
-	var scrollTop = getScrollTop();
-	scrollPos = scrollPos - scrollTop;
+	scrollPos = scrollPos - document.documentElement.scrollTop;
 	var remainder = scrollPos % 50;
 	var repeatTimes = (scrollPos - remainder) / 50;
 	ScrollSmoothly(scrollPos,repeatTimes);
@@ -619,20 +618,6 @@ function elementPosition(obj) {
 	}
 	repeatCount++;
 	cTimeout = setTimeout("ScrollSmoothly('" + scrollPos + "','"+ repeatTimes +"')",110);
-	}
-	
-	// Getting scroll top value
-	function getScrollTop(){
-	    if(typeof pageYOffset!= 'undefined'){
-	        //most browsers except IE before #9
-	        return pageYOffset;
-	    }
-	    else{
-	        var B= document.body; //IE 'quirks'
-	        var D= document.documentElement; //IE with doctype
-	        D= (D.clientHeight)? D: B;
-	        return D.scrollTop;
-	    }
 	}
 
 

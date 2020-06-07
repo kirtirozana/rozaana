@@ -20,21 +20,30 @@
  * ==============================================================
  *
  * @category    Apptha
- * @package     Apptha_Marketplace
- * @version     1.9.0
+ * @package     Apptha_Onestepcheckout
+ * @version     0.1.9
  * @author      Apptha Team <developers@contus.in>
- * @copyright   Copyright (c) 2015 Apptha. (http://www.apptha.com)
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
  * @license     http://www.apptha.com/LICENSE.txt
  *
- */
-/**
- * Add additional field for custmer comment
- */
+ * */
 $installer = $this;
-$installer->startSetup ();
+$installer->startSetup();
 
-$resource = Mage::getResourceModel ( 'sales/order_collection' );
-if (! method_exists ( $resource, 'getEntity' )) {
-    $installer->run ( "ALTER TABLE {$this->getTable('sales_flat_order')} ADD COLUMN `onestepcheckout_customercomment` TEXT CHARACTER SET utf8 DEFAULT NULL" );
+$resource = Mage::getResourceModel('sales/order_collection');
+if(!method_exists($resource, 'getEntity')){
+
+    //$table = $this->getTable('sales_flat_order');
+    //$query = 'ALTER TABLE `' . $table . '` ADD COLUMN `onestepcheckout_customercomment` TEXT CHARACTER SET utf8 DEFAULT NULL';
+    //$connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+	
+	$installer->run("ALTER TABLE {$this->getTable('sales_flat_order')} ADD COLUMN `onestepcheckout_customercomment` TEXT CHARACTER SET utf8 DEFAULT NULL");
+	
+    //try {
+        //$connection->query($query);
+    //} catch (Exception $e) {
+		//return $e;
+    //}
 }
-$installer->endSetup ();
+
+$installer->endSetup();

@@ -20,140 +20,103 @@
  * ==============================================================
  *
  * @category    Apptha
- * @package     Apptha_Marketplace
- * @version     1.9.0
+ * @package     Apptha_Onestepcheckout
+ * @version     0.1.9
  * @author      Apptha Team <developers@contus.in>
- * @copyright   Copyright (c) 2015 Apptha. (http://www.apptha.com)
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
  * @license     http://www.apptha.com/LICENSE.txt
  *
- */
+ * */ 
 class Apptha_Onestepcheckout_Block_Onestepcheckout extends Mage_Checkout_Block_Onepage_Abstract {
-    /**
-     * get default country and set estimate rates
-     *
-     * @return void
-     */
+//get default country and set estimate rates
     public function _construct() {
-        parent::_construct ();
-        $defaut_country = Mage::getStoreConfig ( 'onestepcheckout/general/default_country_id' );
-        /**
-         * check condition default country is not empty
-         */
-        if (! $defaut_country) {
+        parent::_construct();
+
+        $rates = $this->getEstimateRates();
+
+        $defaut_country = Mage::getStoreConfig('onestepcheckout/general/default_country_id');
+        if (!$defaut_country) {
             $defaut_country = 'US';
         }
-    }
-    /**
-     * Get all shipping rates
-     *
-     * @return int
-     */
+
+        //$this->getQuote()->getShippingAddress()->setCountryId($defaut_country)->setCollectShippingRates(true)->save();
+    	
+	}
+//get all shipping rates 
     public function getEstimateRates() {
-        /**
-         * check condition rates is empty
-         */
-        if (empty ( $this->_rates )) {
-            $groups = $this->getQuote ()->getShippingAddress ()->getGroupedAllShippingRates ();
+        if (empty($this->_rates)) {
+            $groups = $this->getQuote()->getShippingAddress()->getGroupedAllShippingRates();
             $this->_rates = $groups;
         }
         return $this->_rates;
     }
+
     public function _prepareLayout() {
-        $title = Mage::getStoreConfig ( 'onestepcheckout/general/checkout_title' );
-        /**
-         * check codndition title is not empty
-         */
+
+        $title = Mage::getStoreConfig('onestepcheckout/general/checkout_title');
         if ($title) {
-            $checkoutTitle = $title;
+            $checkout_title = $title;
         } else {
-            $checkoutTitle = "Onestep Checkout";
+            $checkout_title = "Onestep Checkout";
         }
-        $this->getLayout ()->getBlock ( 'head' )->setTitle ( $checkoutTitle );
-        return parent::_prepareLayout ();
+        $this->getLayout()->getBlock('head')->setTitle($checkout_title);
+        return parent::_prepareLayout();
     }
-    /**
-     * Get shipping methods
-     *
-     * @return bool
-     */
-    public function shippingmethods($shipping, $methods) {
-        /**
-         * check condition shipping method and method is not empty
-         */
-        if (($shipping) && ($methods)) {
-            return true;
-        }
-    }
-    /**
-     * Getting steps based on the product
-     *
-     * @return int
-     */
+    //get shipping methods 
+	public function shippingmethods($shipping,$methods)
+	{
+	if(($shipping)&&($methods))
+	{
+		return true;	
+	}
+	
+	}
+//getting steps based on the product
     public function getSteps() {
-        $steps = array ();
-        
-        /**
-         * steps for virtual product
-         */
-        if ($this->getOnepage ()->getQuote ()->isVirtual ()) {
-            $stepCodes = array (
-                    'billing',
-                    'payment',
-                    'review' 
-            );
-        } /**
-         * steps for other product
-         */
-        else {
-            $stepCodes = array (
-                    'billing',
-                    'shipping',
-                    'shipping_method',
-                    'payment',
-                    'review' 
-            );
+        $steps = array();
+
+       //steps for virtual product
+        if ($this->getOnepage()->getQuote()->isVirtual())
+        {
+            $stepCodes = array('billing', 'payment', 'review');
         }
-        
-        foreach ( $stepCodes as $step ) {
-            
-            $steps [$step] = $this->getCheckout ()->getStepData ( $step );
+        //steps for other product
+        else
+        {
+            $stepCodes = array('billing', 'shipping', 'shipping_method', 'payment', 'review');
         }
-        
+
+        foreach ($stepCodes as $step)
+        {
+
+            $steps[$step] = $this->getCheckout()->getStepData($step);
+        }
+      
         return $steps;
     }
-    
-    /**
-     * check the active step
-     *
-     * @return string
-     */
-    public function getActiveStep() {
-        return $this->isCustomerLoggedIn () ? 'billing' : 'login';
+
+//check the active step
+    public function getActiveStep()
+    {
+        return $this->isCustomerLoggedIn() ? 'billing' : 'login';
     }
-    /**
-     * Get the checkout url
-     *
-     * @return string
-     */
-    public function getOnepage() {
-        return Mage::getSingleton ( 'checkout/type_onepage' );
+
+    public function getOnepage()
+    {
+        return Mage::getSingleton('checkout/type_onepage');
     }
-    
-    /**
-     * Get product is virtual product or not
-     *
-     * @return bool
-     */
-    public function getVirtual() {
-        $returnValue = '';
-        /**
-         * check condition virtual value is not empty
-         */
-        if ($this->getOnepage ()->getQuote ()->isVirtual ()) {
-            $returnValue = true;
-        } else {
-            $returnValue = false;
+
+    //get product is virtual product  or not
+    public function getVirtual()
+    {
+        if ($this->getOnepage()->getQuote()->isVirtual())
+        {
+            return true;
+        } 
+        else
+        {
+            return false;
         }
-        return $returnValue;
     }
+
 }

@@ -21,19 +21,19 @@
  * ==============================================================
  *
  * @category    Apptha
- * @package     Apptha_Marketplace
- * @version     1.9.0
+ * @package     Apptha_Onestepcheckout
+ * @version     0.1.9
  * @author      Apptha Team <developers@contus.in>
- * @copyright   Copyright (c) 2015 Apptha. (http://www.apptha.com)
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
  * @license     http://www.apptha.com/LICENSE.txt
  *
- */
+ * */
  -->
 <config>
     <modules>
-        <Apptha_Onestepcheckout>
+       <Apptha_Onestepcheckout> 
             <active>true</active>
             <codePool>local</codePool>
-        </Apptha_Onestepcheckout>
+       </Apptha_Onestepcheckout>
     </modules>
 </config> 

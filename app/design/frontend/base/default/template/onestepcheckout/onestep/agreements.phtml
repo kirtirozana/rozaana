@@ -20,13 +20,13 @@
  * ==============================================================
  *
  * @category    Apptha
- * @package     Apptha_Marketplace
- * @version     1.9.0
+ * @package     Apptha_Onestepcheckout
+ * @version    0.1.9
  * @author      Apptha Team <developers@contus.in>
- * @copyright   Copyright (c) 2015 Apptha. (http://www.apptha.com)
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
  * @license     http://www.apptha.com/LICENSE.txt
  *
- */
+ * */
 ?>
 <?php
 /**
@@ -34,22 +34,14 @@
  */
 ?>
 
-<?php if (!$this->getAgreements()){
-     return;
-}
+<?php if (!$this->getAgreements()) return;
 $terms_enable = Mage::getStoreConfig('onestepcheckout/terms/enable_terms');
 ?>
 <form id="checkout-agreements" onsubmit="return false;" >
-<ol class="checkout-agreements" <?php if($terms_enable == 1) {
-    echo 'style="display:none!important"'; 
-} ?>>
+<ol class="checkout-agreements" <?php if($terms_enable == 1) { echo 'style="display:none!important"'; } ?>>
 <?php foreach ($this->getAgreements() as $_a): ?>
     <li>
-        <div class="agreement-content"<?php         
-        if($_a->getContentHeight()){
-        echo ' style="height:' . $_a->getContentHeight() . '"';
-        }
-        ?>>
+        <div class="agreement-content"<?php echo ($_a->getContentHeight() ? ' style="height:' . $_a->getContentHeight() . '"' : '')?>>
             <?php if ($_a->getIsHtml()):?>
                 <?php echo $_a->getContent() ?>
             <?php else:?>
@@ -57,14 +49,7 @@ $terms_enable = Mage::getStoreConfig('onestepcheckout/terms/enable_terms');
             <?php endif; ?>
         </div>
         <p class="agree">
-            <input type="checkbox" <?php if($terms_enable == 1) {
-                echo 'checked="checked"'; 
-            } ?> class="required-entry" id="agreement-<?php
-             echo $_a->getId()?>" name="agreement[<?php
-              echo $_a->getId()?>]" value="1" title="<?php
-               echo $this->htmlEscape($_a->getCheckboxText()) ?>" class="checkbox" /><label for="agreement-<?php
-                echo $_a->getId()?>"><?php 
-                echo $this->htmlEscape($_a->getCheckboxText()) ?></label>
+            <input type="checkbox" <?php if($terms_enable == 1) { echo 'checked="checked"'; } ?> class="required-entry" id="agreement-<?php echo $_a->getId()?>" name="agreement[<?php echo $_a->getId()?>]" value="1" title="<?php echo $this->htmlEscape($_a->getCheckboxText()) ?>" class="checkbox" /><label for="agreement-<?php echo $_a->getId()?>"><?php echo $this->htmlEscape($_a->getCheckboxText()) ?></label>
         </p>
     </li>
 <?php endforeach ?>

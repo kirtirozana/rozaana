@@ -20,15 +20,17 @@
  * ==============================================================
  *
  * @category    Apptha
- * @package     Apptha_Marketplace
- * @version     1.9.0
+ * @package     Apptha_Onestepcheckout
+ * @version     0.1.9
  * @author      Apptha Team <developers@contus.in>
- * @copyright   Copyright (c) 2015 Apptha. (http://www.apptha.com)
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
  * @license     http://www.apptha.com/LICENSE.txt
  *
- */
+ * */ 
 require_once 'Mage/Checkout/controllers/CartController.php';
 require_once 'Apptha/Onestepcheckout/controllers/IndexController.php';
-class Apptha_Onestepcheckout_Checkout_CartController extends Mage_Checkout_CartController{
+class Apptha_Onestepcheckout_Checkout_CartController extends Mage_Checkout_CartController
+{
+     
 }
 

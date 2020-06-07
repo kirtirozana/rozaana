@@ -20,35 +20,30 @@
  * ==============================================================
  *
  * @category    Apptha
- * @package     Apptha_Marketplace
- * @version     1.9.0
+ * @package     Apptha_Onestepcheckout
+ * @version     0.1.9
  * @author      Apptha Team <developers@contus.in>
- * @copyright   Copyright (c) 2015 Apptha. (http://www.apptha.com)
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
  * @license     http://www.apptha.com/LICENSE.txt
  *
- */
-/**
- * One step checkout links management
- */
-class Apptha_OneStepCheckout_Block_Checkout_Links extends Mage_Checkout_Block_Links {
-    /**
-     * Redirect to onestepcheck url if enabled
-     *
-     * @return string
-     */
-    public function addCheckoutLink() {
-        if (! $this->helper ( 'onestepcheckout' )->isOnepageCheckoutLinksEnabled ()) {
-            return parent::addCheckoutLink ();
+ * */
+ 
+class Apptha_OneStepCheckout_Block_Checkout_Links extends Mage_Checkout_Block_Links
+{
+   
+    public function addCheckoutLink()
+    {
+
+        if (!$this->helper('onestepcheckout')->isOnepageCheckoutLinksEnabled()){
+            return parent::addCheckoutLink();
         }
-        
-        if (! $this->helper ( 'checkout' )->canOnepageCheckout ()) {
+
+        if (!$this->helper('checkout')->canOnepageCheckout()) {
             return $this;
         }
-        if ($parentBlock = $this->getParentBlock ()) {
-            $text = $this->__ ( 'Checkout' );
-            $parentBlock->addLink ( $text, 'onestepcheckout', $text, true, array (
-                    '_secure' => true 
-            ), 60, null, 'class="top-link"' );
+        if ($parentBlock = $this->getParentBlock()) {
+            $text = $this->__('Checkout');
+            $parentBlock->addLink($text, 'onestepcheckout', $text, true, array('_secure'=>true), 60, null, 'class="top-link"');
         }
         return $this;
     }

@@ -20,40 +20,30 @@
  * ==============================================================
  *
  * @category    Apptha
- * @package     Apptha_Marketplace
- * @version     1.9.0
+ * @package     Apptha_Onestepcheckout
+ * @version     0.1.9
  * @author      Apptha Team <developers@contus.in>
- * @copyright   Copyright (c) 2015 Apptha. (http://www.apptha.com)
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
  * @license     http://www.apptha.com/LICENSE.txt
  *
- */
-class Apptha_Onestepcheckout_Model_Activate extends Mage_Core_Model_Abstract {
-    public function _construct() {
-        parent::_construct ();
-        $this->_init ( 'onestepcheckout/activate' );
+ * */
+
+class Apptha_Onestepcheckout_Model_Activate extends Mage_Core_Model_Abstract
+{
+ 	public function _construct()
+    {
+        parent::_construct();
+        $this->_init('onestepcheckout/activate');
     }
-    /**
-     * Check whether checkout display in cart page or separate
-     *
-     * @return multitype:multitype:NULL unknown
-     */
-    public function toOptionArray() {
-        $activatePage = array (
-                'Cart Page',
-                'Seperate Page' 
-        );
-        $activateValue = array (
-                '1',
-                '2' 
-        );
-        $arrayCombine = array_combine ( $activatePage, $activateValue );
-        $temp = array ();
-        
-        foreach ( $arrayCombine as $activatePageKey => $activatePageValue ) {
-            $temp [] = array (
-                    'label' => $activatePageKey,
-                    'value' => strtolower ( $activatePageValue ) 
-            );
+    public function toOptionArray()
+    {
+        $activatePage = array('Cart Page', 'Seperate Page');
+        $activateValue = array('1', '2');
+        $arrayCombine = array_combine($activatePage,$activateValue);
+        $temp = array();
+
+        foreach($arrayCombine as $activatePageKey=>$activatePageValue)	{
+            $temp[] = array('label' => $activatePageKey, 'value' => strtolower($activatePageValue));
         }
         return $temp;
     }

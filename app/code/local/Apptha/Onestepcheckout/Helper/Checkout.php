@@ -20,415 +20,343 @@
  * ==============================================================
  *
  * @category    Apptha
- * @package     Apptha_Marketplace
- * @version     1.9.0
+ * @package     Apptha_Onestepcheckout
+ * @version     0.1.9
  * @author      Apptha Team <developers@contus.in>
- * @copyright   Copyright (c) 2015 Apptha. (http://www.apptha.com)
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
  * @license     http://www.apptha.com/LICENSE.txt
  *
- */
+ * */
 class Apptha_Onestepcheckout_Helper_Checkout extends Mage_Core_Helper_Abstract {
-    public $methods = array ();
-    
-    /**
-     * Save payment detail
-     */
-    public function savePayment($data) {
-        /**
-         * check condition if data is empty
-         */
-        if (empty ( $data )) {
-            return array (
-                    'error' => - 1,
-                    'message' => Mage::helper ( 'checkout' )->__ ( 'Invalid data' ) 
-            );
+
+    public $methods = array();
+
+    public function savePayment($data)
+    {
+        if (empty($data)) {
+            return array('error' => -1, 'message' => Mage::helper('checkout')->__('Invalid data'));
         }
-        /**
-         * check condition virtual data is not empty
-         */
-        if ($this->getOnepage ()->getQuote ()->isVirtual ()) {
-            $this->getOnepage ()->getQuote ()->getBillingAddress ()->setPaymentMethod ( isset ( $data ['method'] ) ? $data ['method'] : null );
+        if ($this->getOnepage()->getQuote()->isVirtual()) {
+            $this->getOnepage()->getQuote()->getBillingAddress()->setPaymentMethod(isset($data['method']) ? $data['method'] : null);
         } else {
-            $this->getOnepage ()->getQuote ()->getShippingAddress ()->setPaymentMethod ( isset ( $data ['method'] ) ? $data ['method'] : null );
+            $this->getOnepage()->getQuote()->getShippingAddress()->setPaymentMethod(isset($data['method']) ? $data['method'] : null);
         }
-        
-        $payment = $this->getOnepage ()->getQuote ()->getPayment ();
-        $payment->importData ( $data );
-        
-        $this->getOnepage ()->getQuote ()->save ();
-        
-        return array ();
+
+        $payment = $this->getOnepage()->getQuote()->getPayment();
+        $payment->importData($data);
+
+        $this->getOnepage()->getQuote()->save();
+
+        return array();
     }
-    
-    /**
-     * Save shipping method detail
-     *
-     * @param unknown $shippingMethod            
-     * @return multitype:number Ambigous <string, string, multitype:> |multitype:
-     */
-    public function saveShippingMethod($shippingMethod) {
-        
-        /**
-         * check condition
-         * if shipping method is empty means return error message
-         */
-        if (empty ( $shippingMethod )) {
-            return array (
-                    'error' => - 1,
-                    'message' => Mage::helper ( 'checkout' )->__ ( 'Invalid shipping method.' ) 
+
+    public function saveShippingMethod($shippingMethod)
+    {
+        if (empty($shippingMethod)) {
+            $res = array(
+                'error' => -1,
+                'message' => Mage::helper('checkout')->__('Invalid shipping method.')
             );
+            return $res;
         }
-        $rate = $this->getOnepage ()->getQuote ()->getShippingAddress ()->getShippingRateByCode ( $shippingMethod );
-        
-        /**
-         * check condition
-         * if rate is empty means return error message
-         */
-        if (! $rate) {
-            return array (
-                    'error' => - 1,
-                    'message' => Mage::helper ( 'checkout' )->__ ( 'Invalid shipping method.' ) 
+        $rate = $this->getOnepage()->getQuote()->getShippingAddress()->getShippingRateByCode($shippingMethod);
+        if (!$rate) {
+            $res = array(
+                'error' => -1,
+                'message' => Mage::helper('checkout')->__('Invalid shipping method.')
             );
+            return $res;
         }
-        $this->getOnepage ()->getQuote ()->getShippingAddress ()->setShippingMethod ( $shippingMethod );
-        
-        return array ();
+        $this->getOnepage()->getQuote()->getShippingAddress()->setShippingMethod($shippingMethod);
+
+        return array();
     }
-    
-    /**
-     * Save shipping date into database table
-     *
-     * @param array $data            
-     * @param
-     *            $customerAddressId
-     * @return multitype:number Ambigous <string, string, multitype:> |multitype:number unknown |multitype:
-     */
-    public function saveShipping($data, $customerAddressId) {
-        
-        /**
-         * check condition
-         * if data is empty means return error message to customer
-         */
-        if (empty ( $data )) {
-            return array (
-                    'error' => - 1,
-                    'message' => Mage::helper ( 'checkout' )->__ ( 'Invalid data' ) 
+
+    public function saveShipping($data, $customerAddressId)
+    {
+        if (empty($data)) {
+            $res = array(
+                'error' => -1,
+                'message' => Mage::helper('checkout')->__('Invalid data')
             );
+            return $res;
         }
-        $address = $this->getOnepage ()->getQuote ()->getShippingAddress ();
-        /**
-         * check condition customer address data is not empty
-         */
-        if (! empty ( $customerAddressId )) {
-            $customerAddress = Mage::getModel ( 'customer/address' )->load ( $customerAddressId );
-            /**
-             * check condition
-             * customer address id is not empty
-             */
-            if ($customerAddress->getId ()) {
-                /**
-                 * check condition
-                 * current customer id is not equal to onepage customer id
-                 */
-                if ($customerAddress->getCustomerId () != $this->getOnepage ()->getQuote ()->getCustomerId ()) {
-                    return array (
-                            'error' => 1,
-                            'message' => Mage::helper ( 'checkout' )->__ ( 'Customer Address is not valid.' ) 
+        $address = $this->getOnepage()->getQuote()->getShippingAddress();
+
+        if (!empty($customerAddressId)) {
+            $customerAddress = Mage::getModel('customer/address')->load($customerAddressId);
+            if ($customerAddress->getId()) {
+                if ($customerAddress->getCustomerId() != $this->getOnepage()->getQuote()->getCustomerId()) {
+                    return array('error' => 1,
+                        'message' => Mage::helper('checkout')->__('Customer Address is not valid.')
                     );
                 }
-                $address->importCustomerAddress ( $customerAddress );
+                $address->importCustomerAddress($customerAddress);
             }
         } else {
-            unset ( $data ['address_id'] );
-            $address->addData ( $data );
+            unset($data['address_id']);
+            $address->addData($data);
         }
-        
-        $address->implodeStreetAddress ();
-        $address->setCollectShippingRates ( true );
-        /**
-         * check condition address validate is false
-         */
-        
-        if (($validateRes = $address->validate ()) !== true) {
-            return array (
-                    'error' => 1,
-                    'message' => $validateRes 
+
+        $address->implodeStreetAddress();
+        $address->setCollectShippingRates(true);
+
+        if (($validateRes = $address->validate())!==true) {
+            $res = array(
+                'error' => 1,
+                'message' => $validateRes
             );
+            return $res;
         }
-        
-        $this->getOnepage ()->getQuote ()->save ();
+
+        $this->getOnepage()->getQuote()
+        //->collectTotals()
+        ->save();
+
+        return array();
     }
-    
-    /**
-     * default class constructior function
-     */
-    function __construct() {
-        $this->settings = $this->loadSettings ();
+
+    function __construct()
+    {
+        $this->settings = $this->loadSettings();
     }
-    
-    /**
-     * get the Onestepcheckout settings
-     *
-     * @return multitype:string Ambigous <mixed, string, NULL, multitype:, multitype:Ambigous <string, multitype:, NULL> >
-     */
-    public function loadSettings() {
-        $settings = array ();
-        $items = array ();
-        $items = Mage::getStoreConfig ( 'onestepcheckout' );
-        foreach ( $items as $config ) {
-            foreach ( $config as $key => $value ) {
-                $settings [$key] = $value;
+//get the Onestepcheckout settings
+    public function loadSettings()
+    {
+        $settings = array();
+        $items = array();
+        $items = Mage::getStoreConfig('onestepcheckout');
+        foreach ($items as $config) {
+            foreach ($config as $key => $value) {
+                $settings[$key] = $value;
             }
         }
-        /**
-         * check condition default country is empty
-         */
-        if (empty ( $settings ['default_country_id'] )) {
-            $settings ['default_country_id'] = 'US';
+         if(empty($settings['default_country_id']))
+        {
+            $settings['default_country_id'] = 'US';
         }
         return $settings;
     }
     
-    /**
-     * check the exluded fields and assign - to that values
-     */
+	
+
+
+//check the exluded fields and assign - to that values
     public function load_exclude_data(&$data) {
-        /**
-         * check condition display city is not empty
-         */
-        if ($this->settings ['display_city']) {
-            $data ['city'] = '-';
+        if ($this->settings['display_city'])
+        {
+            $data['city'] = '-';
         }
-        /**
-         * check condition display country is not empty
-         */
-        $getDisplayCountry = $this->settings ['display_country'];
-        if ($getDisplayCountry) {
-            /**
-             * chcek condition str enable geoip is equal to 1
-             */
-            $geiIPEnableStatus = $this->settings ['enable_geoip'];
-            if ($geiIPEnableStatus == 1) {
-                /**
-                 * check condition customer is logged in
-                 */
-                $userLoggedStatus = Mage::helper ( 'customer' )->isLoggedIn ();
-                if ($userLoggedStatus == 1) {
-                    $countryId = $this->getCountryCode ();
-                } else {
-                    $countryId = $this->getGeoIp ()->countryCode;
+        if ($this->settings['display_country'])
+        {
+        if($this->settings['enable_geoip'] == 1)
+                {
+                    if(Mage::helper('customer')->isLoggedIn() == 1)
+                    {
+                        $customerAddressId = Mage::getSingleton('customer/session')->getCustomer()->getDefaultBilling();
+                        if ($customerAddressId){
+                            $address = Mage::getModel('customer/address')->load($customerAddressId);
+                            $countryId = $address['country_id'];
+                        }
+                        else{
+                            $countryId = $this->getGeoIp()->countryCode;
+                        }
+                    }
+                    else
+                    {
+                        $countryId = $this->getGeoIp()->countryCode;
+                    }
                 }
-            } else {
-                /**
-                 * check condition customer is loggedin
-                 */
-                $userLoggedinStatus = Mage::helper ( 'customer' )->isLoggedIn ();
-                if ($userLoggedinStatus == 1) {
-                    $countryId = $this->getCountryData ();
-                } else {
-                    $countryId = $this->settings ['default_country_id'];
+        else
+                {
+                    if(Mage::helper('customer')->isLoggedIn() == 1)
+                    {
+                        $customerAddressId = Mage::getSingleton('customer/session')->getCustomer()->getDefaultBilling();
+                        if ($customerAddressId){
+                            $address = Mage::getModel('customer/address')->load($customerAddressId);
+                            $countryId = $address['country_id'];
+                        }
+                        else{
+                            $countryId = $this->settings['default_country_id'];
+                        }
+
+                    }
+                    else
+                    {
+                        $countryId = $this->settings['default_country_id'];
+                    }
                 }
-            }
         }
-        return $this->CheckCondition ( $data );
-    }
-    
-    /**
-     * get country data
-     */
-    public function getCountryData() {
-        $customerAddressIdData = Mage::getSingleton ( 'customer/session' )->getCustomer ()->getDefaultBilling ();
-        /**
-         * check condition address id is not empty
-         */
-        if ($customerAddressIdData) {
-            $address = Mage::getModel ( 'customer/address' )->load ( $customerAddressIdData );
-            return $address ['country_id'];
-        } else {
-            return $this->settings ['default_country_id'];
+        if ($this->settings['display_telephone'])
+        {
+            $data['telephone'] = '-';
         }
-    }
-    
-    /**
-     * function to get country code
-     */
-    public function getCountryCode() {
-        $customerAddressIdData = Mage::getSingleton ( 'customer/session' )->getCustomer ()->getDefaultBilling ();
-        /**
-         * check condition customer id is not empty
-         */
-        if ($customerAddressIdData) {
-            $address = Mage::getModel ( 'customer/address' )->load ( $customerAddressIdData );
-            return $address ['country_id'];
-        } else {
-            return $this->getGeoIp ()->countryCode;
+        if ($this->settings['display_state'])
+        {
+            $data['region'] = '-';
+            $data['region_id'] = '1';
         }
-    }
-    /**
-     * check the exclude fields and assign - to that values when ajax updates trigger
-     */
-    public function load_add_data($data) {
-        /**
-         * check condition cite is not empty
-         */
-        if (isset ( $data ['city'] )) {
-            /**
-             * check condition enable geiopis equal to 1
-             */
-            if ($this->settings ['enable_geoip'] == 1) {
-                
-                $data ['city'] = $this->getGeoIp ()->city;
-            } else {
-                $data ['city'] = '-';
-            }
+        if ($this->settings['display_zipcode'])
+        {
+            $data['postcode'] = '-';
         }
-        /**
-         * check condition country id is not empty
-         */
-        if (empty ( $data ['country_id'] )) {
-            /**
-             * check codnition enable geiop is equal to 1
-             */
-            if ($this->settings ['enable_geoip'] == 1) {
-                /**
-                 * check condition customer logged in id is equal to 1
-                 */
-                if (Mage::helper ( 'customer' )->isLoggedIn () == 1) {
-                    $countryId = $this->getCountryCode ();
-                } else {
-                    $countryId = $this->getGeoIp ()->countryCode;
-                }
-            } else {
-                /**
-                 * check condition customer loggedin value is equal to 1
-                 */
-                if (Mage::helper ( 'customer' )->isLoggedIn () == 1) {
-                    $countryId = $this->getCountryData ();
-                } else {
-                    $countryId = $this->settings ['default_country_id'];
-                }
-            }
+        if ($this->settings['display_company'])
+        {
+            $data['company'] = '-';
         }
-        return $this->CheckCondition ( $data );
-    }
-    
-    /**
-     * checking condition is empty
-     */
-    public function CheckCondition($data) {
-        /**
-         * check condition telephone is empty
-         */
-        if (empty ( $data ['telephone'] )) {
-            $data ['telephone'] = '-';
+        if ($this->settings['display_fax'])
+        {
+            $data['fax'] = '-';
         }
-        /**
-         * chekc condition region id is empty
-         */
-        if (empty ( $data ['region_id'] )) {
-            $data ['region_id'] = '-';
-            $data ['region'] = '-';
-        }
-        /**
-         * chekc condition post code is empty
-         */
-        if (empty ( $data ['postcode'] )) {
-            $data ['postcode'] = '-';
-        }
-        /**
-         * chekc condition company is empty
-         */
-        if (empty ( $data ['company'] )) {
-            $data ['company'] = '-';
-        }
-        /**
-         * chekc condition fax is empty
-         */
-        if (empty ( $data ['fax'] )) {
-            $data ['fax'] = '-';
-        }
-        /**
-         * chekc condition street is empty
-         */
-        if (empty ( $data ['street'] [0] )) {
-            $data ['street'] [0] = '-';
+        if ($this->settings['display_address'])
+        {
+            $data['street'][] = '-';
         }
         return $data;
     }
     
-    /**
-     * get location detail using geoip
-     */
-    public function getGeoIp() {
-        $enableGeoIp = Mage::getStoreConfig ( 'onestepcheckout/general/enable_geoip' );
-        $database = Mage::getStoreConfig ( 'onestepcheckout/general/geoip_database' );
-        
-        try {
-            require_once ('Net/GeoIP.php');
-            $ipaddress = Mage::helper ( 'core/http' )->getRemoteAddr ();
-            $geoip = Net_GeoIP::getInstance ( $database );
-            $location = $geoip->lookupLocation ( $ipaddress );
-            /**
-             * IF PEAR NET_GEOIP IS INSTALLED AND PHP CAN ACCESS THIS THEN YOU WILL SEE YOUR COUNTRY CODE DETECTED IF NOT THEN YOU SEE ERRORS INSTEAD
-             */
-            if ($enableGeoIp == 1) {
-                return $location;
-            }
-        } catch ( Exception $e ) {
-            return $e->getMessage ();
+     //check the exclude fields and assign - to that values when ajax updates trigger
+
+	public function load_add_data($data)
+    {
+        if (isset($data['city']))
+        {
+            //$data['city'] = '-';
+        	if($this->settings['enable_geoip'] == 1)
+    		{
+
+        		$data['city'] = $this->getGeoIp()->city;
+    		}
+    		else
+    		{
+        		 $data['city'] = '-';
+    		}
+        }
+        if (empty($data['country_id']))
+        {
+        	if($this->settings['enable_geoip'] == 1)
+                {
+                    if(Mage::helper('customer')->isLoggedIn() == 1)
+                    {
+                        $customerAddressId = Mage::getSingleton('customer/session')->getCustomer()->getDefaultBilling();
+                        if ($customerAddressId){
+                            $address = Mage::getModel('customer/address')->load($customerAddressId);
+                            $countryId = $address['country_id'];
+                        }
+                        else{
+                            $countryId = $this->getGeoIp()->countryCode;
+                        }
+                    }
+                    else
+                    {
+                        $countryId = $this->getGeoIp()->countryCode;
+                    }
+                }
+        else
+                {
+                    if(Mage::helper('customer')->isLoggedIn() == 1)
+                    {
+                        $customerAddressId = Mage::getSingleton('customer/session')->getCustomer()->getDefaultBilling();
+                        if ($customerAddressId){
+                            $address = Mage::getModel('customer/address')->load($customerAddressId);
+                            $countryId = $address['country_id'];
+                        }
+                        else{
+                            $countryId = $this->settings['default_country_id'];
+                        }
+
+                    }
+                    else
+                    {
+                        $countryId = $this->settings['default_country_id'];
+                    }
+                }
+        }
+        if (empty($data['telephone']))
+        {
+            $data['telephone'] = '-';
+        }
+        if (empty($data['region_id']))
+        {
+            $data['region_id'] = '-';
+            $data['region'] = '-';
+        }
+        if (empty($data['postcode']))
+        {
+            $data['postcode'] = '-';
+        }
+        if (empty($data['company']))
+        {
+            $data['company'] = '-';
+        }
+        if (empty($data['fax']))
+        {
+            $data['fax'] = '-';
+        }
+        if (empty($data['street'][0]))
+        {
+            $data['street'][0] = '-';
+        }
+        return $data;
+    }
+	public function getGeoIp()
+    {
+		$enableGeoIp = Mage::getStoreConfig('onestepcheckout/general/enable_geoip');
+		$database = Mage::getStoreConfig('onestepcheckout/general/geoip_database');
+		
+		try {
+				require_once('Net/GeoIP.php');
+			    $ipaddress = Mage::helper('core/http')->getRemoteAddr();
+			    $geoip = Net_GeoIP::getInstance($database);
+			    $location = $geoip->lookupLocation($ipaddress);
+                $strCountryCode = $this->settings['default_country_id'];
+				$country = Mage::getStoreConfig('onestepcheckout/general/default_country_id');
+			    /**
+			     * IF PEAR NET_GEOIP IS INSTALLED AND PHP CAN ACCESS THIS THEN YOU WILL SEE YOUR COUNTRY CODE DETECTED IF NOT THEN YOU SEE ERRORS INSTEAD
+			     */
+			    if($enableGeoIp == 1)
+			    {
+			    	$countrycode = $location->countryCode;
+			    	$citycode = $location->city;
+			    	return $location;
+			    }
+			}
+			catch (Exception $e) {
+		    	return $e->getMessage();
+			}
+    }
+    
+     public function getOnepage()
+    {
+        return Mage::getSingleton('checkout/type_onepage');
+    }
+
+    public function getVirtual()
+    {
+        if ($this->getOnepage()->getQuote()->isVirtual())
+        {
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
-    
-    /**
-     * get checkout onepage detail from database
-     *
-     * @return Ambigous <Mage_Core_Model_Abstract, mixed, NULL, multitype:>
-     */
-    public function getOnepage() {
-        return Mage::getSingleton ( 'checkout/type_onepage' );
-    }
-    
-    /**
-     * get virtual value
-     *
-     * @return boolean
-     */
-    public function getVirtual() {
-        $returnValue = '';
-        /**
-         * check condition onepage checkout is not empty
-         */
-        if ($this->getOnepage ()->getQuote ()->isVirtual ()) {
-            $returnValue = true;
-        } else {
-            $returnValue = false;
-        }
-        return $returnValue;
-    }
-    
-    /**
-     * check condition passes email is exist in customer table
-     *
-     * @param customer $email            
-     * @return Ambigous <mixed, NULL, multitype:>|boolean
-     */
-    public function IscustomerEmailExists($email) {
+
+     public function IscustomerEmailExists($email) {
+
         $websiteId = null;
-        $websiteId = Mage::app ()->getWebsite ()->getId ();
-        $customer = Mage::getModel ( 'customer/customer' );
-        /**
-         * chcek condition website id is not empty
-         */
+        $websiteId = Mage::app()->getWebsite()->getId();
+        $customer = Mage::getModel('customer/customer');
         if ($websiteId) {
-            $customer->setWebsiteId ( $websiteId );
+            $customer->setWebsiteId($websiteId);
         }
-        $customer->loadByEmail ( $email );
-        /**
-         * chcek condition customer id is not empty
-         */
-        if ($customer->getId ()) {
-            return $customer->getId ();
+        $customer->loadByEmail($email);
+        if ($customer->getId()) {
+            return $customer->getId();
         }
         return false;
     }
+
+    
 }

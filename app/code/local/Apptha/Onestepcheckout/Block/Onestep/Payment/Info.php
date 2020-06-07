@@ -20,37 +20,34 @@
  * ==============================================================
  *
  * @category    Apptha
- * @package     Apptha_Marketplace
- * @version     1.9.0
+ * @package     Apptha_Onestepcheckout
+ * @version     0.1.9
  * @author      Apptha Team <developers@contus.in>
- * @copyright   Copyright (c) 2015 Apptha. (http://www.apptha.com)
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
  * @license     http://www.apptha.com/LICENSE.txt
  *
- */
-/**
- * Payment Info
- * This class is used for managing payment information of one step checkout
- */
-class Mage_Checkout_Block_Onestep_Payment_Info extends Mage_Payment_Block_Info_Container {
+ * */ 
+class Mage_Checkout_Block_Onestep_Payment_Info extends Mage_Payment_Block_Info_Container
+{
     /**
      * Retrieve payment info model
      *
      * @return Mage_Payment_Model_Info
      */
-    public function getPaymentInfo() {
-        $info = Mage::getSingleton ( 'checkout/session' )->getQuote ()->getPayment ();
-        if ($info->getMethod ()) {
+    public function getPaymentInfo()
+    {
+        $info = Mage::getSingleton('checkout/session')->getQuote()->getPayment();
+        if ($info->getMethod()) {
             return $info;
         }
         return false;
     }
-    /**
-     * Prepare to html
-     */
-    protected function _toHtml() {
+
+    protected function _toHtml()
+    {
         $html = '';
-        if ($block = $this->getChild ( $this->_getInfoBlockName () )) {
-            $html = $block->toHtml ();
+        if ($block = $this->getChild($this->_getInfoBlockName())) {
+            $html = $block->toHtml();
         }
         return $html;
     }

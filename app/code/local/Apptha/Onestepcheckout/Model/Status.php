@@ -20,23 +20,24 @@
  * ==============================================================
  *
  * @category    Apptha
- * @package     Apptha_Marketplace
- * @version     1.9.0
+ * @package     Apptha_Onestepcheckout
+ * @version     0.1.9
  * @author      Apptha Team <developers@contus.in>
- * @copyright   Copyright (c) 2015 Apptha. (http://www.apptha.com)
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
  * @license     http://www.apptha.com/LICENSE.txt
  *
- */
-class Apptha_Onestepcheckout_Model_Status extends Varien_Object {
-    /**
-     * Define status values as constant
-     */
-    const STATUS_ENABLED = 1;
-    const STATUS_DISABLED = 2;
-    static public function getOptionArray() {
-        return array (
-                static::STATUS_ENABLED => Mage::helper ( 'onestepcheckout' )->__ ( 'Enabled' ),
-                static::STATUS_DISABLED => Mage::helper ( 'onestepcheckout' )->__ ( 'Disabled' ) 
+ * */
+
+class Apptha_Onestepcheckout_Model_Status extends Varien_Object
+{
+    const STATUS_ENABLED	= 1;
+    const STATUS_DISABLED	= 2;
+
+    static public function getOptionArray()
+    {
+        return array(
+            self::STATUS_ENABLED    => Mage::helper('onestepcheckout')->__('Enabled'),
+            self::STATUS_DISABLED   => Mage::helper('onestepcheckout')->__('Disabled')
         );
     }
 }

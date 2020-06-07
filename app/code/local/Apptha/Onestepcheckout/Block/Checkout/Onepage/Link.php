@@ -20,32 +20,22 @@
  * ==============================================================
  *
  * @category    Apptha
- * @package     Apptha_Marketplace
- * @version     1.9.0
+ * @package     Apptha_Onestepcheckout
+ * @version     0.1.9
  * @author      Apptha Team <developers@contus.in>
- * @copyright   Copyright (c) 2015 Apptha. (http://www.apptha.com)
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
  * @license     http://www.apptha.com/LICENSE.txt
  *
- */
-/**
- * if Onestepcheckout is activated redirect to Onestepcheckout or else redirect to magento checkout
- */
-class Apptha_Onestepcheckout_Block_Checkout_Onepage_Link extends Mage_Checkout_Block_Onepage_Link {
-    /**
-     * Redirect to onestepcheck url if enabled
-     *
-     * @return string
-     *
-     */
-    public function getCheckoutUrl() {
-        /**
-         * Check onestep checkout links not enabled
-         */
-        if (! $this->helper ( 'onestepcheckout' )->isOnepageCheckoutLinksEnabled ()) {
-            return parent::getCheckoutUrl ();
+ * */
+//if Onestepcheckout is activated redirect to Onestepcheckout or else redirect to magento checkout
+class Apptha_Onestepcheckout_Block_Checkout_Onepage_Link extends Mage_Checkout_Block_Onepage_Link
+{
+    public function getCheckoutUrl()
+    {
+        
+        if (!$this->helper('onestepcheckout')->isOnepageCheckoutLinksEnabled()){
+            return parent::getCheckoutUrl();
         }
-        return $this->getUrl ( 'onestepcheckout', array (
-                '_secure' => true 
-        ) );
+        return $this->getUrl('onestepcheckout', array('_secure'=>true));
     }
 }

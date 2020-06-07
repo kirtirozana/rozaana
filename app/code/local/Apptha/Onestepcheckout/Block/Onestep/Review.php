@@ -20,43 +20,31 @@
  * ==============================================================
  *
  * @category    Apptha
- * @package     Apptha_Marketplace
- * @version     1.9.0
+ * @package     Apptha_Onestepcheckout
+ * @version     0.1.9
  * @author      Apptha Team <developers@contus.in>
- * @copyright   Copyright (c) 2015 Apptha. (http://www.apptha.com)
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
  * @license     http://www.apptha.com/LICENSE.txt
  *
- */
-/**
- * Manage cart items
- * This class is used to get onestep checkout
- * all cart items
- * and total amount of cart items
- */
+ * */ 
 class Apptha_Onestepcheckout_Block_Onestep_Review extends Mage_Checkout_Block_Onepage_Abstract {
+
     protected function _construct() {
-        $this->getCheckout ()->setStepData ( 'review', array (
-                'label' => Mage::helper ( 'checkout' )->__ ( 'Order Review' ),
-                'is_show' => $this->isShow () 
-        ) );
-        parent::_construct ();
-        
-        $this->getQuote ()->collectTotals ()->save ();
+        $this->getCheckout()->setStepData('review', array(
+            'label' => Mage::helper('checkout')->__('Order Review'),
+            'is_show' => $this->isShow()
+        ));
+        parent::_construct();
+
+        $this->getQuote()->collectTotals()->save();
     }
-    /**
-     * Get all items in cart
-     *
-     * @return string
-     */
+
     public function getItems() {
-        return $this->getQuote ()->getAllVisibleItems ();
+        return $this->getQuote()->getAllVisibleItems();
     }
-    /**
-     * Get total amount of cart items
-     *
-     * @return int
-     */
+
     public function getTotals() {
-        return $this->getQuote ()->getTotals ();
+        return $this->getQuote()->getTotals();
     }
+
 }

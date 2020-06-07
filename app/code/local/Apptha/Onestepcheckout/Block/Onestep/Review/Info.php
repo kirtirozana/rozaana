@@ -20,32 +20,23 @@
  * ==============================================================
  *
  * @category    Apptha
- * @package     Apptha_Marketplace
- * @version     1.9.0
+ * @package     Apptha_Onestepcheckout
+ * @version     0.1.9
  * @author      Apptha Team <developers@contus.in>
- * @copyright   Copyright (c) 2015 Apptha. (http://www.apptha.com)
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
  * @license     http://www.apptha.com/LICENSE.txt
  *
- */
-/**
- * Checkout Review
- * This class is used for getting cart items and and total cart items
- */
-class Apptha_Onestepcheckout_Block_Onestep_Review_Info extends Mage_Checkout_Block_Onepage_Review_Info {
-    /**
-     * Get all items in cart
-     *
-     * @return string
-     */
-    public function getItems() {
-        return Mage::getSingleton ( 'checkout/session' )->getQuote ()->getAllVisibleItems ();
+ * */
+class Apptha_Onestepcheckout_Block_Onestep_Review_Info extends Mage_Checkout_Block_Onepage_Review_Info
+{
+    public function getItems()
+    {
+        return Mage::getSingleton('checkout/session')->getQuote()->getAllVisibleItems();
     }
-    /**
-     * Get cart total
-     *
-     * @return int
-     */
-    public function getTotals() {
-        return Mage::getSingleton ( 'checkout/session' )->getQuote ()->getTotals ();
+
+    public function getTotals()
+    {
+        return Mage::getSingleton('checkout/session')->getQuote()->getTotals();
     }
+    
 }

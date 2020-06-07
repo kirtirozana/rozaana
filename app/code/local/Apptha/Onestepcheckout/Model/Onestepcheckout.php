@@ -20,43 +20,29 @@
  * ==============================================================
  *
  * @category    Apptha
- * @package     Apptha_Marketplace
- * @version     1.9.0
+ * @package     Apptha_Onestepcheckout
+ * @version     0.1.9
  * @author      Apptha Team <developers@contus.in>
- * @copyright   Copyright (c) 2015 Apptha. (http://www.apptha.com)
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
  * @license     http://www.apptha.com/LICENSE.txt
  *
- */
-/**
- * This is used to define methods for onestep checkout
- */
-class Apptha_Onestepcheckout_Model_Onestepcheckout extends Mage_Core_Model_Abstract {
-    /**
-     * Loading Default Constructor
-     */
-    public function _construct() {
-        /**
-         * Loading Parent Constructor
-         */
-        parent::_construct ();
-        $this->_init ( 'onestepcheckout/onestepcheckout' );
+ * */
+class Apptha_Onestepcheckout_Model_Onestepcheckout extends Mage_Core_Model_Abstract
+{
+    public function _construct()
+    {
+        parent::_construct();
+        $this->_init('onestepcheckout/onestepcheckout');
     }
-    public function toOptionArray() {
-        $colors = array (
-                'Country',
-                'Zip Code / Postal Code',
-                'State/region',
-                'City' 
-        );
-        $temp = array ();
-        
-        foreach ( $colors as $color ) {
-            $temp [] = array (
-                    'label' => $color,
-                    'value' => strtolower ( $color ) 
-            );
+    public function toOptionArray()
+    {
+        $colors = array('Country', 'Zip Code / Postal Code', 'State/region', 'City');
+        $temp = array();
+
+        foreach($colors as $color)	{
+            $temp[] = array('label' => $color, 'value' => strtolower($color));
         }
-        
+
         return $temp;
     }
 }

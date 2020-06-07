@@ -20,63 +20,49 @@
  * ==============================================================
  *
  * @category    Apptha
- * @package     Apptha_Marketplace
- * @version     1.9.0
+ * @package     Apptha_Onestepcheckout
+ * @version     0.1.9
  * @author      Apptha Team <developers@contus.in>
- * @copyright   Copyright (c) 2015 Apptha. (http://www.apptha.com)
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
  * @license     http://www.apptha.com/LICENSE.txt
  *
- */
-/**
- * Manage one step checkout payment information
- */
+ * */ 
 class Apptha_Onestepcheckout_Block_Onestep_Payment extends Mage_Checkout_Block_Onepage_Payment {
-    
-    /**
-     * default class construct function
-     *
-     * @see Mage_Checkout_Block_Onepage_Payment::_construct()
-     */
-    protected function _construct() {
-        $this->getCheckout ()->setStepData ( 'payment', array (
-                'label' => $this->__ ( 'Payment Information' ),
-                'is_show' => $this->isShow () 
-        ) );
-        parent::_construct ();
+
+    protected function _construct()
+    {
+        $this->getCheckout()->setStepData('payment', array(
+            'label' => $this->__('Payment Information'),
+            'is_show' => $this->isShow()
+        ));
+        parent::_construct();
     }
-    
+
     /**
-     * Get base grand total of the cart
+     * Getter
      *
      * @return float
      */
-    public function getQuoteBaseGrandTotal() {
-        return ( float ) $this->getQuote ()->getBaseGrandTotal ();
+    public function getQuoteBaseGrandTotal()
+    {
+        return (float) $this->getQuote()->getBaseGrandTotal();
     }
-    /**
-     * get onepage detail function
-     *
-     * @return Ambigous <Mage_Core_Model_Abstract, mixed, NULL, multitype:>
-     */
-    public function getOnepage() {
-        return Mage::getSingleton ( 'checkout/type_onepage' );
+     public function getOnepage()
+    {
+        return Mage::getSingleton('checkout/type_onepage');
     }
-    
-    /**
-     * Get product is virtual product or not
-     *
-     * @return bool
-     */
-    public function getVirtual() {
-        $returnValue = '';
-        /**
-         * check condition virtual value is not empty
-         */
-        if ($this->getOnepage ()->getQuote ()->isVirtual ()) {
-            $returnValue = true;
-        } else {
-            $returnValue = false;
+
+    //get product is virtual product  or not
+    public function getVirtual()
+    {
+        if ($this->getOnepage()->getQuote()->isVirtual())
+        {
+            return true;
+        } 
+        else
+        {
+            return false;
         }
-        return $returnValue;
     }
+
 }

@@ -20,20 +20,18 @@
  * ==============================================================
  *
  * @category    Apptha
- * @package     Apptha_Marketplace
- * @version     1.9.0
+ * @package     Apptha_Onestepcheckout
+ * @version     0.1.9
  * @author      Apptha Team <developers@contus.in>
- * @copyright   Copyright (c) 2015 Apptha. (http://www.apptha.com)
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
  * @license     http://www.apptha.com/LICENSE.txt
  *
- */
-/**
- * Insert geoip value in core config data table
- */
+ * */
 $installer = $this;
 
-$installer->startSetup ();
+$installer->startSetup();
 
-$installer->run ( "INSERT INTO {$this->getTable('core_config_data')} (`path`, `value`) VALUES ('onestepcheckout/general/geoip_database', 'GeoIp/GeoLiteCity.dat')" );
+$installer->run("INSERT INTO {$this->getTable('core_config_data')} (`path`, `value`) VALUES ('onestepcheckout/general/geoip_database', 'GeoIp/GeoLiteCity.dat')");
+  
 
-$installer->endSetup (); 
+$installer->endSetup(); 

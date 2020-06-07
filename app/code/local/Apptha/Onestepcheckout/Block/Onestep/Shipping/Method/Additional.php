@@ -20,12 +20,14 @@
  * ==============================================================
  *
  * @category    Apptha
- * @package     Apptha_Marketplace
- * @version     1.9.0
+ * @package     Apptha_Onestepcheckout
+ * @version     0.1.9
  * @author      Apptha Team <developers@contus.in>
- * @copyright   Copyright (c) 2015 Apptha. (http://www.apptha.com)
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
  * @license     http://www.apptha.com/LICENSE.txt
  *
- */
-class Apptha_Onestepcheckout_Block_Onestep_Shipping_Method_Additional extends Mage_Checkout_Block_Onepage_Shipping_Method_Additional{
+ * */
+class Apptha_Onestepcheckout_Block_Onestep_Shipping_Method_Additional extends Mage_Checkout_Block_Onepage_Shipping_Method_Additional
+{
+
 }

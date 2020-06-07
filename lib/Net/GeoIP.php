@@ -1,31 +1,137 @@
 <?php
 /**
- * Apptha
+ * +----------------------------------------------------------------------+
+ * | PHP version 5                                                        |
+ * +----------------------------------------------------------------------+
+ * | Copyright (C) 2004 MaxMind LLC                                       |
+ * +----------------------------------------------------------------------+
+ * | This library is free software; you can redistribute it and/or        |
+ * | modify it under the terms of the GNU Lesser General Public           |
+ * | License as published by the Free Software Foundation; either         |
+ * | version 2.1 of the License, or (at your option) any later version.   |
+ * |                                                                      |
+ * | This library is distributed in the hope that it will be useful,      |
+ * | but WITHOUT ANY WARRANTY; without even the implied warranty of       |
+ * | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU    |
+ * | Lesser General Public License for more details.                      |
+ * |                                                                      |
+ * | You should have received a copy of the GNU Lesser General Public     |
+ * | License along with this library; if not, write to the Free Software  |
+ * | Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 |
+ * | USA, or view it online at http://www.gnu.org/licenses/lgpl.txt.      |
+ * +----------------------------------------------------------------------+
+ * | Authors: Jim Winstead <jimw@apache.org> (original Maxmind version)   |
+ * |          Hans Lellelid <hans@xmpl.org>                               |
+ * +----------------------------------------------------------------------+
  *
- * NOTICE OF LICENSE
+ * @category Net
+ * @package  Net_GeoIP
+ * @author   Jim Winstead <jimw@apache.org> (original Maxmind PHP API)
+ * @author   Hans Lellelid <hans@xmpl.org>
+ * @license  LGPL http://www.gnu.org/licenses/lgpl.txt
+ * @link     http://pear.php.net/package/Net_GeoIp
+ * $Id: GeoIP.php 296763 2010-03-25 00:53:44Z clockwerx $
+ */
+
+require_once 'Exception.php';
+
+/**
+ * GeoIP class provides an API for performing geo-location lookups based on IP
+ * address.
  *
- * This source file is subject to the EULA
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://www.apptha.com/LICENSE.txt
+ * To use this class you must have a [binary version] GeoIP database. There is
+ * a free GeoIP country database which can be obtained from Maxmind:
+ * {@link http://www.maxmind.com/app/geoip_country}
  *
- * ==============================================================
- *                 MAGENTO EDITION USAGE NOTICE
- * ==============================================================
- * This package designed for Magento COMMUNITY edition
- * Apptha does not guarantee correct work of this extension
- * on any other Magento edition except Magento COMMUNITY edition.
- * Apptha does not provide extension support in case of
- * incorrect edition usage.
- * ==============================================================
  *
- * @category    Apptha
- * @package     Apptha_Marketplace
- * @version     1.9.0
- * @author      Apptha Team <developers@contus.in>
- * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
- * @license     http://www.apptha.com/LICENSE.txt
- * 
+ * <b>SIMPLE USE</b>
+ *
+ *
+ * Create an instance:
+ *
+ * <code>
+ * $geoip = Net_GeoIP::getInstance('/path/to/geoipdb.dat', Net_GeoIP::SHARED_MEMORY);
+ * </code>
+ *
+ * Depending on which database you are using (free, or one of paid versions)
+ * you must use appropriate lookup method:
+ *
+ * <code>
+ * // for free country db:
+ * $country_name = $geoip->lookupCountryName($_SERVER['REMOTE_ADDR']);
+ * $country_code = $geoip->lookupCountryCode($_SERVER['REMOTE_ADDR']);
+ *
+ * // for [non-free] region db:
+ * list($ctry_code, $region) = $geoip->lookupRegion($_SERVER['REMOTE_ADDR']);
+ *
+ * // for [non-free] city db:
+ * $location = $geoip->lookupLocation($_SERVER['REMOTE_ADDR']);
+ * print "city: " . $location->city . ", " . $location->region;
+ * print "lat: " . $location->latitude . ", long: " . $location->longitude;
+ *
+ * // for organization or ISP db:
+ * $org_or_isp_name = $geoip->lookupOrg($_SERVER['REMOTE_ADDR']);
+ * </code>
+ *
+ *
+ * <b>MULTIPLE INSTANCES</b>
+ *
+ *
+ * You can have several instances of this class, one for each database file
+ * you are using.  You should use the static getInstance() singleton method
+ * to save on overhead of setting up database segments.  Note that only one
+ * instance is stored per filename, and any flags will be ignored if an
+ * instance already exists for the specifiedfilename.
+ *
+ * <b>Special note on using SHARED_MEMORY flag</b>
+ *
+ * If you are using SHARED_MEMORY (shmop) you can only use SHARED_MEMORY for
+ * one (1) instance  (i.e. for one database). Any subsequent attempts to
+ * instantiate using SHARED_MEMORY will read the same shared memory block
+ * already initialized, and therefore will cause problems since the expected
+ * database format won't match the database in the shared memory block.
+ *
+ * Note that there is no easy way to flag "nice errors" to prevent attempts
+ * to create new instances using SHARED_MEMORY flag and it is also not posible
+ * (in a safe way) to allow new instances to overwrite the shared memory block.
+ *
+ * In short, is you are using multiple databses, use the SHARED_MEMORY flag
+ * with care.
+ *
+ *
+ * <b>LOOKUPS ON HOSTNAMES</b>
+ *
+ *
+ * Note that this PHP API does NOT support lookups on hostnames.  This is so
+ * that the public API can be kept simple and so that the lookup functions
+ * don't need to try name lookups if IP lookup fails (which would be the only
+ * way to keep the API simple and support name-based lookups).
+ *
+ * If you do not know the IP address, you can convert an name to IP very
+ * simply using PHP native functions or other libraries:
+ *
+ * <code>
+ *     $geoip->lookupCountryName(gethostbyname('www.sunset.se'));
+ * </code>
+ *
+ * Or, if you don't know whether an address is a name or ip address, use
+ * application-level logic:
+ *
+ * <code>
+ * if (ip2long($ip_or_name) === false) {
+ *   $ip = gethostbyname($ip_or_name);
+ * } else {
+ *   $ip = $ip_or_name;
+ * }
+ * $ctry = $geoip->lookupCountryName($ip);
+ * </code>
+ *
+ * @category Net
+ * @package  Net_GeoIP
+ * @author   Jim Winstead <jimw@apache.org> (original Maxmind PHP API)
+ * @author   Hans Lellelid <hans@xmpl.org>
+ * @license  LGPL http://www.gnu.org/licenses/lgpl.txt
+ * @link     http://pear.php.net/package/Net_GeoIp
  */
 class Net_GeoIP
 {

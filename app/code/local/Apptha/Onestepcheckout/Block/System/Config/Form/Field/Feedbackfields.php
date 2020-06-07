@@ -20,24 +20,23 @@
  * ==============================================================
  *
  * @category    Apptha
- * @package     Apptha_Marketplace
- * @version     1.9.0
+ * @package     Apptha_Onestepcheckout
+ * @version     0.1.9
  * @author      Apptha Team <developers@contus.in>
- * @copyright   Copyright (c) 2015 Apptha. (http://www.apptha.com)
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
  * @license     http://www.apptha.com/LICENSE.txt
  *
- */
-class Apptha_Onestepcheckout_Block_System_Config_Form_Field_Feedbackfields extends Mage_Adminhtml_Block_System_Config_Form_Field_Array_Abstract {
-    /**
-     * Construct to feedback fields
-     */
-    public function __construct() {
-        $this->addColumn ( 'value', array (
-                'label' => $this->__ ( 'Label' ),
-                'style' => 'width:250px' 
-        ) );
+ * */
+class Apptha_Onestepcheckout_Block_System_Config_Form_Field_Feedbackfields extends Mage_Adminhtml_Block_System_Config_Form_Field_Array_Abstract
+{
+    public function __construct()
+    {
+        $this->addColumn('value', array(
+            'label' => $this->__('Label'),
+            'style' => 'width:250px',
+        ));
         $this->_addAfter = false;
-        $this->_addButtonLabel = $this->__ ( 'Add label' );
-        parent::__construct ();
+        $this->_addButtonLabel = $this->__('Add label');
+        parent::__construct();
     }
 }

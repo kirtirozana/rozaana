@@ -20,13 +20,13 @@
  * ==============================================================
  *
  * @category    Apptha
- * @package     Apptha_Marketplace
- * @version     1.9.0
+ * @package     Apptha_Onestepcheckout
+ * @version     0.1.9
  * @author      Apptha Team <developers@contus.in>
- * @copyright   Copyright (c) 2015 Apptha. (http://www.apptha.com)
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
  * @license     http://www.apptha.com/LICENSE.txt
  *
- */
+ * */
 
 echo $this->settings['enable_comments'];
 ?>
@@ -34,8 +34,6 @@ echo $this->settings['enable_comments'];
  <?php if($this->settings['enable_comments']): ?>
             <div class="onestepcheckout-comments">
                 <label for="id_comments"><?php echo $this->__('Comments'); ?></label><br/>
-                <textarea id="id_comments" name="onestepcheckout_comments"><?php if(isset($_POST['onestepcheckout_comments'])) {
-                    echo $_POST['onestepcheckout_comments']; 
-                } ?></textarea>
+                <textarea id="id_comments" name="onestepcheckout_comments"><?php if(isset($_POST['onestepcheckout_comments'])) { echo $_POST['onestepcheckout_comments']; } ?></textarea>
             </div>
 <?php endif; ?>

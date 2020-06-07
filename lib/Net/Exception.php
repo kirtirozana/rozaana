@@ -1,33 +1,105 @@
 <?php
+/* vim: set expandtab tabstop=4 shiftwidth=4 foldmethod=marker: */
 /**
- * Apptha
+ * PEAR_Exception
  *
- * NOTICE OF LICENSE
+ * PHP versions 4 and 5
  *
- * This source file is subject to the EULA
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://www.apptha.com/LICENSE.txt
+ * LICENSE: This source file is subject to version 3.0 of the PHP license
+ * that is available through the world-wide-web at the following URI:
+ * http://www.php.net/license/3_0.txt.  If you did not receive a copy of
+ * the PHP License and are unable to obtain it through the web, please
+ * send a note to license@php.net so we can mail you a copy immediately.
  *
- * ==============================================================
- *                 MAGENTO EDITION USAGE NOTICE
- * ==============================================================
- * This package designed for Magento COMMUNITY edition
- * Apptha does not guarantee correct work of this extension
- * on any other Magento edition except Magento COMMUNITY edition.
- * Apptha does not provide extension support in case of
- * incorrect edition usage.
- * ==============================================================
- *
- * @category    Apptha
- * @package     Apptha_Marketplace
- * @version     1.9.0
- * @author      Apptha Team <developers@contus.in>
- * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
- * @license     http://www.apptha.com/LICENSE.txt
- * 
+ * @category   pear
+ * @package    PEAR
+ * @author     Tomas V. V. Cox <cox@idecnet.com>
+ * @author     Hans Lellelid <hans@velum.net>
+ * @author     Bertrand Mansion <bmansion@mamasam.com>
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2008 The PHP Group
+ * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
+ * @version    CVS: $Id: Exception.php,v 1.29 2008/01/03 20:26:35 cellog Exp $
+ * @link       http://pear.php.net/package/PEAR
+ * @since      File available since Release 1.3.3
  */
 
+
+/**
+ * Base PEAR_Exception Class
+ *
+ * 1) Features:
+ *
+ * - Nestable exceptions (throw new PEAR_Exception($msg, $prev_exception))
+ * - Definable triggers, shot when exceptions occur
+ * - Pretty and informative error messages
+ * - Added more context info available (like class, method or cause)
+ * - cause can be a PEAR_Exception or an array of mixed
+ *   PEAR_Exceptions/PEAR_ErrorStack warnings
+ * - callbacks for specific exception classes and their children
+ *
+ * 2) Ideas:
+ *
+ * - Maybe a way to define a 'template' for the output
+ *
+ * 3) Inherited properties from PHP Exception Class:
+ *
+ * protected $message
+ * protected $code
+ * protected $line
+ * protected $file
+ * private   $trace
+ *
+ * 4) Inherited methods from PHP Exception Class:
+ *
+ * __clone
+ * __construct
+ * getMessage
+ * getCode
+ * getFile
+ * getLine
+ * getTraceSafe
+ * getTraceSafeAsString
+ * __toString
+ *
+ * 5) Usage example
+ *
+ * <code>
+ *  require_once 'PEAR/Exception.php';
+ *
+ *  class Test {
+ *     function foo() {
+ *         throw new PEAR_Exception('Error Message', ERROR_CODE);
+ *     }
+ *  }
+ *
+ *  function myLogger($pear_exception) {
+ *     echo $pear_exception->getMessage();
+ *  }
+ *  // each time a exception is thrown the 'myLogger' will be called
+ *  // (its use is completely optional)
+ *  PEAR_Exception::addObserver('myLogger');
+ *  $test = new Test;
+ *  try {
+ *     $test->foo();
+ *  } catch (PEAR_Exception $e) {
+ *     print $e;
+ *  }
+ * </code>
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author     Tomas V.V.Cox <cox@idecnet.com>
+ * @author     Hans Lellelid <hans@velum.net>
+ * @author     Bertrand Mansion <bmansion@mamasam.com>
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  1997-2008 The PHP Group
+ * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
+ * @version    Release: 1.7.2
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 1.3.3
+ *
+ */
 class PEAR_Exception extends Exception
 {
     const OBSERVER_PRINT = -2;
