@@ -1,0 +1,1364 @@
+<?php
+
+/**
+ * Apptha
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the EULA
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://www.apptha.com/LICENSE.txt
+ *
+ * ==============================================================
+ *                 MAGENTO EDITION USAGE NOTICE
+ * ==============================================================
+ * This package designed for Magento COMMUNITY edition
+ * Apptha does not guarantee correct work of this extension
+ * on any other Magento edition except Magento COMMUNITY edition.
+ * Apptha does not provide extension support in case of
+ * incorrect edition usage.
+ * ==============================================================
+ *
+ * @category    Apptha
+ * @package     Apptha_Advancedreports
+ * @version     0.2.1
+ * @author      Apptha Team <developers@contus.in>
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
+ * @license     http://www.apptha.com/LICENSE.txt
+ * 
+ */
+
+// Checking session dates for sales report
+if (Mage::getSingleton('core/session')->getAdvancedReportDateOption() && Mage::app()->getRequest()->getParam('advanced_report_date_session') == 1) {
+    if (Mage::getSingleton('core/session')->getAdvancedReportDateOption() == "Custom") {
+        $_advanced_get_option = Mage::getSingleton('core/session')->getAdvancedReportDateOption();
+        $_advanced_get_from = Mage::getSingleton('core/session')->getAdvancedReportDateFrom();
+        $_advanced_get_to = Mage::getSingleton('core/session')->getAdvancedReportDateTo();
+    } else {
+        $_advanced_get_option = Mage::getSingleton('core/session')->getAdvancedReportDateOption();
+    }
+} else {
+    $_advanced_get_option = Mage::app()->getRequest()->getParam('date_range_option');
+    $_advanced_get_from = Mage::app()->getRequest()->getParam('from');
+    $_advanced_get_to = Mage::app()->getRequest()->getParam('to');
+}
+
+// Assigning from and to date
+if (!empty($_advanced_get_option)) {
+    switch ($_advanced_get_option) {
+        case "Today":
+            // today interval
+            $start_day = strtotime("-1 today midnight");
+            $end_day = strtotime("-1 tomorrow midnight");
+            $from = date("Y-m-d", $start_day);
+            $to = date("Y-m-d", $end_day);
+            $from_display = date("Y-m-d", $start_day);
+            $to_display = date("Y-m-d", $start_day);
+            break;
+        case "Yesterday":
+            // yesterday interval
+            $start_day = strtotime("-1 yesterday midnight");
+            $end_day = strtotime("-1 today midnight");
+            $from = date("Y-m-d", $start_day);
+            $to = date("Y-m-d", $end_day);
+            $from_display = date("Y-m-d", $start_day);
+            $to_display = date("Y-m-d", $start_day);
+            break;
+        case "LastWeek":
+            // last week interval
+            $t = date('d-m-Y');
+            $to_day = date('l', strtotime($t));
+            // if today is monday, take last monday
+            if ($to_day == 'Monday') {
+                $start_day = strtotime("-1 monday midnight");
+                $end_day = strtotime("yesterday");
+            } else {
+                $start_day = strtotime("-2 monday midnight");
+                $end_day = strtotime("-1 sunday midnight");
+            }
+            $from = date("Y-m-d", $start_day);
+            $to = date("Y-m-d", $end_day);
+            $to = date('Y-m-d', strtotime($to . ' + 1 day'));
+            $from_display = $from;
+            $to_display = date("Y-m-d", $end_day);
+            break;
+        case "LastMonth":
+            // last month interval
+            $from = date('Y-m-01', strtotime('last month'));
+            $to = date('Y-m-t', strtotime('last month'));
+            $to = date('Y-m-d', strtotime($to . ' + 1 day'));
+            $from_display = $from;
+            $to_display = date('Y-m-t', strtotime('last month'));
+            break;
+        case "Custom":
+            // last custom interval
+            $from = date('Y-m-d', strtotime($_advanced_get_from));
+            $to = date('Y-m-d', strtotime($_advanced_get_to . ' + 1 day'));
+            $from_display = $from;
+            $to_display = date('Y-m-d', strtotime($_advanced_get_to));
+            break;
+        default:
+            // last 30 interval
+            $from = date('Y-m-d', strtotime('-30 day'));
+            $to = date('Y-m-d', strtotime("-1 today midnight"));
+            $to = date('Y-m-d', strtotime($to . ' + 1 day'));
+            $from_display = $from;
+            $to_display = date('Y-m-d', strtotime("-1 today midnight"));
+    }
+} else {
+    // last 30 interval
+    $from = date('Y-m-d', strtotime('-30 day'));
+    $to = date('Y-m-d', strtotime("-1 today midnight"));
+    $to = date('Y-m-d', strtotime($to . ' + 1 day'));
+    $from_display = $from;
+    $to_display = date('Y-m-d', strtotime("-1 today midnight"));
+}
+
+// Initializing transaction option for gross and net revenue
+$transaction_option = 0;
+if (Mage::app()->getRequest()->getParam('transaction_option')) {
+    if (Mage::app()->getRequest()->getParam('transaction_option') == 'net') {
+        $transaction_option = 1;
+    } else {
+        $transaction_option = 0;
+    }
+}
+
+// Changing selected dates to database dates
+$db_from = Mage::getModel('core/date')->gmtDate(null, strtotime($from));
+$db_to = Mage::getModel('core/date')->gmtDate(null, strtotime($to));
+
+// Getting collection for transaction report
+$orderTotals = $this->advancedTransactionsReportCollection($db_from, $db_to);
+
+// Initializing transaction report chart variables
+$transactions = array();
+$transactions_month = array();
+$transactions_week = array();
+$transactions_net = array();
+$transactions_month_net = array();
+$transactions_week_net = array();
+$transactions_table_data = array();
+$transactions_count = 0;
+
+// Calculating transactions report datas
+foreach ($orderTotals as $order) {
+    if ($transaction_option == 0) {
+        $transactions_revenue = Mage::helper('core')->currency(round($order->getBaseGrandTotal(), 2), true, false);
+    } else {
+        $transactions_revenue = $order->getBaseGrandTotal() - ($order->getBaseShippingAmount() + $order->getBaseTaxAmount());
+        $transactions_revenue = Mage::helper('core')->currency(round($transactions_revenue, 2), true, false);
+    }
+    $transactions_tax = Mage::helper('core')->currency(round($order->getBaseTaxAmount(), 2), true, false);
+    $transactions_shipping = Mage::helper('core')->currency(round($order->getBaseShippingAmount(), 2), true, false);
+    $transactions_table_data[$transactions_count]['id'] = $order->getIncrementId();
+    $transactions_table_data[$transactions_count]['revenue'] = $transactions_revenue;
+    $transactions_table_data[$transactions_count]['tax'] = $transactions_tax;
+    $transactions_table_data[$transactions_count]['shipping'] = $transactions_shipping;
+    $transactions_table_data[$transactions_count]['qty'] = round($order->getTotalQtyOrdered());
+    $transactions_date = Mage::getModel('core/date')->date(null, strtotime($order->getCreatedAt()));
+    $transactions_table_data[$transactions_count]['date'] = date('M j, Y', strtotime($transactions_date));
+
+    // Increment transaction count for iteration
+    $transactions_count = $transactions_count + 1;
+
+    // Day wise gross data calculation for transaction report
+    $date_r = Mage::getModel('core/date')->date(null, strtotime($order->getCreatedAt()));
+    $date_r = date('F j, Y', strtotime($date_r));
+    if (array_key_exists($date_r, $transactions)) {
+        $transactions[$date_r] = $transactions[$date_r] + $order->getBaseGrandTotal();
+    } else {
+        $transactions[$date_r] = $order->getBaseGrandTotal();
+    }
+
+    // Month wise gross data calculation for transaction report
+    $date_m = Mage::getModel('core/date')->date(null, strtotime($order->getCreatedAt()));
+    $date_m = date('M, Y', strtotime($date_m));
+    if (array_key_exists($date_m, $transactions_month)) {
+        $transactions_month[$date_m] = $transactions_month[$date_m] + $order->getBaseGrandTotal();
+    } else {
+        $transactions_month[$date_m] = $order->getBaseGrandTotal();
+    }
+
+    // Week wise gross data calculation for transaction report
+    $date_w = Mage::getModel('core/date')->date(null, strtotime($order->getCreatedAt()));
+    $date_w = date('W, Y', strtotime($date_w));
+    if (array_key_exists($date_w, $transactions_week)) {
+        $transactions_week[$date_w] = $transactions_week[$date_w] + $order->getBaseGrandTotal();
+    } else {
+        $transactions_week[$date_w] = $order->getBaseGrandTotal();
+    }
+
+    // Day wise net data calculation for transaction report
+    $date_r = Mage::getModel('core/date')->date(null, strtotime($order->getCreatedAt()));
+    $date_r = date('F j, Y', strtotime($date_r));
+    if (array_key_exists($date_r, $transactions_net)) {
+        $transactions_net[$date_r] = $transactions_net[$date_r] + $order->getBaseGrandTotal() - ( $order->getBaseShippingAmount() + $order->getBaseTaxAmount());
+    } else {
+        $transactions_net[$date_r] = $order->getBaseGrandTotal() - ( $order->getBaseShippingAmount() + $order->getBaseTaxAmount() );
+    }
+
+    // Month wise net data calculation for transaction report
+    $date_m = Mage::getModel('core/date')->date(null, strtotime($order->getCreatedAt()));
+    $date_m = date('M, Y', strtotime($date_m));
+    if (array_key_exists($date_m, $transactions_month_net)) {
+        $transactions_month_net[$date_m] = $transactions_month_net[$date_m] + $order->getBaseGrandTotal() - ( $order->getBaseShippingAmount() + $order->getBaseTaxAmount());
+    } else {
+        $transactions_month_net[$date_m] = $order->getBaseGrandTotal() - ( $order->getBaseShippingAmount() + $order->getBaseTaxAmount());
+    }
+
+    // Week wise net data calculation for transaction report
+    $date_w = Mage::getModel('core/date')->date(null, strtotime($order->getCreatedAt()));
+    $date_w = date('W, Y', strtotime($date_w));
+    if (array_key_exists($date_w, $transactions_week_net)) {
+        $transactions_week_net[$date_w] = $transactions_week_net[$date_w] + $order->getBaseGrandTotal() - ( $order->getBaseShippingAmount() + $order->getBaseTaxAmount());
+    } else {
+        $transactions_week_net[$date_w] = $order->getBaseGrandTotal() - ( $order->getBaseShippingAmount() + $order->getBaseTaxAmount());
+    }
+}
+
+// calculating total gross and net revenue for transactions report
+$total_transactions = array_sum($transactions);
+$total_transactions_net = array_sum($transactions_net);
+
+// Initilizing variable for all dates between selected dates
+$transaction_all_days = array();
+$transaction_all_days_net = array();
+
+// Getting all dates between selected dates
+$from_all_days = strtotime($from);
+$to_all_days = strtotime($to);
+for ($current_transaction_day = $from_all_days; $current_transaction_day < $to_all_days; $current_transaction_day += (60 * 60 * 24)) {
+    $current_day_string = date('F j, Y', $current_transaction_day);
+    $transaction_all_days[$current_day_string] = 0;
+    $transaction_all_days_net[$current_day_string] = 0;
+}
+
+// Initilizing variable for all weeks between selected dates
+$transactions_all_weeks = array();
+$transactions_all_weeks_net = array();
+
+// Getting all weeks between selected dates
+for ($current_transaction_day = $from_all_days; $current_transaction_day <= $to_all_days; $current_transaction_day += (60 * 60 * 24 * 7)) {
+    $current_day_string = date('W, Y', $current_transaction_day);
+    $transactions_all_weeks[$current_day_string] = 0;
+    $transactions_all_weeks_net[$current_day_string] = 0;
+}
+
+// Condition for final week
+$final_week = date('W, Y', strtotime($to_display));
+if (!array_key_exists($final_week, $transactions_all_weeks)) {
+    $transactions_all_weeks[$final_week] = 0;
+    $transactions_all_weeks_net[$final_week] = 0;
+}
+
+// Initilizing variable for all month between selected dates
+$transactions_all_months = array();
+$transactions_all_months_net = array();
+
+// Getting all month between selected dates
+if ($transactions > 0 || $transactions_net > 0) {
+    $tmp = date('mY', $to_all_days);
+    $month_key = date('M, Y', $from_all_days);
+    $transactions_all_months[$month_key] = 0;
+    $transactions_all_months_net[$month_key] = 0;
+    while ($from_all_days < $to_all_days) {
+        if ($from_all_days < 31) {
+            $from_all_days = strtotime(date('Y-m-d', $from_all_days) . ' +1 month');
+        } else {
+            $from_all_days = strtotime(date('Y-m-d', $from_all_days) . ' +15days');
+        }
+        if (date('mY', $from_all_days) != $tmp && ($from_all_days < strtotime($to_display))) {
+            $month_key = date('M, Y', $from_all_days);
+            $transactions_all_months[$month_key] = 0;
+            $transactions_all_months_net[$month_key] = 0;
+        }
+    }
+    $month_key = date('M, Y', strtotime($to_display));
+    $transactions_all_months[$month_key] = 0;
+    $transactions_all_months_net[$month_key] = 0;
+}
+
+
+// Assigning all days value for selected from and to date
+foreach ($transactions as $key => $value) {
+    $transaction_all_days[$key] = $value;
+}
+foreach ($transactions_net as $key => $value) {
+    $transaction_all_days_net[$key] = $value;
+}
+
+// Assigning all week value for selected from and to date
+foreach ($transactions_week as $key => $value) {
+    $transactions_all_weeks[$key] = $value;
+}
+foreach ($transactions_week_net as $key => $value) {
+    $transactions_all_weeks_net[$key] = $value;
+}
+
+// Assigning all month value for selected from and to date
+foreach ($transactions_month as $key => $value) {
+    $transactions_all_months[$key] = $value;
+}
+foreach ($transactions_month_net as $key => $value) {
+    $transactions_all_months_net[$key] = $value;
+}
+
+// Reset transaction all days, week and month array
+if (count($transactions) < 1) {
+    $transaction_all_days = array();
+    $transactions_all_months = array();
+    $transactions_all_weeks = array();
+}
+if (count($transactions_net) < 1) {
+    $transaction_all_days_net = array();
+    $transactions_all_months_net = array();
+    $transactions_all_weeks_net = array();
+}
+
+// Initializing chart variable for transaction report
+$transactions_day_data = '';
+$transactions_week_data = '';
+$transactions_month_data = '';
+$transactions_day_data_net = '';
+$transactions_week_data_net = '';
+$transactions_month_data_net = '';
+
+// Calculating chart values for day (gross revenue)
+foreach ($transaction_all_days as $key => $value) {
+    $key_value=date('M j, Y', strtotime($key)); 
+    $tool_data = date('l, F j, Y', strtotime($key)) . ' ' . Mage::helper('advancedreports')->__('Revenue') . ' : ' . Mage::helper('core')->currency(round($value, 2), true, false);
+    $transactions_day_data.="data.addRow(['{$key_value}', {$value}, '{$tool_data}']);";
+}
+
+// Calculating chart values for week (gross revenue)
+foreach ($transactions_all_weeks as $key => $value) {
+    $arr = array();
+    $arr = explode(',', $key);
+    $week = $arr[0];
+    $year = $arr[1];
+    $time = strtotime("1 January $year", time());
+    $day = date('w', $time);
+    $time += ((7 * $week) + 1 - $day) * 24 * 3600 - 7 * 24 * 3600;
+    $week_start = date('F j, Y', $time);
+    $time += 6 * 24 * 3600;
+    $week_end = date('F j, Y', $time);
+    if (date('W, Y', strtotime($from)) == $key) {
+        $week_start = date('F j, Y', strtotime($from));
+    }
+    if (date('W, Y', strtotime($to_display)) == $key) {
+        $week_end = date('F j, Y', strtotime($to_display));
+    }
+    $tool_data = $week_start . ' - ' . $week_end . ' ' . Mage::helper('advancedreports')->__('Revenue') . ' : ' . Mage::helper('core')->currency(round($value, 2), true, false);
+    $key_value_value=date('M j, Y', strtotime($week_start)); 
+    $transactions_week_data.="data.addRow(['{$key_value_value}', {$value}, '{$tool_data}']);";
+}
+
+// Calculating chart values for month (gross revenue)
+foreach ($transactions_all_months as $key => $value) {
+    $month_start = date('F 1, Y', strtotime($key));
+    $month_end = date('F t, Y', strtotime($key));
+    if (date('M, Y', strtotime($from)) == $key) {
+        $month_start = date('F j, Y', strtotime($from));
+    }
+    if (date('M, Y', strtotime($to_display)) == $key) {
+        $month_end = date('F j, Y', strtotime($to_display));
+    }
+     $key_value=date('M, Y', strtotime($key)); 
+    $tool_data = $month_start . ' - ' . $month_end . ' ' . Mage::helper('advancedreports')->__('Revenue') . ' : ' . Mage::helper('core')->currency(round($value, 2), true, false);
+    $transactions_month_data.="data.addRow(['{$key_value}', {$value}, '{$tool_data}']);";
+}
+
+// Calculating chart values for day (net revenue)
+foreach ($transaction_all_days_net as $key => $value) {
+    $key_value=date('M j, Y', strtotime($key)); 
+    $tool_data = date('l, F j, Y', strtotime($key)) . ' ' . Mage::helper('advancedreports')->__('Revenue') . ' : ' . Mage::helper('core')->currency(round($value, 2), true, false);
+    $transactions_day_data_net.="data.addRow(['{$key_value}', {$value}, '{$tool_data}']);";
+}
+
+// Calculating chart values for week (net revenue)
+foreach ($transactions_all_weeks_net as $key => $value) {
+    $arr = array();
+    $arr = explode(',', $key);
+    $week = $arr[0];
+    $year = $arr[1];
+    $time = strtotime("1 January $year", time());
+    $day = date('w', $time);
+    $time += ((7 * $week) + 1 - $day) * 24 * 3600 - 7 * 24 * 3600;
+    $week_start = date('F j, Y', $time);
+    $time += 6 * 24 * 3600;
+    $week_end = date('F j, Y', $time);
+    if (date('W, Y', strtotime($from)) == $key) {
+        $week_start = date('F j, Y', strtotime($from));
+    }
+    if (date('W, Y', strtotime($to_display)) == $key) {
+        $week_end = date('F j, Y', strtotime($to_display));
+    }
+    $tool_data = $week_start . ' - ' . $week_end . ' ' . Mage::helper('advancedreports')->__('Revenue') . ' : ' . Mage::helper('core')->currency(round($value, 2), true, false);
+    $week_start_value=date('M j, Y', strtotime($week_start)); 
+    $transactions_week_data_net.="data.addRow(['{$week_start_value}', {$value}, '{$tool_data}']);";
+}
+
+// Calculating chart values for month (net revenue)
+foreach ($transactions_all_months_net as $key => $value) {
+    $month_start = date('F 1, Y', strtotime($key));
+    $month_end = date('F t, Y', strtotime($key));
+    if (date('M, Y', strtotime($from)) == $key) {
+        $month_start = date('F j, Y', strtotime($from));
+    }
+    if (date('M, Y', strtotime($to_display)) == $key) {
+        $month_end = date('F j, Y', strtotime($to_display));
+    }
+     $key_value=date('M, Y', strtotime($key)); 
+    $tool_data = $month_start . ' - ' . $month_end . ' ' . Mage::helper('advancedreports')->__('Revenue') . ' : ' . Mage::helper('core')->currency(round($value, 2), true, false);
+    $transactions_month_data_net.="data.addRow(['{$key_value}', {$value}, '{$tool_data}']);";
+}
+?>
+
+
+
+
+<?php
+// Today
+$today_start_day = strtotime("-1 today midnight");
+$today_from = date("Y-m-d", $today_start_day);
+$today_to = date("Y-m-d", $today_start_day);
+
+// Yesterday
+$yesterday_start_day = strtotime("-1 yesterday midnight");
+$yesterday_from = date("Y-m-d", $yesterday_start_day);
+$yesterday_to = date("Y-m-d", $yesterday_start_day);
+
+// Last week
+$t = date('d-m-Y');
+$to_day = date('l', strtotime($t));
+// if today is monday, take last monday
+if ($to_day == 'Monday') {
+    $start_day = strtotime("-1 monday midnight");
+    $end_day = strtotime("yesterday");
+} else {
+    $start_day = strtotime("-2 monday midnight");
+    $end_day = strtotime("-1 sunday midnight");
+}
+$lastweek_from = date("Y-m-d", $start_day);
+$lastweek_to = date("Y-m-d", $end_day);
+
+// Last Month
+$lastmonth_from = date('Y-m-01', strtotime('last month'));
+$lastmonth_to = date('Y-m-t', strtotime('last month'));
+?>
+
+<input type="hidden" id="transactions-revenue-today-date-from" value="<?php echo date('m/d/Y', strtotime($today_from)); ?>" />
+<input type="hidden" id="transactions-revenue-today-date-to" value="<?php echo date('m/d/Y', strtotime($today_to)); ?>" />
+<input type="hidden" id="transactions-revenue-yesterday-date-from" value="<?php echo date('m/d/Y', strtotime($yesterday_from)); ?>" />
+<input type="hidden" id="transactions-revenue-yesterday-date-to" value="<?php echo date('m/d/Y', strtotime($yesterday_to)); ?>" />
+<input type="hidden" id="transactions-revenue-lastweek-date-from" value="<?php echo date('m/d/Y', strtotime($lastweek_from)); ?>" />
+<input type="hidden" id="transactions-revenue-lastweek-date-to" value="<?php echo date('m/d/Y', strtotime($lastweek_to)); ?>" />
+<input type="hidden" id="transactions-revenue-lastmonth-date-from" value="<?php echo date('m/d/Y', strtotime($lastmonth_from)); ?>" />
+<input type="hidden" id="transactions-revenue-lastmonth-date-to" value="<?php echo date('m/d/Y', strtotime($lastmonth_to)); ?>" />
+<!-- Transaction report hidden value for report generation -->
+<input type="hidden" id="transaction-revenue-custom-date-from" value="<?php echo date('m/d/Y', strtotime($from_display)); ?>" />
+<input type="hidden" id="transaction-revenue-custom-date-to" value="<?php echo date('m/d/Y', strtotime($to_display)); ?>" />
+<!-- For ajax url -->
+<!--<input type="hidden" id="transactions_ajax_url" value="<?php echo Mage::helper("adminhtml")->getUrl("advancedreports/adminhtml_advancedreports/transactions"); ?>" />-->
+<!-- For reset drop down -->
+<input type="hidden" id="transactions_reset_dropdown" value="<?php
+if (!empty($_advanced_get_option)) {
+    echo Mage::helper('advancedreports')->__($_advanced_get_option);
+} else {
+    echo Mage::helper('advancedreports')->__('Custom');
+}
+?>" />
+    <!-- Transaction report wrapper -->
+    <div class="advanced_report_wrapper" id="transactions_advanced_report_wrapper">
+
+        <!-- Transaction report ajax loader -->    
+        <!--        <div id="transactions_report_ajax_load" style="display: none;" class="loading_img">
+            <p><?php echo Mage::helper('advancedreports')->__('Please wait') . ' ...'; ?></p>
+        </div>-->
+        <h3 class="advanced_report_header content-header"> <span class="title_head"> <?php echo Mage::helper('advancedreports')->__('Transactions Report'); ?> </span>
+
+            <!-- Transaction report date picker -->
+            <div class="advanced_date_picker">
+                <span id="transactions-report-date-range" class="report-date-range" >
+                    <?php echo Date('M j, Y', strtotime($from_display)) . ' - ' . Date('M j, Y', strtotime($to_display)); ?>
+                </span>
+                <div id="transactions-report-date-picker"  class="date_popup" style="display: none">
+
+                    <div id="transactions-advanced-report-datepicker"></div>
+
+                    <div class="advanced-report-right">
+                        <label for="daterange-select"><?php echo Mage::helper('advancedreports')->__('Date Range'); ?></label>
+                        <select id="transactions-date-range-select" name="daterange">
+
+                            <option value="Custom" <?php
+                            if (!empty($_advanced_get_option)) {
+                                if ($_advanced_get_option == 'Custom') {
+                                    echo 'selected';
+                                }
+                            }
+                            ?>><?php echo Mage::helper('advancedreports')->__('Custom'); ?></option>
+
+
+                            <option value="Today" <?php
+                            if (!empty($_advanced_get_option)) {
+                                if ($_advanced_get_option == 'Today') {
+                                    echo 'selected';
+                                }
+                            }
+                            ?>><?php echo Mage::helper('advancedreports')->__('Today'); ?></option>
+                            <option value="Yesterday" <?php
+                            if (!empty($_advanced_get_option)) {
+                                if ($_advanced_get_option == 'Yesterday') {
+                                    echo 'selected';
+                                }
+                            }
+                            ?>><?php echo Mage::helper('advancedreports')->__('Yesterday'); ?></option>
+                            <option value="LastWeek" <?php
+                            if (!empty($_advanced_get_option)) {
+                                if ($_advanced_get_option == 'LastWeek') {
+                                    echo 'selected';
+                                }
+                            }
+                            ?>><?php echo Mage::helper('advancedreports')->__('Last Week'); ?></option>
+                            <option value="LastMonth" <?php
+                            if (!empty($_advanced_get_option)) {
+                                if ($_advanced_get_option == 'LastMonth') {
+                                    echo 'selected';
+                                }
+                            }
+                            ?>><?php echo Mage::helper('advancedreports')->__('Last Month'); ?></option>
+
+                        </select>
+                        <div style="clear: both;margin-bottom: 10px;"></div>
+                        <input type="text" id="transactions-custom-date-from" size="10"  <?php
+                        if (!empty($_advanced_get_option)) {
+                            if ($_advanced_get_option != "Custom") {
+                                echo 'disabled';
+                            }
+                        }
+                        ?>/> <?php echo Mage::helper('advancedreports')->__('-'); ?>
+                        <input type="text" id="transactions-custom-date-to" size="10" <?php
+                        if (!empty($_advanced_get_option)) {
+                            if ($_advanced_get_option != "Custom") {
+                                echo 'disabled';
+                            }
+                        }
+                        ?>/>
+
+                        <!-- Transaction report date fields error message -->
+                        <span  id="transactions-report-err-msg" class="err-msg" style="display: none">
+                            <?php echo Mage::helper('advancedreports')->__('Please select') . ' '; ?>
+                            <b><?php echo Mage::helper('advancedreports')->__('from') . ' '; ?></b>
+                            <?php echo Mage::helper('advancedreports')->__('and') . ' '; ?>
+                            <b> <?php echo Mage::helper('advancedreports')->__('to') . ' '; ?></b>
+                            <?php echo Mage::helper('advancedreports')->__('dates'); ?>
+                        </span>
+                        <span  id="transactions-report-todate-err-msg" class="err-msg" style="display: none">
+                            <?php echo Mage::helper('advancedreports')->__('Please select valid') . ' '; ?>
+                            <b> <?php echo '"' . Mage::helper('advancedreports')->__('to') . '" '; ?></b>
+                            <?php echo Mage::helper('advancedreports')->__('date') . ' '; ?>
+                        </span>
+                        <div style="clear: both;padding-bottom: 10px;border-bottom: 1px dotted #666;margin-bottom: 10px;"></div>
+                        <a id="transactions_report_apply" href="javascript:void(0)" class="apply" onclick="transactions_report_apply_click();"><?php echo Mage::helper('advancedreports')->__('Apply'); ?></a>
+                        <div style="position: relative; float:left;">
+                            <div id="transactions-report-disable-click-event">
+                                <a><?php echo Mage::helper('advancedreports')->__('Cancel'); ?></a>
+                            </div>
+                            <a href="javascript:void(0)" id="transactions-report-date-cancel" onclick="transactionscancel();"><?php echo Mage::helper('advancedreports')->__('Cancel'); ?></a>
+                        </div> 
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transaction report export option -->
+            <div id="transactionsexport">
+                <span><?php echo Mage::helper('advancedreports')->__('Export As:'); ?></span>
+                <a href="<?php echo Mage::helper("adminhtml")->getUrl("advancedreports/adminhtml_advancedreports/advancedReports/", array("from" => $from, "to" => $to, "report" => 'transactions_csv', "transaction_option_value" => $transaction_option)); ?>" class="csv"><img src="<?php echo $this->getSkinUrl('advancedreports/images/export_csv.png') ?>" width="25"  height="24" alt="<?php echo Mage::helper('advancedreports')->__('CSV'); ?>" title="<?php echo Mage::helper('advancedreports')->__('CSV'); ?>" /></a>
+                <a href="<?php echo Mage::helper("adminhtml")->getUrl("advancedreports/adminhtml_advancedreports/advancedReports/", array("from" => $from, "to" => $to, "report" => 'transactions_xml', "transaction_option_value" => $transaction_option)); ?>" class="excel"><img src="<?php echo $this->getSkinUrl('advancedreports/images/export_xml.png') ?>" width="25"  height="24" alt="<?php echo Mage::helper('advancedreports')->__('XML'); ?>" title="<?php echo Mage::helper('advancedreports')->__('XML'); ?>"/></a>
+            </div>
+        </h3>
+
+
+
+        <!-- Transaction report chart wrapper -->
+        <div class="report-chart">        
+            <div class="chart_top">
+                <div class="revenue_transaction">
+
+                    <!-- Transaction report include and exclude shipping/tax -->
+                    <div class="shipping-tax-options">
+                        <ul>
+                            <li><span class="spantxt"><?php echo Mage::helper('advancedreports')->__('Tax / Shipping') . ' : '; ?></span></li>
+                            <li  id="li_transactions_tax_inc" class="include <?php
+                            if ($transaction_option == 0) {
+                                echo 'active';
+                            } else {
+                                echo 'inactive';
+                            }
+                            ?>" >
+                                <a id="transactions_inc_id" class="first_child" href="javascript:void(0)" onclick="transactions_inc_id_click();"><span class="tex_text"><?php echo Mage::helper('advancedreports')->__('Included'); ?></span>
+                                </a>
+                            </li>
+                            <li id="li_transactions_tax_exc" class=" <?php
+                            if ($transaction_option == 1) {
+                                echo 'active';
+                            } else {
+                                echo 'inactive';
+                            }
+                            ?>" >
+                                <a id="transactions_exc_id" href="javascript:void(0)" onclick="transactions_exc_id_click();" ><span class="tex_text"><?php echo Mage::helper('advancedreports')->__('Excluded'); ?></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Total no of transaction for transaction report --> 
+                    <div class="sales total-transaction">
+                        <p class="text">
+                            <?php echo Mage::helper('advancedreports')->__('No of Transactions'); ?>
+                        </p>
+                        <p class="number">
+                            <?php echo count($orderTotals); ?>
+                        </p>
+                    </div>
+                    <div class="total-revenue sales_report">
+                        <p class="text">
+                            <?php echo Mage::helper('advancedreports')->__('Revenue'); ?>
+                        </p>             
+                        <p class="number">
+                            <?php
+                            if ($transaction_option == 0) {
+                                echo Mage::helper('core')->currency(round($total_transactions, 2), true);
+                            } else {
+                                echo Mage::helper('core')->currency(round($total_transactions_net, 2), true);
+                            }
+                            ?>
+                        </p>
+                    </div>
+                </div>
+
+
+                <!-- Day, week and option wise option for transactions report --> 
+                <div class="chart-button-options">
+                    <a href="javascript:void(0)" id="transactions_report_day_select" onclick="transactionsloadChart();"><?php echo Mage::helper('advancedreports')->__('Day'); ?></a>
+                    <a href="javascript:void(0)" id="transactions_report_week_select" onclick="transactionsloadChartWeek();"><?php echo Mage::helper('advancedreports')->__('Week'); ?></a>
+                    <a href="javascript:void(0)" id="transactions_report_month_select" onclick="transactionsloadChartMonth();"><?php echo Mage::helper('advancedreports')->__('Month'); ?></a>
+                </div>
+
+            </div>
+            <!-- Transaction report chart div -->
+            <div id="transactions_chart_div" style="" ></div>
+        </div>
+
+        <!-- Transaction report table -->
+        <table id="transactions-advanced-report-table" border="0" width="960px" cellpadding="0" cellspacing="0">
+            <thead>
+                <tr>
+                    <th id="transactions-advanced-report-table-th" align="left" class="text_left advancedreports-headerDesc" width="30%" ><?php echo Mage::helper('advancedreports')->__('Transaction'); ?></th>
+                    <th align="right" class="text_right sort-order-none" width="12%" data-sorter="false"><?php echo Mage::helper('advancedreports')->__('Revenue'); ?></th>
+                    <th align="right" class="text_right sort-order-none" width="13%" data-sorter="false"><?php echo Mage::helper('advancedreports')->__('Tax'); ?></th>
+                    <th align="right" class="text_right sort-order-none" width="20%" data-sorter="false"><?php echo Mage::helper('advancedreports')->__('Shipping'); ?></th>
+                    <th align="right" class="text_right sort-order-none" width="15%" data-sorter="false"><?php echo Mage::helper('advancedreports')->__('Quantity'); ?></th>
+
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                $sno = 0;
+
+                // Assigning no of transactions data.
+                $total_transactions_data_count = count($transactions_table_data);
+
+                // Initiliazing transactions table data variables. 
+                $transactions_date = 0;
+                $transactions_current_date = 0;
+                $transactions_next_date = 0;
+                $transactions_start_date_flag = 0;
+                $transactions_end_date_flag = 0;
+                $transactions_revenue = 0;
+
+                // Loop for record iterations
+                foreach ($transactions_table_data as $key => $value) {
+                    $transactions_revenue = $value['revenue'];
+                    $transactions_tax = $value['tax'];
+                    $transactions_shipping = $value['shipping'];
+                    $transactions_date = $value['date'];
+                    $transactions_id = $value['id'];
+                    $transactions_qty = $value['qty'];
+
+                    // Setting flag for first date data.
+                    if ($transactions_current_date != $transactions_date) {
+                        $transactions_start_date_flag = 1;
+                    } else {
+                        $transactions_start_date_flag = 0;
+                    }
+
+                    // Assigning current date
+                    $transactions_current_date = $transactions_date;
+
+                    // If checking whether next data exits/not
+                    if (($total_transactions_data_count - 1) > $key) {
+
+                        // Checking current date vs next date.    
+                        $transactions_next_date = $transactions_table_data[$key + 1]['date'];
+                        if ($transactions_current_date != $transactions_next_date) {
+                            $transactions_end_date_flag = 1;
+                        } else {
+                            $transactions_end_date_flag = 0;
+                        }
+                    }
+                    ?>          
+
+                    <!-- Transactions report table data -->
+                    <tr class="advanced-report-data">
+                        <td align="left" class="tooltip_content">
+
+                            <?php
+                            // Checking whether starting table row or not
+                            if ($transactions_start_date_flag == 1 || $sno == 0) {
+                                if ($transactions_end_date_flag == 1 || $sno == $total_transactions_data_count - 1) {
+                                    ?>
+                                    <table cellpadding="0" cellspacing="0" class="both_start_end"><tr><td> <p class="date_data"><?php echo $transactions_current_date . ' '; ?></p></td></tr></table>          
+                                    <?php
+                                } else {
+                                    ?>
+                                    <table cellpadding="0" cellspacing="0" class="only_start"><tr><td> <p class="date_data"><?php echo $transactions_current_date . ' '; ?></p></td></tr></table> 
+                                    <?php
+                                }
+                            } else {
+                                if ($transactions_end_date_flag == 1 || $sno == $total_transactions_data_count - 1) {
+                                    ?>
+                                    <table class="only_end" cellpadding="0" cellspacing="0"><tr><td> <p class="date_data"><?php echo $transactions_current_date . ' '; ?></p></td></tr></table> 
+                                    <?php
+                                } else {
+                                    ?>
+                                    <span style="display:none">
+                                        <?php echo $transactions_current_date . ' '; ?>
+                                    </span>    
+                                    <?php
+                                }
+                            }
+                            ?>       
+
+                            <p><a href="<?php echo $this->getAdvancedReportOrderUrl($transactions_id); ?>" target="_blank" >          
+                                    <?php
+                                    if (!empty($transactions_id)) {
+                                        echo $transactions_id;
+                                    }
+                                    ?>                   
+                                </a></p>              
+                            <span class="tooltip_box">
+                                <?php echo $this->getAdvancedProductInfo($transactions_id); ?>
+                            </span>              
+                        </td>
+                        <td align="right" class="revenue_amt">                     
+
+                            <?php
+                            // Checking whether starting table row or not
+                            if ($transactions_start_date_flag == 1 || $sno == 0) {
+                                if ($transactions_end_date_flag == 1 || $sno == $total_transactions_data_count - 1) {
+                                    ?>
+                                    <table class="both_start_end" cellpadding="0" cellspacing="0"><tr><td> <p class="date_data"><?php echo $transactions_current_date . ' '; ?></p></td></tr></table>          
+                                    <?php
+                                } else {
+                                    ?>
+                                    <table class="only_start" cellpadding="0" cellspacing="0"><tr><td> <p class="date_data"><?php echo $transactions_current_date . ' '; ?></p></td></tr></table> 
+                                    <?php
+                                }
+                            } else {
+                                if ($transactions_end_date_flag == 1 || $sno == $total_transactions_data_count - 1) {
+                                    ?>
+                                    <table class="only_end"><tr><td> <p class="date_data"><?php echo $transactions_current_date . ' '; ?></p></td></tr></table> 
+                                    <?php
+                                } else {
+                                    ?>
+                                    <span style="display:none">
+                                        <?php echo $transactions_current_date . ' '; ?>
+                                    </span>    
+                                    <?php
+                                }
+                            }
+                            ?>       
+                            <p>      
+                                <?php
+                                if (!empty($transactions_revenue)) {
+                                    echo $transactions_revenue;
+                                }
+                                ?></p></td>
+                        <td align="right" class="tax_grid">                        
+
+                            <?php
+                            // Checking whether starting table row or not
+                            if ($transactions_start_date_flag == 1 || $sno == 0) {
+                                if ($transactions_end_date_flag == 1 || $sno == $total_transactions_data_count - 1) {
+                                    ?>
+                                    <table class="both_start_end" cellpadding="0" cellspacing="0"><tr><td> <p class="date_data"><?php echo $transactions_current_date . ' '; ?></p></td></tr></table>          
+                                    <?php
+                                } else {
+                                    ?>
+                                    <table class="only_start" cellpadding="0" cellspacing="0"><tr><td> <p class="date_data"><?php echo $transactions_current_date . ' '; ?></p></td></tr></table> 
+                                    <?php
+                                }
+                            } else {
+                                if ($transactions_end_date_flag == 1 || $sno == $total_transactions_data_count - 1) {
+                                    ?>
+                                    <table class="only_end" cellpadding="0" cellspacing="0"><tr><td > <p class="date_data"><?php echo $transactions_current_date . ' '; ?></p></td></tr></table> 
+                                    <?php
+                                } else {
+                                    ?>
+                                    <span style="display:none">
+                                        <?php echo $transactions_current_date . ' '; ?>
+                                    </span>    
+                                    <?php
+                                }
+                            }
+                            ?>      
+
+                            <p> <?php
+                                if (!empty($transactions_tax)) {
+                                    echo $transactions_tax;
+                                }
+                                ?>
+                            </p>
+                        </td>
+                        <td align="right" class="shipping_grid">
+
+                            <?php
+                            // Checking whether starting table row or not
+                            if ($transactions_start_date_flag == 1 || $sno == 0) {
+                                if ($transactions_end_date_flag == 1 || $sno == $total_transactions_data_count - 1) {
+                                    ?>
+                                    <table cellpadding="0" cellspacing="0" class="both_start_end"><tr><td> <p class="date_data"><?php echo $transactions_current_date . ' '; ?></p></td></tr></table>          
+                                    <?php
+                                } else {
+                                    ?>
+                                    <table cellpadding="0" cellspacing="0" class="only_start"><tr><td> <p class="date_data"><?php echo $transactions_current_date . ' '; ?></p></td></tr></table> 
+                                    <?php
+                                }
+                            } else {
+                                if ($transactions_end_date_flag == 1 || $sno == $total_transactions_data_count - 1) {
+                                    ?>
+                                    <table cellpadding="0" cellspacing="0" class="only_end"><tr><td> <p class="date_data"><?php echo $transactions_current_date . ' '; ?></p></td></tr></table> 
+                                    <?php
+                                } else {
+                                    ?>
+                                    <span style="display:none">
+                                        <?php echo $transactions_current_date . ' '; ?>
+                                    </span>    
+                                    <?php
+                                }
+                            }
+                            ?>      <p>
+
+                                <?php
+                                if (!empty($transactions_shipping)) {
+                                    echo $transactions_shipping;
+                                }
+                                ?>
+                            </p>
+                        </td>
+                        <td align="right" class="qty_grid">
+                            <?php
+                            // Checking whether starting table row or not
+                            if ($transactions_start_date_flag == 1 || $sno == 0) {
+                                if ($transactions_end_date_flag == 1 || $sno == $total_transactions_data_count - 1) {
+                                    ?>
+                                    <table cellpadding="0" cellspacing="0" class="both_start_end"><tr><td> <p class="date_data"><?php echo $transactions_current_date . ' '; ?></p></td></tr></table>          
+                                    <?php
+                                } else {
+                                    ?>
+                                    <table cellpadding="0" cellspacing="0" class="only_start"><tr><td> <p class="date_data"><?php echo $transactions_current_date . ' '; ?></p></td></tr></table> 
+                                    <?php
+                                }
+                            } else {
+                                if ($transactions_end_date_flag == 1 || $sno == $total_transactions_data_count - 1) {
+                                    ?>
+                                    <table cellpadding="0" cellspacing="0" class="only_end"><tr><td> <p class="date_data"><?php echo $transactions_current_date . ' '; ?></p></td></tr></table> 
+                                    <?php
+                                } else {
+                                    ?>
+                                    <span style="display:none">
+                                        <?php echo $transactions_current_date . ' '; ?>
+                                    </span>    
+                                    <?php
+                                }
+                            }
+                            ?>      
+
+                            <p> <?php
+                                if (!empty($transactions_qty)) {
+                                    echo $transactions_qty;
+                                }
+                                ?>
+                            </p>
+                        </td>
+                    </tr>
+
+
+                    <?php
+                    $sno = $sno + 1;
+                }
+                ?>
+
+
+            </tbody>
+
+            <?php
+// checking for table data
+            if ($total_transactions_data_count < 1) {
+                ?>
+                <tfoot>  <tr><td colspan="5" align="center" class="empty_data"> <?php echo Mage::helper('advancedreports')->__('No data found') . '.'; ?> </td></tr></tfoot>
+            <?php } // end if for checking table data  ?>
+        </table>
+
+
+
+        <?php
+// checking for pagination
+        if ($total_transactions_data_count > 5) {
+            ?>
+            <!-- Calling sorting and pagination functionality for transactions report --> 
+            <script type="text/javascript">
+                                jq(function() {
+
+                                    jq("#transactions-advanced-report-table")
+                                            .tablesorter({widthFixed: true, widgets: ['zebra']})
+                                            .advancedtablesorterPager({container: jq("#advanced_transactions_report_pager")});
+
+                                });
+
+            </script>
+
+            <!-- Transaction report table pagination -->
+            <div id="advanced_transactions_report_pager" class="pager">
+                <form>
+                    <span class="goto_row"> <?php echo Mage::helper('advancedreports')->__('Show rows') . ' : '; ?> </span>
+                    <select class="pagesize">
+                        <option selected="selected" value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option  value="100">100</option>
+                        <option  value="500">500</option>                   
+                    </select>               
+                    <span class="goto_span"> <?php echo Mage::helper('advancedreports')->__('Go to') . ' : '; ?> </span>                
+                    <input value="1" type="text" class="goto"/>
+                    <span class="nopage"></span>
+                    <span class="page_arrow">
+                        <span class="tablePagination_firstPage first" >&#171;</span>
+                        <span class="tablePagination_prevPage prev">&#8249;</span>
+                        <span class="tablePagination_nextPage next" >&#8250;</span>
+                        <span class="tablePagination_lastPage last" >&#187;</span>
+                    </span>
+                </form>
+            </div>  
+
+        <?php } else { ?>
+
+            <!-- Calling sorting functionality for transactions report -->  
+            <script type="text/javascript">
+                jq(function() {
+                    jq("#transactions-advanced-report-table")
+                            .tablesorter({widthFixed: true, widgets: ['zebra']});
+                });
+
+            </script>
+
+        <?php } // end if for checking paginatin and sorting     ?>  
+    </div>
+    <!--<script type="text/javascript" src="https://www.google.com/jsapi"></script>-->
+
+    <!-- CODE FOR LESS THAN IE 8 VERSIONS -->
+    <!--[if lt IE 9]>
+    <script type="text/javascript">              
+    jq(document).ready(function() {
+    setTimeout(transactionsloadChart,300);
+            jq("#advancedreports_tabs_transactions_section").click(function(event) {
+                setTimeout(transactionsloadChart,300);
+            });
+        });                 
+    </script>
+    <![endif]-->
+
+    <!-- Calculating day, week and month wise chart --> 
+    <script type="text/javascript">
+
+    //    google.load('visualization', '1.0', {'packages': ['corechart']});
+    //    google.setOnLoadCallback(transactionsloadChart);
+
+        // Calculating day wise chart for transactions report
+        function transactionsloadChart() {
+            document.getElementById("transactions_report_day_select").className = "active";
+            document.getElementById("transactions_report_week_select").className = "";
+            document.getElementById("transactions_report_month_select").className = "";
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', '<?php echo Mage::helper('advancedreports')->__("Date"); ?>');
+            data.addColumn('number', '<?php echo Mage::helper('advancedreports')->__("Revenue"); ?>');
+            data.addColumn({type: 'string', role: 'tooltip'});
+
+    <?php
+    if ($transaction_option == 0) {
+        echo $transactions_day_data;
+    } else {
+        echo $transactions_day_data_net;
+    }
+    ?>
+            var options = {width: 940, height: 250,
+                colors: ['#058dc7', '#e6f4fa'],
+                areaOpacity: 0.1,
+                vAxis: {format: '<?php echo Mage::app()->getLocale()->currency(Mage::app()->getStore()->getBaseCurrencyCode())->getSymbol(); ?>###,###,###.00', textPosition: 'in', showTextEvery: 5, slantedText: false, textStyle: {color: '#000000', fontSize: 11}},
+                hAxis: {title: '<?php echo Mage::helper('advancedreports')->__("Day"); ?>', titleTextStyle: {color: '#000000', fontSize: 12, italic: false, bold: true}, textPosition: 'out', showTextEvery: 7, slantedText: false, textStyle: {color: '#000000', fontSize: 10}},
+                pointSize: 5,
+                legend: 'top',
+                chartArea: {left: 40, top: 30, width: "100%", height: "75%"},
+                tooltip: {isHtml: true}
+            };
+            var chart = new google.visualization.AreaChart(document.getElementById('transactions_chart_div'));
+            chart.draw(data, options);
+        }
+
+        // Calculating day wise chart for transactions report
+        function transactionsloadChartMonth()
+        {
+            document.getElementById("transactions_report_day_select").className = "";
+            document.getElementById("transactions_report_week_select").className = "";
+            document.getElementById("transactions_report_month_select").className = "active";
+
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', '<?php echo Mage::helper('advancedreports')->__("Date"); ?>');
+            data.addColumn('number', '<?php echo Mage::helper('advancedreports')->__("Revenue"); ?>');
+            data.addColumn({type: 'string', role: 'tooltip'});
+    <?php
+    if ($transaction_option == 0) {
+        echo $transactions_month_data;
+    } else {
+        echo $transactions_month_data_net;
+    }
+    ?>
+            var options = {width: 940, height: 250,
+                colors: ['#058dc7', '#e6f4fa'],
+                areaOpacity: 0.1,
+                vAxis: {format: '<?php echo Mage::app()->getLocale()->currency(Mage::app()->getStore()->getBaseCurrencyCode())->getSymbol(); ?>###,###,###.00', textPosition: 'in', showTextEvery: 5, slantedText: false, textStyle: {color: '#000000', fontSize: 11}},
+                hAxis: {title: '<?php echo Mage::helper('advancedreports')->__("Month"); ?>', titleTextStyle: {color: '#000000', fontSize: 12, italic: false, bold: true}, textPosition: 'out', showTextEvery: 1, slantedText: false, textStyle: {color: '#000000', fontSize: 10}},
+                pointSize: 5,
+                legend: 'top',
+                chartArea: {left: 40, top: 30, width: "100%", height: "75%"},
+                tooltip: {isHtml: true}
+            };
+            var chart = new google.visualization.AreaChart(document.getElementById('transactions_chart_div'));
+            chart.draw(data, options);
+        }
+
+        // Calculating day wise chart for transactions report
+        function transactionsloadChartWeek()
+        {
+            document.getElementById("transactions_report_day_select").className = "";
+            document.getElementById("transactions_report_week_select").className = "active";
+            document.getElementById("transactions_report_month_select").className = "";
+
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', '<?php echo Mage::helper('advancedreports')->__("Date"); ?>');
+            data.addColumn('number', '<?php echo Mage::helper('advancedreports')->__("Revenue"); ?>');
+            data.addColumn({type: 'string', role: 'tooltip'});
+    <?php
+    if ($transaction_option == 0) {
+        echo $transactions_week_data;
+    } else {
+        echo $transactions_week_data_net;
+    }
+    ?>
+            var options = {width: 940, height: 250,
+                colors: ['#058dc7', '#e6f4fa'],
+                areaOpacity: 0.1,
+                vAxis: {format: '<?php echo Mage::app()->getLocale()->currency(Mage::app()->getStore()->getBaseCurrencyCode())->getSymbol(); ?>###,###,###.00', textPosition: 'in', showTextEvery: 5, slantedText: false, textStyle: {color: '#000000', fontSize: 11}},
+                hAxis: {title: '<?php echo Mage::helper('advancedreports')->__("Week"); ?>', titleTextStyle: {color: '#000000', fontSize: 12, italic: false, bold: true}, textPosition: 'out', showTextEvery: 1, slantedText: false, textStyle: {color: '#000000', fontSize: 10}},
+                pointSize: 5,
+                legend: 'top',
+                chartArea: {left: 40, top: 30, width: "100%", height: "75%"},
+                tooltip: {isHtml: true}
+            };
+            var chart = new google.visualization.AreaChart(document.getElementById('transactions_chart_div'));
+            chart.draw(data, options);
+        }
+
+    </script>
+
+    <!-- Calling transaction chart based on transaction option -->
+    <?php
+    if (Mage::app()->getRequest()->getParam('transaction_option')) {
+        if (Mage::app()->getRequest()->getParam('active') == 'day') {
+            ?>
+            <script type="text/javascript">
+                jq(document).ready(function() {
+                    setTimeout(transactionsloadChart, 200);
+                });
+            </script>
+            <?php
+        }
+        if (Mage::app()->getRequest()->getParam('active') == 'week') {
+            ?>
+
+            <script type="text/javascript">
+                jq(document).ready(function() {
+                    setTimeout(transactionsloadChartWeek, 200);
+                });
+            </script>
+
+            <?php
+        }
+        if (Mage::app()->getRequest()->getParam('active') == 'month') {
+            ?>
+            <script type="text/javascript">
+                jq(document).ready(function() {
+                    setTimeout(transactionsloadChartMonth, 200);
+                });
+            </script>
+            <?php
+        }
+    }
+    ?>
+
+    <script type="text/javascript">
+        jq(document).ready(function() {
+
+    // Adding class for transaction table for sorting arrow icon
+            jq("#transactions-advanced-report-table-th").click(function() {
+                if (jq("#transactions-advanced-report-table").hasClass("advancedreports-desc"))
+                {
+                    jq("#transactions-advanced-report-table").removeClass('advancedreports-desc').addClass('advancedreports-asc');
+                }
+                else
+                {
+                    jq("#transactions-advanced-report-table").removeClass('advancedreports-asc').addClass('advancedreports-desc');
+                }
+            });
+
+    // Assign dates to text fields
+            jq("#transactions-report-date-range").click(function() {
+                jq("#transactions-custom-date-from").val(jq("#transaction-revenue-custom-date-from").val());
+                jq("#transactions-custom-date-to").val(jq("#transaction-revenue-custom-date-to").val());
+            });
+            jq("#transactions-report-date-cancel").click(function() {
+                jq("#transactions-custom-date-from").val(jq("#transaction-revenue-custom-date-from").val());
+                jq("#transactions-custom-date-to").val(jq("#transaction-revenue-custom-date-to").val());
+            });
+        });
+
+        // Reset transactions date picker
+        jq("#transactions-report-date-cancel").click(function() {
+            jq("#transactions-advanced-report-datepicker").datepicker("refresh");
+            jq("#transactions-report-todate-err-msg").hide();
+            jq("#transactions-report-disable-click-event").show();
+        });
+        jq('#transactions-date-range-select').change(function() {
+
+            jq("#transactions-report-disable-click-event").hide();
+            if (jq(this).val() != "Custom")
+            {
+
+                jq("#transactions-advanced-report-datepicker").datepicker("destroy");
+
+                jq("#transactions-advanced-report-datepicker").datepicker({
+                    monthNames: ['<?php echo Mage::helper('advancedreports')->__('January'); ?>', '<?php echo Mage::helper('advancedreports')->__('February'); ?>', '<?php echo Mage::helper('advancedreports')->__('March'); ?>', '<?php echo Mage::helper('advancedreports')->__('April'); ?>', '<?php echo Mage::helper('advancedreports')->__('May'); ?>', '<?php echo Mage::helper('advancedreports')->__('June'); ?>',
+                        '<?php echo Mage::helper('advancedreports')->__('July'); ?>', '<?php echo Mage::helper('advancedreports')->__('August'); ?>', '<?php echo Mage::helper('advancedreports')->__('September'); ?>', '<?php echo Mage::helper('advancedreports')->__('October'); ?>', '<?php echo Mage::helper('advancedreports')->__('November'); ?>', '<?php echo Mage::helper('advancedreports')->__('December'); ?>'],
+                   // dayNamesMin: ['Mo', 'Tu','We','Th','Fr','Sa','Su'],
+                    maxDate: 0,
+                    yearRange: "-100:+0",
+                    numberOfMonths: 3,
+                    beforeShowDay: function(date) {
+
+                        if (jq("#transactions-date-range-select").val() == "Today")
+                        {
+                            var from = jq("#transactions-revenue-today-date-from").val();
+                            var to = jq("#transactions-revenue-today-date-to").val();
+                            jq("#transactions-custom-date-from").val(from);
+                            jq("#transactions-custom-date-to").val(to);
+                        }
+                        else if (jq("#transactions-date-range-select").val() == "Yesterday")
+                        {
+                            var from = jq("#transactions-revenue-yesterday-date-from").val();
+                            var to = jq("#transactions-revenue-yesterday-date-to").val();
+                            jq("#transactions-custom-date-from").val(from);
+                            jq("#transactions-custom-date-to").val(to);
+                        }
+                        else if (jq("#transactions-date-range-select").val() == "LastWeek")
+                        {
+                            var from = jq("#transactions-revenue-lastweek-date-from").val();
+                            var to = jq("#transactions-revenue-lastweek-date-to").val();
+                            jq("#transactions-custom-date-from").val(from);
+                            jq("#transactions-custom-date-to").val(to);
+                        }
+                        else if (jq("#transactions-date-range-select").val() == "LastMonth")
+                        {
+                            var from = jq("#transactions-revenue-lastmonth-date-from").val();
+                            var to = jq("#transactions-revenue-lastmonth-date-to").val();
+                            jq("#transactions-custom-date-from").val(from);
+                            jq("#transactions-custom-date-to").val(to);
+
+                        }
+                        else
+                        {
+                        }
+
+                        var date1 = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, jq("#transactions-custom-date-from").val());
+                        var date2 = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, jq("#transactions-custom-date-to").val());
+                        return [true, date1 && ((date.getTime() == date1.getTime()) || (date2 && date >= date1 && date <= date2)) ? "dp-highlight" : ""];
+
+
+                    },
+                    onSelect: function(dateText, inst) {
+                        var date1 = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, jq("#transactions-custom-date-from").val());
+                        var date2 = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, jq("#transactions-custom-date-to").val());
+                        jq("#transactions-date-range-select").val("Custom");
+                        jq("#transactions-custom-date-from").removeAttr("disabled");
+                        jq("#transactions-custom-date-to").removeAttr("disabled");
+                        jq("#transactions-report-disable-click-event").hide();
+                        if (!date1 || date2) {
+                            jq("#transactions-custom-date-from").val(dateText);
+                            jq("#transactions-custom-date-to").val("");
+                            jq(this).datepicker();
+                        } else {
+
+                            var checkdate = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, jq("#transactions-custom-date-from").val());
+                            var checkdateText = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, dateText);
+                            if (checkdate > checkdateText)
+                            {
+                                jq("#transactions-report-todate-err-msg").show();
+                                return;
+                            }
+                            jq("#transactions-report-todate-err-msg").hide();
+                            jq("#transactions-custom-date-to").val(dateText);
+                            jq(this).datepicker();
+                        }
+                        jq("#timetopurchase-report-err-msg").hide();
+
+                    }
+                }
+                );
+
+
+
+
+            }
+            jq("#transactions-report-todate-err-msg").hide();
+        });
+
+        // Display and hide datepicker div.
+        jq('#transactions-report-date-range').click(function() {
+            jq('#transactions-report-date-picker').slideToggle('fast');
+            jq('#transactions-report-date-range').toggleClass('arrowdown');
+        });
+
+        // Hide datepicker div.
+        jq(document).click(function() {
+            jq("#transactions-report-date-picker").hide();
+            jq('#transactions-report-date-range').removeClass('arrowdown');
+        });
+        jq('#transactions-report-date-picker,#transactions-report-date-range').click(function(event) {
+            event.stopPropagation();
+        });
+
+        // Enable or disable custom date fields.
+        jq("#transactions-date-range-select").change(function() {
+
+            if (jq("#transactions-date-range-select").val() == 'Custom')
+            {
+                jq("#transactions-custom-date-from").removeAttr("disabled");
+                jq("#transactions-custom-date-to").removeAttr("disabled");
+
+                jq("#transactions-custom-date-from").val('');
+                jq("#transactions-custom-date-to").val('');
+                jq("#transactions-advanced-report-datepicker").datepicker("refresh");
+            }
+            else
+            {
+                jq("#transactions-custom-date-from").attr("disabled", "disabled");
+                jq("#transactions-custom-date-to").attr("disabled", "disabled");
+            }
+        });
+
+
+    // Transactions report  date picker
+        jq(function() {
+            jq("#transactions-advanced-report-datepicker").datepicker({
+                monthNames: ['<?php echo Mage::helper('advancedreports')->__('January'); ?>', '<?php echo Mage::helper('advancedreports')->__('February'); ?>', '<?php echo Mage::helper('advancedreports')->__('March'); ?>', '<?php echo Mage::helper('advancedreports')->__('April'); ?>', '<?php echo Mage::helper('advancedreports')->__('May'); ?>', '<?php echo Mage::helper('advancedreports')->__('June'); ?>',
+                    '<?php echo Mage::helper('advancedreports')->__('July'); ?>', '<?php echo Mage::helper('advancedreports')->__('August'); ?>', '<?php echo Mage::helper('advancedreports')->__('September'); ?>', '<?php echo Mage::helper('advancedreports')->__('October'); ?>', '<?php echo Mage::helper('advancedreports')->__('November'); ?>', '<?php echo Mage::helper('advancedreports')->__('December'); ?>'],
+               // dayNamesMin: ['Mo', 'Tu','We','Th','Fr','Sa','Su'],
+                maxDate: 0,
+                yearRange: "-100:+0",
+                numberOfMonths: 3,
+                beforeShowDay: function(date) {
+
+                    if (jq("#transactions-custom-date-from").val() == '' && jq("#transactions-custom-date-to").val() == '')
+                    {
+                        var d_h1 = jq("#transaction-revenue-custom-date-from").val();
+                        var d_h2 = jq("#transaction-revenue-custom-date-to").val();
+                        var date1 = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, d_h1);
+                        var date2 = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, d_h2);
+                        return [true, date1 && ((date.getTime() == date1.getTime()) || (date2 && date >= date1 && date <= date2)) ? "dp-highlight" : ""];
+                    }
+
+                    var date1 = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, jq("#transactions-custom-date-from").val());
+                    var date2 = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, jq("#transactions-custom-date-to").val());
+                    return [true, date1 && ((date.getTime() == date1.getTime()) || (date2 && date >= date1 && date <= date2)) ? "dp-highlight" : ""];
+                },
+                onSelect: function(dateText, inst) {
+                    var date1 = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, jq("#transactions-custom-date-from").val());
+                    var date2 = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, jq("#transactions-custom-date-to").val());
+                    jq("#transactions-date-range-select").val("Custom");
+                    jq("#transactions-custom-date-from").removeAttr("disabled");
+                    jq("#transactions-custom-date-to").removeAttr("disabled");
+                    jq("#transactions-report-disable-click-event").hide();
+                    if (!date1 || date2) {
+                        jq("#transactions-custom-date-from").val(dateText);
+                        jq("#transactions-custom-date-to").val("");
+                        jq(this).datepicker();
+                    } else {
+
+                        var checkdate = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, jq("#transactions-custom-date-from").val());
+                        var checkdateText = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, dateText);
+                        if (checkdate > checkdateText)
+                        {
+                            jq("#transactions-report-todate-err-msg").show();
+                            return;
+                        }
+                        jq("#transactions-report-todate-err-msg").hide();
+
+                        jq("#transactions-custom-date-to").val(dateText);
+                        jq(this).datepicker();
+                    }
+                    jq("#transactions-report-err-msg").hide();
+
+                }
+            }
+            );
+        });
+    </script>
+
+    <?php if (Mage::app()->getRequest()->getParam('advanced_report_date_session') == 1) { ?>
+        <!-- Calling Transactions report chart  -->
+        <script type="text/javascript">
+            jq(document).ready(function() {
+                setTimeout(transactionsloadChart, 200);
+            });
+        </script>
+    <?php } ?>
+
+    <?php
+// Setting session for advanced report date
+    if (Mage::app()->getRequest()->getParam('advanced_session') == 1) {
+        if (Mage::getSingleton('core/session')->getAdvancedReportDateOption()) {
+            Mage::getSingleton('core/session')->unsAdvancedReportDateOption();
+            Mage::getSingleton('core/session')->unsAdvancedReportDateFrom();
+            Mage::getSingleton('core/session')->unsAdvancedReportDateTo();
+        }
+        $advanced_report_date_option = Mage::app()->getRequest()->getParam('date_range_option');
+        $advanced_report_date_from = Mage::app()->getRequest()->getParam('from');
+        $advanced_report_date_to = Mage::app()->getRequest()->getParam('to');
+        Mage::getSingleton('core/session')->setAdvancedReportDateOption($advanced_report_date_option);
+        Mage::getSingleton('core/session')->setAdvancedReportDateFrom($advanced_report_date_from);
+        Mage::getSingleton('core/session')->setAdvancedReportDateTo($advanced_report_date_to);
+    }
+    ?>

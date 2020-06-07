@@ -1,0 +1,308 @@
+<?php
+
+/**
+ * Apptha
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the EULA
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://www.apptha.com/LICENSE.txt
+ *
+ * ==============================================================
+ *                 MAGENTO EDITION USAGE NOTICE
+ * ==============================================================
+ * This package designed for Magento COMMUNITY edition
+ * Apptha does not guarantee correct work of this extension
+ * on any other Magento edition except Magento COMMUNITY edition.
+ * Apptha does not provide extension support in case of
+ * incorrect edition usage.
+ * ==============================================================
+ *
+ * @category    Apptha
+ * @package     Apptha_Advancedreports
+ * @version     0.2.1
+ * @author      Apptha Team <developers@contus.in>
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
+ * @license     http://www.apptha.com/LICENSE.txt
+ *
+ */
+
+?>
+
+
+<?php
+// Assigning from and to date for top selling products report
+$topsellingproducts_from = date('Y-m-01', strtotime("-6 months"));
+$topsellingproducts_to = date('Y-m-t', strtotime("-1 months"));
+
+// Converting local time to db time
+$db_from = Mage::getModel('core/date')->gmtDate(null, strtotime($topsellingproducts_from));
+$db_to = Mage::getModel('core/date')->gmtDate(null, strtotime($topsellingproducts_to));
+
+$from_all_days = strtotime($topsellingproducts_from);
+$to_all_days = strtotime($topsellingproducts_to);
+
+// Initiliazing months array
+$months = array();
+
+// Calculating all months between given dates
+$tmp = date('mY', $to_all_days);
+$month_key = date('M, Y', $from_all_days);
+$months[$month_key] = 0;
+while ($from_all_days < $to_all_days) {
+
+    if ($from_all_days < 31) {
+        $from_all_days = strtotime(date('Y-m-d', $from_all_days) . ' +1 month');
+    } else {
+        $from_all_days = strtotime(date('Y-m-d', $from_all_days) . ' +15days');
+    }
+
+    if (date('mY', $from_all_days) != $tmp && ($from_all_days < strtotime($topsellingproducts_to))) {
+        $month_key = date('M, Y', $from_all_days);
+        $months[$month_key] = 0;
+    }
+}
+$month_key = date('M, Y', strtotime($topsellingproducts_to));
+$months[$month_key] = 0;
+
+
+$month_increment = 1;
+foreach ($months as $key => $month) {
+    $top_selling_product_month[$month_increment] = $key;
+    $month_increment = $month_increment + 1;
+}
+
+
+// Top selling products collection
+$orderTotals = $this->advancedTopSellingProductsReportCollection($db_from, $db_to);
+
+// Product collection for getting product name
+$obj = Mage::getModel('catalog/product');
+$topsellingproducts_report = array();
+
+
+// Calculating product data
+foreach ($orderTotals as $value) {
+
+    $_product = $obj->load($value->getProductId());
+    $_product_name = $_product->getName();
+
+    // Assigning product name
+    if (empty($topsellingproducts_report[$_product_name]['name'])) {
+        $topsellingproducts_report[$_product_name]['name'] = $_product->getName();
+        $topsellingproducts_report[$_product_name]['id'] = $value->getProductId();
+        $topsellingproducts_report[$_product_name]['total_revenue'] = 0;
+        foreach ($months as $key => $month) {
+            $topsellingproducts_report[$_product_name][$key] = $month;
+        }
+    }
+
+    if (array_key_exists($_product_name, $topsellingproducts_report)) {
+
+        // Last sixth month data
+        $date_sixth_month = Mage::getModel('core/date')->date(null, strtotime($value->getSfogCreatedAt()));
+        $date_sixth_month = date('M, Y', strtotime($date_sixth_month));
+        if (array_key_exists($date_sixth_month, $topsellingproducts_report[$_product_name])) {
+            $topsellingproducts_report[$_product_name][$date_sixth_month] = $topsellingproducts_report[$_product_name][$date_sixth_month] + ($value->getBaseOriginalPrice() * $value->getQtyOrdered()) - $value->getBaseDiscountAmount();
+        } else {
+            $topsellingproducts_report[$_product_name][$date_sixth_month] = ($value->getBaseOriginalPrice() * $value->getQtyOrdered()) - $value->getBaseDiscountAmount();
+        }
+        $topsellingproducts_report[$_product_name]['total_revenue'] = $topsellingproducts_report[$_product_name]['total_revenue'] + ($value->getBaseOriginalPrice() * $value->getQtyOrdered()) - $value->getBaseDiscountAmount();
+    }
+}
+
+$sorted_topsellingproducts_report = Mage::helper('advancedreports')->sort_array_by_key($topsellingproducts_report, 'total_revenue');
+?>
+
+<!--<input type="hidden" id="topsellingproducts_ajax_url" value="<?php echo Mage::helper("adminhtml")->getUrl("advancedreports/adminhtml_advancedreports/topsellingproducts"); ?>" />   -->
+<div class="advanced_report_wrapper" id="topsellingproducts_advanced_report_wrapper">
+        <!-- Top selling products ajax loader -->
+<!--        <div id="topsellingproducts_report_ajax_load" style="display: none;" class="loading_img">
+            <p><?php echo Mage::helper('advancedreports')->__('Please wait') . ' ...'; ?></p>
+        </div>-->
+
+        <h3 class="advanced_report_header content-header"> <span class="title_head"> <?php echo Mage::helper('advancedreports')->__('Top Selling Products Report'); ?></span>
+
+            <!-- Top selling Products export option -->
+            <div id="topsellingproductsexport"  class="export">
+                <span><?php echo Mage::helper('advancedreports')->__('Export As:'); ?></span>
+                <a href="<?php echo Mage::helper("adminhtml")->getUrl("advancedreports/adminhtml_advancedreports/advancedReports/", array("report" => 'topsellingproducts_csv')); ?>" class="csv"><img src="<?php echo $this->getSkinUrl('advancedreports/images/export_csv.png') ?>" width="25"  height="24" alt="<?php echo Mage::helper('advancedreports')->__('CSV'); ?>" title="<?php echo Mage::helper('advancedreports')->__('CSV'); ?>" /></a>
+                <a href="<?php echo Mage::helper("adminhtml")->getUrl("advancedreports/adminhtml_advancedreports/advancedReports/", array("report" => 'topsellingproducts_xml')); ?>" class="excel"><img src="<?php echo $this->getSkinUrl('advancedreports/images/export_xml.png') ?>" width="25"  height="24" alt="<?php echo Mage::helper('advancedreports')->__('XML'); ?>" title="<?php echo Mage::helper('advancedreports')->__('XML'); ?>" /></a>
+            </div>
+
+        </h3>
+
+        <!-- Time to purchase report chart container -->
+        <div class="topsellingproducts_chart_container">
+            <div class="topsellingproducts_chart_table">
+                <table id="topsellingproducts-advanced-report-table"  border="0"  cellpadding="0" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th align="left" class="text_left" width="25%"><?php echo Mage::helper('advancedreports')->__('Product'); ?></th>
+                            <th align="right" class="text_right" width="10%"><?php
+                                if (!empty($top_selling_product_month[1])) {
+                                    echo $top_selling_product_month[1];
+                                } else {
+                                    echo Mage::helper('advancedreports')->__('First Month');
+                                }
+                                ?></th>
+                            <th align="right" class="text_right" width="10%"><?php
+                                if (!empty($top_selling_product_month[2])) {
+                                    echo $top_selling_product_month[2];
+                                } else {
+                                    echo Mage::helper('advancedreports')->__('Second Month');
+                                }
+                                ?></th>
+                            <th align="right" class="text_right" width="10%"><?php
+                                if (!empty($top_selling_product_month[3])) {
+                                    echo $top_selling_product_month[3];
+                                } else {
+                                    echo Mage::helper('advancedreports')->__('Third Month');
+                                }
+                                ?></th>
+                            <th align="right" class="text_right" width="10%"><?php
+                                if (!empty($top_selling_product_month[4])) {
+                                    echo $top_selling_product_month[4];
+                                } else {
+                                    echo Mage::helper('advancedreports')->__('Forth Month');
+                                }
+                                ?></th>
+                            <th align="right" class="text_right" width="10%"><?php
+                                if (!empty($top_selling_product_month[5])) {
+                                    echo $top_selling_product_month[5];
+                                } else {
+                                    echo Mage::helper('advancedreports')->__('Fifth Month');
+                                }
+                                ?></th>
+                            <th align="right" class="text_right" width="10%"><?php
+                                if (!empty($top_selling_product_month[6])) {
+                                    echo $top_selling_product_month[6];
+                                } else {
+                                    echo Mage::helper('advancedreports')->__('sixth Month');
+                                }
+                                ?></th>
+                            <th align="right" class="text_right" width="15%"><?php echo Mage::helper('advancedreports')->__('Total Revenue'); ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $sno = 1;
+                        if (count($sorted_topsellingproducts_report) >= 1) {
+                            foreach ($sorted_topsellingproducts_report as $key => $value) {
+                                ?>
+                                <tr class="advanced-report-data <?php
+                                if ($sno % 2 == 0) {
+                                    echo 'advanced-report-even';
+                                }
+                                ?>">
+                                    <td align="left" ><?php
+                                        if (!empty($value['name'])) {
+                                            echo $value['name'];
+                                        }
+                                        ?></td>
+                                    <td align="right" ><?php
+                                        if (!empty($top_selling_product_month[1])) {
+                                            $first_data = $top_selling_product_month[1];
+                                            if (!empty($value[$first_data])) {
+                                                echo Mage::helper('core')->currency(round($value[$first_data], 2), true);
+                                            } else {
+                                                echo Mage::helper('core')->currency(round(0, 2), true);
+                                            }
+                                        } else {
+                                            echo Mage::helper('core')->currency(round(0, 2), true);
+                                        }
+                                        ?></td>
+                                    <td align="right" ><?php
+                                        if (!empty($top_selling_product_month[2])) {
+                                            $second_data = $top_selling_product_month[2];
+                                            if (!empty($value[$second_data])) {
+                                                echo Mage::helper('core')->currency(round($value[$second_data], 2), true);
+                                            } else {
+                                                echo Mage::helper('core')->currency(round(0, 2), true);
+                                            }
+                                        } else {
+                                            echo Mage::helper('core')->currency(round(0, 2), true);
+                                        }
+                                        ?></td>
+                                    <td align="right" ><?php
+                                        if (!empty($top_selling_product_month[3])) {
+                                            $third_data = $top_selling_product_month[3];
+                                            if (!empty($value[$third_data])) {
+                                                echo Mage::helper('core')->currency(round($value[$third_data], 2), true);
+                                            } else {
+                                                echo Mage::helper('core')->currency(round(0, 2), true);
+                                            }
+                                        } else {
+                                            echo Mage::helper('core')->currency(round(0, 2), true);
+                                        }
+                                        ?></td>
+                                    <td align="right" ><?php
+                                        if (!empty($top_selling_product_month[4])) {
+                                            $forth_data = $top_selling_product_month[4];
+                                            if (!empty($value[$forth_data])) {
+                                                echo Mage::helper('core')->currency(round($value[$forth_data], 2), true);
+                                            } else {
+                                                echo Mage::helper('core')->currency(round(0, 2), true);
+                                            }
+                                        } else {
+                                            echo Mage::helper('core')->currency(round(0, 2), true);
+                                        }
+                                        ?></td>
+                                    <td align="right" ><?php
+                                        if (!empty($top_selling_product_month[5])) {
+                                            $fifth_data = $top_selling_product_month[5];
+                                            if (!empty($value[$fifth_data])) {
+                                                echo Mage::helper('core')->currency(round($value[$fifth_data], 2), true);
+                                            } else {
+                                                echo Mage::helper('core')->currency(round(0, 2), true);
+                                            }
+                                        } else {
+                                            echo Mage::helper('core')->currency(round(0, 2), true);
+                                        }
+                                        ?></td>
+                                    <td align="right" ><?php
+                                        if (!empty($top_selling_product_month[6])) {
+                                            $sixth_data = $top_selling_product_month[6];
+                                            if (!empty($value[$sixth_data])) {
+                                                echo Mage::helper('core')->currency(round($value[$sixth_data], 2), true);
+                                            } else {
+                                                echo Mage::helper('core')->currency(round(0, 2), true);
+                                            }
+                                        } else {
+                                            echo Mage::helper('core')->currency(round(0, 2), true);
+                                        }
+                                        ?></td>
+                                    <td align="right" ><?php
+                                        if (!empty($value['total_revenue'])) {
+                                            echo Mage::helper('core')->currency(round($value['total_revenue'], 2), true);
+                                        }
+                                        ?></td>
+
+                                </tr>
+                                <?php
+                                $sno = $sno + 1;
+                                if ($sno > 25) {
+                                    break;
+                                }
+                            }
+                        }
+                        ?>
+
+
+
+                    </tbody>
+
+                    <?php
+// checking for table data
+                    if (count($sorted_topsellingproducts_report) < 1) {
+                        ?>
+                        <tfoot> <tr><td colspan="8" align="center"> <?php echo Mage::helper('advancedreports')->__('No data found') . '.'; ?> </td></tr></tfoot>
+                    <?php } // end if for checking table data      ?>
+                </table>
+
+            </div>
+
+        </div>
+    </div>

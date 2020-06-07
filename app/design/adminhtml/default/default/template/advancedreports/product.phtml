@@ -1,0 +1,1230 @@
+<?php
+
+/**
+ * Apptha
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the EULA
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://www.apptha.com/LICENSE.txt
+ *
+ * ==============================================================
+ *                 MAGENTO EDITION USAGE NOTICE
+ * ==============================================================
+ * This package designed for Magento COMMUNITY edition
+ * Apptha does not guarantee correct work of this extension
+ * on any other Magento edition except Magento COMMUNITY edition.
+ * Apptha does not provide extension support in case of
+ * incorrect edition usage.
+ * ==============================================================
+ *
+ * @category    Apptha
+ * @package     Apptha_Advancedreports
+ * @version     0.2.1
+ * @author      Apptha Team <developers@contus.in>
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
+ * @license     http://www.apptha.com/LICENSE.txt
+ *
+ */
+
+// Checking session dates for product report
+if (Mage::getSingleton('core/session')->getAdvancedReportDateOption() && Mage::app()->getRequest()->getParam('advanced_report_date_session') == 1) {
+    if (Mage::getSingleton('core/session')->getAdvancedReportDateOption() == "Custom") {
+        $_advanced_get_option = Mage::getSingleton('core/session')->getAdvancedReportDateOption();
+        $_advanced_get_from = Mage::getSingleton('core/session')->getAdvancedReportDateFrom();
+        $_advanced_get_to = Mage::getSingleton('core/session')->getAdvancedReportDateTo();
+    } else {
+        $_advanced_get_option = Mage::getSingleton('core/session')->getAdvancedReportDateOption();
+    }
+} else {
+    $_advanced_get_option = Mage::app()->getRequest()->getParam('date_range_option');
+    $_advanced_get_from = Mage::app()->getRequest()->getParam('from');
+    $_advanced_get_to = Mage::app()->getRequest()->getParam('to');
+}
+
+// Assigning from and to date
+if (!empty($_advanced_get_option)) {
+    switch ($_advanced_get_option) {
+        case "Today":
+            // today interval
+            $start_day = strtotime("-1 today midnight");
+            $end_day = strtotime("-1 tomorrow midnight");
+            $from = date("Y-m-d", $start_day);
+            $to = date("Y-m-d", $end_day);
+            $from_display = date("Y-m-d", $start_day);
+            $to_display = date("Y-m-d", $start_day);
+            break;
+        case "Yesterday":
+            // yesterday interval
+            $start_day = strtotime("-1 yesterday midnight");
+            $end_day = strtotime("-1 today midnight");
+            $from = date("Y-m-d", $start_day);
+            $to = date("Y-m-d", $end_day);
+            $from_display = date("Y-m-d", $start_day);
+            $to_display = date("Y-m-d", $start_day);
+            break;
+        case "LastWeek":
+            // last week interval
+            $t = date('d-m-Y');
+            $to_day = date('l', strtotime($t));
+            // if today is monday, take last monday
+            if ($to_day == 'Monday') {
+                $start_day = strtotime("-1 monday midnight");
+                $end_day = strtotime("yesterday");
+            } else {
+                $start_day = strtotime("-2 monday midnight");
+                $end_day = strtotime("-1 sunday midnight");
+            }
+            $from = date("Y-m-d", $start_day);
+            $to = date("Y-m-d", $end_day);
+            $to = date('Y-m-d', strtotime($to . ' + 1 day'));
+            $from_display = $from;
+            $to_display = date("Y-m-d", $end_day);
+            break;
+        case "LastMonth":
+            // last month interval
+            $from = date('Y-m-01', strtotime('last month'));
+            $to = date('Y-m-t', strtotime('last month'));
+            $to = date('Y-m-d', strtotime($to . ' + 1 day'));
+            $from_display = $from;
+            $to_display = date('Y-m-t', strtotime('last month'));
+            break;
+        case "Custom":
+            // last custom interval
+            $from = date('Y-m-d', strtotime($_advanced_get_from));
+            $to = date('Y-m-d', strtotime($_advanced_get_to . ' + 1 day'));
+            $from_display = $from;
+            $to_display = date('Y-m-d', strtotime($_advanced_get_to));
+            break;
+        default:
+            // last 30 interval
+            $from = date('Y-m-d', strtotime('-30 day'));
+            $to = date('Y-m-d', strtotime("-1 today midnight"));
+            $to = date('Y-m-d', strtotime($to . ' + 1 day'));
+            $from_display = $from;
+            $to_display = date('Y-m-d', strtotime("-1 today midnight"));
+    }
+} else {
+    // last 30 interval
+    $from = date('Y-m-d', strtotime('-30 day'));
+    $to = date('Y-m-d', strtotime("-1 today midnight"));
+    $to = date('Y-m-d', strtotime($to . ' + 1 day'));
+    $from_display = $from;
+    $to_display = date('Y-m-d', strtotime("-1 today midnight"));
+}
+
+// Initializing product option for gross and net revenue
+$product_option = 0;
+if (Mage::app()->getRequest()->getParam('product_option')) {
+    if (Mage::app()->getRequest()->getParam('product_option') == 'net') {
+        $product_option = 1;
+    } else {
+        $product_option = 0;
+    }
+}
+
+// Sales order item collection
+$db_from = Mage::getModel('core/date')->gmtDate(null, strtotime($from));
+$db_to = Mage::getModel('core/date')->gmtDate(null, strtotime($to));
+
+// Checking all or individual product report
+if (Mage::app()->getRequest()->getParam('report_product_id') != '') {
+    $individual_pid = Mage::app()->getRequest()->getParam('report_product_id');
+    $orderTotals = $this->advancedIndividualProductReportCollection($db_from, $db_to, $individual_pid);
+} else {
+    $orderTotals = $this->advancedProductReportCollection($db_from, $db_to);
+}
+
+// Product collection for getting product name
+$obj = Mage::getModel('catalog/product');
+$product_report = array();
+
+// Initializing array for qty, qty_month and qty_week
+$qty = array();
+$qty_month = array();
+$qty_week = array();
+
+// Calculating product data
+foreach ($orderTotals as $value) {
+    $_product = $obj->load($value->getProductId());
+    $_product_name = $_product->getName();
+
+    // Assigning product name
+    if (empty($product_report[$_product_name]['name'])) {
+        $product_report[$_product_name]['name'] = $_product->getName();
+        $product_report[$_product_name]['id'] = $value->getProductId();
+        $product_report[$_product_name]['qty'] = 0;
+        $product_report[$_product_name]['price'] = 0;
+        $product_report[$_product_name]['price_net'] = 0;
+        $product_report[$_product_name]['uni_qty'] = 0;
+    }
+
+    if (array_key_exists($_product_name, $product_report)) {
+        $product_report[$_product_name]['qty'] = $product_report[$_product_name]['qty'] + round($value->getQtyOrdered());
+        $product_report[$_product_name]['price'] = $product_report[$_product_name]['price'] + ($value->getBaseOriginalPrice() * $value->getQtyOrdered()) - $value->getBaseDiscountAmount() + $value->getBaseTaxAmount();
+        $product_report[$_product_name]['price_net'] = $product_report[$_product_name]['price_net'] + ($value->getBaseOriginalPrice() * $value->getQtyOrdered()) - $value->getBaseDiscountAmount();
+        $product_report[$_product_name]['uni_qty'] = $product_report[$_product_name]['uni_qty'] + 1;
+    } else {
+        $product_report[$_product_name]['qty'] = round($value->getQtyOrdered());
+        $product_report[$_product_name]['price'] = ($value->getBaseOriginalPrice() * $value->getQtyOrdered()) - $value->getBaseDiscountAmount() + $value->getBaseTaxAmount();
+        $product_report[$_product_name]['price_net'] = ($value->getBaseOriginalPrice() * $value->getQtyOrdered()) - $value->getBaseDiscountAmount();
+        $product_report[$_product_name]['uni_qty'] = 1;
+    }
+
+// Day wise
+    $date_r = Mage::getModel('core/date')->date(null, strtotime($value->getSfogCreatedAt()));
+    $date_r = date('F j, Y', strtotime($date_r));
+    if (array_key_exists($date_r, $qty)) {
+        $qty[$date_r] = $qty[$date_r] + round($value->getQtyOrdered());
+    } else {
+        $qty[$date_r] = round($value->getQtyOrdered());
+    }
+
+// Month wise
+    $date_m = Mage::getModel('core/date')->date(null, strtotime($value->getSfogCreatedAt()));
+    $date_m = date('M, Y', strtotime($date_m));
+    if (array_key_exists($date_m, $qty_month)) {
+        $qty_month[$date_m] = $qty_month[$date_m] + round($value->getQtyOrdered());
+    } else {
+        $qty_month[$date_m] = round($value->getQtyOrdered());
+    }
+// Week wise
+    $date_w = Mage::getModel('core/date')->date(null, strtotime($value->getSfogCreatedAt()));
+    $date_w = date('W, Y', strtotime($date_w));
+    if (array_key_exists($date_w, $qty_week)) {
+        $qty_week[$date_w] = $qty_week[$date_w] + round($value->getQtyOrdered());
+    } else {
+        $qty_week[$date_w] = round($value->getQtyOrdered());
+    }
+}
+
+
+// Calculating all days
+$product_all_days = array();
+$from_all_day = strtotime($from);
+$to_all_day = strtotime($to);
+for ($current_product_day = $from_all_day; $current_product_day < $to_all_day; $current_product_day += (60 * 60 * 24)) {
+    $current_day_string = date('F j, Y', $current_product_day);
+    $product_all_days[$current_day_string] = 0;
+}
+
+// Sorting for product report data
+$product_report = Mage::helper('advancedreports')->sort_array_by_key($product_report, 'qty');
+
+// Calculating all weeks
+$prodcut_weeks = array();
+for ($current_product_day = $from_all_day; $current_product_day <= $to_all_day; $current_product_day += (60 * 60 * 24 * 7)) {
+    $current_day_string = date('W, Y', $current_product_day);
+    $product_weeks[$current_day_string] = 0;
+}
+
+// For final week
+$final_week = date('W, Y', strtotime($to_display));
+if (!empty($product_weeks)) {
+    if (!array_key_exists($final_week, $product_weeks)) {
+        $product_weeks[$final_week] = 0;
+    }
+}
+
+// Calculating all months
+$product_months = array();
+if ($qty > 0) {
+    $tmp = date('mY', $to_all_day);
+    $month_key = date('M, Y', $from_all_day);
+    $product_months[$month_key] = 0;
+    while ($from_all_day < $to_all_day) {
+        if ($from_all_day < 31) {
+            $from_all_day = strtotime(date('Y-m-d', $from_all_day) . ' +1 month');
+        } else {
+            $from_all_day = strtotime(date('Y-m-d', $from_all_day) . ' +15days');
+        }
+        if (date('mY', $from_all_day) != $tmp && ($from_all_day < strtotime($to_display))) {
+            $month_key = date('M, Y', $from_all_day);
+            $product_months[$month_key] = 0;
+        }
+    }
+    $month_key = date('M, Y', strtotime($to_display));
+    $product_months[$month_key] = 0;
+}
+
+// Assigning all days value
+foreach ($qty as $key => $value) {
+    $product_all_days[$key] = $value;
+}
+
+// Assigning all week value
+foreach ($qty_week as $key => $value) {
+    $product_weeks[$key] = $value;
+}
+
+// Assigning all month value
+foreach ($qty_month as $key => $value) {
+    $product_months[$key] = $value;
+}
+
+// Reset chart data as zero
+if (count($qty) < 1) {
+    $product_all_days = array();
+    $product_months = array();
+    $prodcut_weeks = array();
+}
+
+// Initializing chart data variables
+$product_day_data = '';
+$product_week_data = '';
+$product_month_data = '';
+
+// Calculating day wise chart value
+foreach ($product_all_days as $key => $value) {
+    $tool_data = date('l, F j, Y', strtotime($key)) . ' ' . Mage::helper('advancedreports')->__('Quantity') . ' : ' . $value;
+    $key_value=date('M j, Y', strtotime($key));
+    $product_day_data.="data.addRow(['{$key_value}', {$value}, '{$tool_data}']);";
+}
+
+// Calculating chart values for week
+// If condition for week negative value issue.
+if (count($qty) >= 1) {
+    foreach ($product_weeks as $key => $value) {
+
+        $arr = array();
+        $arr = explode(',', $key);
+        $week = $arr[0];
+        $year = $arr[1];
+        $time = strtotime("1 January $year", time());
+        $day = date('w', $time);
+        $time += ((7 * $week) + 1 - $day) * 24 * 3600 - 7 * 24 * 3600;
+        $week_start = date('F j, Y', $time);
+        $time += 6 * 24 * 3600;
+        $week_end = date('F j, Y', $time);
+        if (date('W, Y', strtotime($from)) == $key) {
+            $week_start = date('F j, Y', strtotime($from));
+        }
+        if (date('W, Y', strtotime($to_display)) == $key) {
+            $week_end = date('F j, Y', strtotime($to_display));
+        }
+        $tool_data = $week_start . ' - ' . $week_end . ' ' . Mage::helper('advancedreports')->__('Quantity') . ' : ' . $value;
+        $week_start_value=date('M j, Y', strtotime($week_start));
+        $product_week_data.="data.addRow(['{$week_start_value}', {$value}, '{$tool_data}']);";
+    }
+}
+// Calculating chart values for month
+foreach ($product_months as $key => $value) {
+    $month_start = date('F 1, Y', strtotime($key));
+    $month_end = date('F t, Y', strtotime($key));
+    if (date('M, Y', strtotime($from)) == $key) {
+        $month_start = date('F j, Y', strtotime($from));
+    }
+    if (date('M, Y', strtotime($to_display)) == $key) {
+        $month_end = date('F j, Y', strtotime($to_display));
+    }
+    $key_value=date('M, Y', strtotime($key));
+    $tool_data = $month_start . ' - ' . $month_end . ' ' . Mage::helper('advancedreports')->__('Quantity') . ' : ' . $value;
+    $product_month_data.="data.addRow(['{$key_value}', {$value}, '{$tool_data}']);";
+}
+// Total Product Revenue
+$total_product_revenue = 0;
+$total_product_revenue_net = 0;
+foreach ($product_report as $value) {
+    $total_product_revenue = $total_product_revenue + $value['price'];
+    $total_product_revenue_net = $total_product_revenue_net + $value['price_net'];
+}
+?>
+
+
+
+<?php
+// Today
+$today_start_day = strtotime("-1 today midnight");
+$today_from = date("Y-m-d", $today_start_day);
+$today_to = date("Y-m-d", $today_start_day);
+
+// Yesterday
+$yesterday_start_day = strtotime("-1 yesterday midnight");
+$yesterday_from = date("Y-m-d", $yesterday_start_day);
+$yesterday_to = date("Y-m-d", $yesterday_start_day);
+
+// Last week
+$t = date('d-m-Y');
+$to_day = date('l', strtotime($t));
+// if today is monday, take last monday
+if ($to_day == 'Monday') {
+    $start_day = strtotime("-1 monday midnight");
+    $end_day = strtotime("yesterday");
+} else {
+    $start_day = strtotime("-2 monday midnight");
+    $end_day = strtotime("-1 sunday midnight");
+}
+$lastweek_from = date("Y-m-d", $start_day);
+$lastweek_to = date("Y-m-d", $end_day);
+
+// Last Month
+$lastmonth_from = date('Y-m-01', strtotime('last month'));
+$lastmonth_to = date('Y-m-t', strtotime('last month'));
+
+// For follow up products
+$followup_products = array();
+$followup_products = Mage::helper('advancedreports')->getFollowupproductsCollection();
+?>
+
+<input type="hidden" id="product-revenue-today-date-from" value="<?php echo date('m/d/Y', strtotime($today_from)); ?>" />
+<input type="hidden" id="product-revenue-today-date-to" value="<?php echo date('m/d/Y', strtotime($today_to)); ?>" />
+<input type="hidden" id="product-revenue-yesterday-date-from" value="<?php echo date('m/d/Y', strtotime($yesterday_from)); ?>" />
+<input type="hidden" id="product-revenue-yesterday-date-to" value="<?php echo date('m/d/Y', strtotime($yesterday_to)); ?>" />
+<input type="hidden" id="product-revenue-lastweek-date-from" value="<?php echo date('m/d/Y', strtotime($lastweek_from)); ?>" />
+<input type="hidden" id="product-revenue-lastweek-date-to" value="<?php echo date('m/d/Y', strtotime($lastweek_to)); ?>" />
+<input type="hidden" id="product-revenue-lastmonth-date-from" value="<?php echo date('m/d/Y', strtotime($lastmonth_from)); ?>" />
+<input type="hidden" id="product-revenue-lastmonth-date-to" value="<?php echo date('m/d/Y', strtotime($lastmonth_to)); ?>" />
+
+
+<!-- product report hidden value for report creation -->
+<input type="hidden" id="product-revenue-custom-date-from" value="<?php echo date('m/d/Y', strtotime($from_display)); ?>" />
+<input type="hidden" id="product-revenue-custom-date-to" value="<?php echo date('m/d/Y', strtotime($to_display)); ?>" />
+<!-- For ajax url -->
+<!--<input type="hidden" id="product_ajax_url" value="<?php echo Mage::helper("adminhtml")->getUrl("advancedreports/adminhtml_advancedreports/product"); ?>" />-->
+<!-- For reset drop down -->
+<input type="hidden" id="product_reset_dropdown" value="<?php
+if (!empty($_advanced_get_option)) {
+    echo Mage::helper('advancedreports')->__($_advanced_get_option);
+} else {
+    echo Mage::helper('advancedreports')->__('Custom');
+}
+?>" />
+
+<!-- Individual product report -->
+<input type="hidden" id="advanced-individual-product-id" value="<?php echo Mage::app()->getRequest()->getParam('report_product_id'); ?>" />
+<!-- product report wrapper -->
+    <div class="advanced_report_wrapper" id="product_advanced_report_wrapper">
+
+<!--        <div id="product_report_ajax_load" style="display: none;" class="loading_img">
+            <p><?php echo Mage::helper('advancedreports')->__('Please wait') . ' ...'; ?></p>
+        </div>-->
+
+        <h3 class="advanced_report_header content-header"> <span class="title_head"> <?php echo Mage::helper('advancedreports')->__('Product Report'); ?></span>
+
+            <!-- product report date picker -->
+
+            <div class="advanced_date_picker">
+                <span id="product-report-date-range" class="report-date-range" >
+                    <?php echo Date('M j, Y', strtotime($from_display)) . ' - ' . Date('M j, Y', strtotime($to_display)); ?>
+                </span>
+                <div id="product-report-date-picker"  class="date_popup" style="display: none">
+
+                    <div id="product-advanced-report-datepicker"></div>
+
+                    <div class="advanced-report-right">
+                        <label for="daterange-select"><?php echo Mage::helper('advancedreports')->__('Date Range'); ?></label>
+                        <select id="product-date-range-select" name="daterange" >
+
+                            <option value="Custom" <?php
+                            if (!empty($_advanced_get_option)) {
+                                if ($_advanced_get_option == 'Custom') {
+                                    echo 'selected';
+                                }
+                            }
+                            ?>><?php echo Mage::helper('advancedreports')->__('Custom'); ?></option>
+
+                            <option value="Today" <?php
+                            if (!empty($_advanced_get_option)) {
+                                if ($_advanced_get_option == 'Today') {
+                                    echo 'selected';
+                                }
+                            }
+                            ?>><?php echo Mage::helper('advancedreports')->__('Today'); ?></option>
+                            <option value="Yesterday" <?php
+                            if (!empty($_advanced_get_option)) {
+                                if ($_advanced_get_option == 'Yesterday') {
+                                    echo 'selected';
+                                }
+                            }
+                            ?>><?php echo Mage::helper('advancedreports')->__('Yesterday'); ?></option>
+                            <option value="LastWeek" <?php
+                            if (!empty($_advanced_get_option)) {
+                                if ($_advanced_get_option == 'LastWeek') {
+                                    echo 'selected';
+                                }
+                            }
+                            ?>><?php echo Mage::helper('advancedreports')->__('Last Week'); ?></option>
+                            <option value="LastMonth" <?php
+                            if (!empty($_advanced_get_option)) {
+                                if ($_advanced_get_option == 'LastMonth') {
+                                    echo 'selected';
+                                }
+                            }
+                            ?>><?php echo Mage::helper('advancedreports')->__('Last Month'); ?></option>
+
+                        </select>
+                        <div style="clear: both;margin-bottom: 10px;"></div>
+                        <input type="text" id="product-custom-date-from" size="10"  <?php
+                        if (!empty($_advanced_get_option)) {
+                            if ($_advanced_get_option != "Custom") {
+                                echo 'disabled';
+                            }
+                        }
+                        ?>/> <?php echo Mage::helper('advancedreports')->__('-'); ?>
+                        <input type="text" id="product-custom-date-to" size="10" <?php
+                        if (!empty($_advanced_get_option)) {
+                            if ($_advanced_get_option != "Custom") {
+                                echo 'disabled';
+                            }
+                        }
+                        ?>/>
+
+                        <!-- product report date fields error message  -->
+                        <span  id="product-report-err-msg" class="err-msg" style="display: none">
+                            <?php echo Mage::helper('advancedreports')->__('Please select') . ' '; ?>
+                            <b><?php echo Mage::helper('advancedreports')->__('from') . ' '; ?></b>
+                            <?php echo Mage::helper('advancedreports')->__('and') . ' '; ?>
+                            <b> <?php echo Mage::helper('advancedreports')->__('to') . ' '; ?></b>
+                            <?php echo Mage::helper('advancedreports')->__('dates'); ?>
+                        </span>
+                        <span  id="product-report-todate-err-msg" class="err-msg" style="display: none">
+                            <?php echo Mage::helper('advancedreports')->__('Please select valid') . ' '; ?>
+                            <b> <?php echo '"' . Mage::helper('advancedreports')->__('to') . '" '; ?></b>
+                            <?php echo Mage::helper('advancedreports')->__('date') . ' '; ?>
+                        </span>
+                        <div style="clear: both;padding-bottom: 10px;border-bottom: 1px dotted #666;margin-bottom: 10px;"></div>
+                        <a id="product_report_apply" href="javascript:void(0)" class="apply" onclick="product_report_apply_click();"><?php echo Mage::helper('advancedreports')->__('Apply'); ?></a>
+                        <div style="position: relative; float:left;">
+                            <div id="product-report-disable-click-event">
+                                <a><?php echo Mage::helper('advancedreports')->__('Cancel'); ?></a>
+                            </div>
+                            <a href="javascript:void(0)" id="product-report-date-cancel" onclick="productcancel();"><?php echo Mage::helper('advancedreports')->__('Cancel'); ?></a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- product report export option -->
+            <div id="export">
+                <span><?php echo Mage::helper('advancedreports')->__('Export As:'); ?></span>
+                <a href="<?php echo Mage::helper("adminhtml")->getUrl("advancedreports/adminhtml_advancedreports/advancedReports/", array("from" => $from, "to" => $to, "report" => 'product_csv', "product_option_value" => $product_option)); ?>" class="csv"><img src="<?php echo $this->getSkinUrl('advancedreports/images/export_csv.png') ?>" width="25"  height="24" alt="<?php echo Mage::helper('advancedreports')->__('CSV'); ?>" title="<?php echo Mage::helper('advancedreports')->__('CSV'); ?>" /></a>
+                <a href="<?php echo Mage::helper("adminhtml")->getUrl("advancedreports/adminhtml_advancedreports/advancedReports/", array("from" => $from, "to" => $to, "report" => 'product_xml', "product_option_value" => $product_option)); ?>" class="excel"><img src="<?php echo $this->getSkinUrl('advancedreports/images/export_xml.png') ?>" width="25"  height="24" alt="<?php echo Mage::helper('advancedreports')->__('XML'); ?>" title="<?php echo Mage::helper('advancedreports')->__('XML'); ?>" /></a>
+            </div>
+        </h3>
+        <div class="advanced-all-product-container">
+            <?php
+// Checking all or individual product report
+            if (Mage::app()->getRequest()->getParam('report_product_id') != '') {
+                ?>
+                <!-- All product link -->
+                <div class="all" >
+                    <a name="" href="javascript:void(0)" onclick="product_individual(this.name);"><?php echo Mage::helper('advancedreports')->__('All'); ?></a>
+                    <span><span>&#187;</span><?php echo Mage::helper('advancedreports')->__('PRODUCT'); ?> :</span>
+                </div>
+                <div class="advanced-all-product-link">
+                    <p>
+                        <?php
+                        $selected_pid = Mage::app()->getRequest()->getParam('report_product_id');
+                        echo $this->selectedProductName($selected_pid);
+                        ?>
+                    </p>
+                    <span id="show-advanced-all-product"><span>&nbsp;</span></span>
+                    <ul id="advanced-all-product-list" style="display:none;">
+                        <li class="title">
+                            <span class="prod"><?php echo Mage::helper('advancedreports')->__('Product'); ?></span>
+                            <span class="qty"><?php echo Mage::helper('advancedreports')->__('Qty'); ?></span>
+                        </li>
+                        <?php
+                        //  All product list
+                        $all_product = array();
+                        $all_product = $this->allProductName($db_from, $db_to, $selected_pid);
+                        foreach ($all_product as $value) {
+                            ?>
+                            <li>
+                                <a name="<?php echo $value['id']; ?>" href="javascript:void(0)" onclick="product_individual(this.name);">
+                                    <span class="prod">
+                                        <?php echo $value['name']; ?>
+                                    </span>
+                                    <span class="qty">
+                                        <?php echo $value['qty']; ?>
+                                    </span>
+                                </a>
+                            </li>
+                            <?php
+                        } // End all product list
+                        ?>
+                    </ul>
+                </div>
+
+                <?php
+            } // Checking all or individual product report
+            ?>
+        </div>
+
+
+
+        <!-- product report char div -->
+        <div class="report-chart">
+            <div class="chart_top">
+                <div class="revenue_transaction_report">
+
+                    <div class="revenue_transaction product_rev_bottom">
+
+                        <div class="shipping-tax-options">
+                            <ul>
+                                <li><span class="spantxt"><?php echo Mage::helper('advancedreports')->__('Tax') . ' : '; ?></span></li>
+
+                                <li id="li_product_tax_inc" class="include <?php
+                                if ($product_option == 0) {
+                                    echo 'active';
+                                } else {
+                                    echo 'inactive';
+                                }
+                                ?>" >
+                                    <a id="product_inc_id" class="first_child" href="javascript:void(0)" onclick="product_inc_id_click();"><span class="tex_text"><?php echo Mage::helper('advancedreports')->__('Included'); ?></span>
+                                    </a>
+                                </li>
+                                <li id="li_product_tax_exc" class=" <?php
+                                if ($product_option == 1) {
+                                    echo 'active';
+                                } else {
+                                    echo 'inactive';
+                                }
+                                ?>" >
+                                    <a id="product_exc_id" href="javascript:void(0)" onclick="product_exc_id_click();"><span class="tex_text"><?php echo Mage::helper('advancedreports')->__('Excluded'); ?></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- product report total revenue -->
+                    <div class="total-revenue sales_report third_child">
+                        <p class="text">
+                            <?php echo Mage::helper('advancedreports')->__('Product Revenue'); ?>
+                        </p>
+                        <p class="number">
+                            <?php
+                            if ($product_option == 0) {
+                                echo Mage::helper('core')->currency(round($total_product_revenue, 2), true);
+                            } else {
+                                echo Mage::helper('core')->currency(round($total_product_revenue_net, 2), true);
+                            }
+                            ?>
+                        </p>
+                    </div>
+
+                    <!-- product report total no of purchase -->
+                    <div class="total-transaction">
+                        <p class="text">
+                            <?php echo Mage::helper('advancedreports')->__('No of Purchases'); ?>
+                        </p>
+                        <p class="number">
+                            <?php echo count($orderTotals); ?>
+                        </p>
+                    </div>
+
+                    <!-- product report total no of quantity -->
+                    <div class="total-revenue">
+                        <p class="text">
+                            <?php echo Mage::helper('advancedreports')->__('Quantity'); ?>
+                        </p>
+                        <p class="number">
+                            <?php echo array_sum($qty); ?>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- product report day, week and month wise option -->
+                <div class="chart-button-options">
+                    <?php
+                    // Checking whether all/individual product
+                    if (Mage::app()->getRequest()->getParam('report_product_id')) {
+                        ?>
+                        <a href="javascript:void(0)" id="product_report_day_select" onclick="productloadChart();"><?php echo Mage::helper('advancedreports')->__('Day'); ?></a>
+                        <a href="javascript:void(0)" id="product_report_week_select" onclick="productloadChartWeek();"><?php echo Mage::helper('advancedreports')->__('Week'); ?></a>
+                        <a href="javascript:void(0)" id="product_report_month_select" onclick="productloadChartMonth();"><?php echo Mage::helper('advancedreports')->__('Month'); ?></a>
+                    <?php } else { ?>
+                        <a href="javascript:void(0)" id="product_report_day_select" onclick="productloadChart();" style="display:none"><?php echo Mage::helper('advancedreports')->__('Day'); ?></a>
+                        <a href="javascript:void(0)" id="product_report_week_select" onclick="productloadChartWeek();" style="display:none"><?php echo Mage::helper('advancedreports')->__('Week'); ?></a>
+                        <a href="javascript:void(0)" id="product_report_month_select" onclick="productloadChartMonth();" style="display:none"><?php echo Mage::helper('advancedreports')->__('Month'); ?></a>
+                    <?php } // End if Checking whether all/individual product    ?>
+                </div>
+
+
+
+            </div>
+            <?php
+            // Checking whether all/individual product
+            if (Mage::app()->getRequest()->getParam('report_product_id')) {
+                ?>
+                <div id="product_chart_div"></div>
+            <?php } else { ?>
+                <div id="product_chart_div" style="display:none" ></div>
+            <?php } // End if Checking whether all/individual product   ?>
+        </div>
+
+        <!-- product report table -->
+        <table id="product-advanced-report-table" border="0" width="960px" cellpadding="0" cellspacing="0">
+            <thead>
+                <tr>
+                    <th align="left" class="text_left" width="25%"><?php echo Mage::helper('advancedreports')->__('Product'); ?></th>
+                    <th align="right" class="text_right advancedreports-headerDesc" width="15%"><?php echo Mage::helper('advancedreports')->__('Quantity'); ?></th>
+                    <th align="right" class="text_right" width="15%"><?php echo Mage::helper('advancedreports')->__('Unique Purchases'); ?></th>
+                    <th align="right" class="text_right" width="15%"><?php echo Mage::helper('advancedreports')->__('Product Revenue'); ?></th>
+                    <th align="right" class="text_right" width="15%"><?php echo Mage::helper('advancedreports')->__('Average Price'); ?></th>
+                    <th align="right" class="text_right border" width="15%"><?php echo Mage::helper('advancedreports')->__('Average QTY'); ?></th>
+
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                $sno = 1;
+
+
+                foreach ($product_report as $value) {
+
+                    if ($product_option == 0) {
+                        $product_revenue = Mage::helper('core')->currency(round($value['price'], 2), true);
+                        $avg_price = $value['price'] / $value['qty'];
+                        $avg_price = Mage::helper('core')->currency(round($avg_price, 2), true);
+                    } else {
+                        $product_revenue = Mage::helper('core')->currency(round($value['price_net'], 2), true);
+                        $avg_price = $value['price_net'] / $value['qty'];
+                        $avg_price = Mage::helper('core')->currency(round($avg_price, 2), true);
+                    }
+                    ?>
+                    <tr class="advanced-report-data <?php
+                    if ($sno % 2 == 0) {
+                        echo 'advanced-report-even';
+                    }
+                    ?>">
+
+                        <?php
+                        // If for checking all or individual product
+                        if (Mage::app()->getRequest()->getParam('report_product_id') != '') {
+                            ?>
+                            <td class="followupproduct" align="left" >
+                                <span class="advance_followup">
+                                    <?php echo $value['name']; ?>
+
+                                    <span class="checkbox_tooltip">
+                                        <em>
+                                            <?php
+                                            if (in_array($value['id'], $followup_products)) {
+                                                echo Mage::helper('advancedreports')->__('Do you want to unfollow up this product') . '?';
+                                            } else {
+                                                echo Mage::helper('advancedreports')->__('Do you want to follow up this product') . '?';
+                                            }
+                                            ?>
+                                        </em>
+                                        <input <?php
+                                        if (in_array($value['id'], $followup_products)) {
+                                            echo 'checked="checked"';
+                                        }
+                                        ?>   type="checkbox" class="advancedreports_followupproducts"  value="<?php echo $value['id']; ?>"/>
+
+                                    </span>
+                                </span>
+                            </td>
+                        <?php } else { ?>
+                            <td class="followupproduct" align="left">
+                                <span class="advance_followup">
+                                    <a name="<?php echo $value['id']; ?>" href="javascript:void(0)" onclick="product_individual(this.name);"><?php echo $value['name']; ?></a>
+
+                                    <span class="checkbox_tooltip">
+                                        <em>
+                                            <?php
+                                            if (in_array($value['id'], $followup_products)) {
+                                                echo Mage::helper('advancedreports')->__('Do you want to unfollow up this product') . '?';
+                                            } else {
+                                                echo Mage::helper('advancedreports')->__('Do you want to follow up this product') . '?';
+                                            }
+                                            ?>
+                                        </em>
+                                        <input <?php
+                                        if (in_array($value['id'], $followup_products)) {
+                                            echo 'checked="checked"';
+                                        }
+                                        ?>   type="checkbox" class="advancedreports_followupproducts"  value="<?php echo $value['id']; ?>"/>
+
+                                    </span>
+                                </span>
+
+                            </td>
+                        <?php } // End if for checking all or individual product    ?>
+                        <td align="right" class="revenue_amt"><?php echo $value['qty']; ?></td>
+                        <td align="right" ><?php echo $value['uni_qty']; ?></td>
+                        <td align="right" ><?php
+                            if (isset($product_revenue)) {
+                                echo $product_revenue;
+                            }
+                            ?></td>
+                        <td align="right" ><?php
+                            if (isset($avg_price)) {
+                                echo $avg_price;
+                            }
+                            ?></td>
+                        <td align="right" class="border"><?php echo round($value['qty'] / $value['uni_qty'], 2); ?></td>
+
+                    </tr>
+                    <?php
+                    $sno = $sno + 1;
+                }
+                ?>
+
+            </tbody>
+            <?php
+// Checking for table data
+            if (count($product_report) < 1) {
+                ?>
+                <tfoot> <tr><td colspan="6" align="center"> <?php echo Mage::helper('advancedreports')->__('No data found') . '.'; ?> </td></tr></tfoot>
+            <?php } // end if for checking table data     ?>
+
+        </table>
+
+
+        <?php
+// Checking for pagination
+        if (count($product_report) > 5) {
+            ?>
+
+            <!-- Calling pagination and sorting functionality for product report table -->
+            <script type="text/javascript">
+                                jq(function() {
+                                    jq("#product-advanced-report-table")
+                                            .tablesorter({widthFixed: true, widgets: ['zebra']})
+                                            .advancedtablesorterPager({container: jq("#advanced_product_report_pager")});
+                                });
+
+            </script>
+
+            <!-- Product report pagination -->
+            <div id="advanced_product_report_pager" class="pager">
+                <form>
+                    <span class="goto_row"> <?php echo Mage::helper('advancedreports')->__('Show rows') . ' : '; ?> </span>
+                    <select class="pagesize">
+                        <option selected="selected" value="5">5</option>
+                        <option value="10">10</option>
+                        <option  value="25">25</option>
+                        <option  value="100">100</option>
+                        <option  value="500">500</option>
+                    </select>
+                    <span class="goto_span"> <?php echo Mage::helper('advancedreports')->__('Go to') . ' : '; ?> </span>
+                    <input value="1" type="text" class="goto"/>
+                    <span class="nopage"></span>
+                    <span class="page_arrow">
+                        <span class="tablePagination_firstPage first" >&#171;</span>
+                        <span class="tablePagination_prevPage prev">&#8249;</span>
+                        <span class="tablePagination_nextPage next" >&#8250;</span>
+                        <span class="tablePagination_lastPage last" >&#187;</span>
+                    </span>
+                </form>
+            </div>
+
+        <?php } else { ?>
+
+            <!-- Calling sorting functionality for product report table -->
+            <script type="text/javascript">
+                jq(function() {
+                    jq("#product-advanced-report-table")
+                            .tablesorter({widthFixed: true, widgets: ['zebra']});
+                });
+
+            </script>
+
+        <?php } // end if for checking paginatin and sorting      ?>
+    </div>
+    <!--<script type="text/javascript" src="https://www.google.com/jsapi"></script>-->
+
+    <!-- CODE FOR LESS THAN IE 8 VERSIONS -->
+    <!--[if lt IE 9]>
+    <script type="text/javascript">
+     jq(document).ready(function() {
+      setTimeout(productloadChart,300);
+        jq("#advancedreports_tabs_product_section").click(function(event) {
+            setTimeout(productloadChart,300);
+        });
+    });
+    </script>
+    <![endif]-->
+
+    <!-- Calculating product report day, week and month wise chart.  -->
+    <script type="text/javascript">
+
+    //    google.load('visualization', '1.0', {'packages': ['corechart']});
+    //    google.setOnLoadCallback(productloadChart);
+
+        // calculating day chart report for product
+        function productloadChart() {
+            document.getElementById('advanced_report_main_ajax_load').style.display = "block";
+            document.getElementById("product_report_day_select").className = "active";
+            document.getElementById("product_report_week_select").className = "";
+            document.getElementById("product_report_month_select").className = "";
+
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', '<?php echo Mage::helper('advancedreports')->__("Date"); ?>');
+            data.addColumn('number', '<?php echo Mage::helper('advancedreports')->__("Quantity"); ?>');
+            data.addColumn({type: 'string', role: 'tooltip'});
+
+    <?php
+    echo $product_day_data;
+    ?>
+
+            var options = {width: 940, height: 250,
+                colors: ['#058dc7', '#e6f4fa'],
+                areaOpacity: 0.1,
+                vAxis: {textPosition: 'in', showTextEvery: 5, slantedText: false, textStyle: {color: '#000000', fontSize: 11}},
+                hAxis: {title: '<?php echo Mage::helper('advancedreports')->__("Day"); ?>', titleTextStyle: {color: '#000000', fontSize: 12, italic: false, bold: true}, textPosition: 'out', showTextEvery: 7, slantedText: false, textStyle: {color: '#000000', fontSize: 10}},
+                pointSize: 5,
+                legend: 'top',
+                chartArea: {left: 40, top: 30, width: "100%", height: "75%"},
+                tooltip: {isHtml: true}
+            };
+
+
+            var chart = new google.visualization.AreaChart(document.getElementById('product_chart_div'));
+
+            chart.draw(data, options);
+            document.getElementById('advanced_report_main_ajax_load').style.display = "none";
+        }
+
+        // calculating month chart report for product
+        function productloadChartMonth()
+        {
+            document.getElementById('advanced_report_main_ajax_load').style.display = "block";
+            document.getElementById("product_report_day_select").className = "";
+            document.getElementById("product_report_week_select").className = "";
+            document.getElementById("product_report_month_select").className = "active";
+
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', '<?php echo Mage::helper('advancedreports')->__("Date"); ?>');
+            data.addColumn('number', '<?php echo Mage::helper('advancedreports')->__("Quantity"); ?>');
+            data.addColumn({type: 'string', role: 'tooltip'});
+    <?php
+    echo $product_month_data;
+    ?>
+
+            var options = {width: 940, height: 250,
+                colors: ['#058dc7', '#e6f4fa'],
+                areaOpacity: 0.1,
+                vAxis: {textPosition: 'in', showTextEvery: 5, slantedText: false, textStyle: {color: '#000000', fontSize: 11}},
+                hAxis: {title: '<?php echo Mage::helper('advancedreports')->__("Month"); ?>', titleTextStyle: {color: '#000000', fontSize: 12, italic: false, bold: true}, textPosition: 'out', showTextEvery: 1, slantedText: false, textStyle: {color: '#000000', fontSize: 10}},
+                pointSize: 5,
+                legend: 'top',
+                chartArea: {left: 40, top: 30, width: "100%", height: "75%"},
+                tooltip: {isHtml: true}
+            };
+
+            var chart = new google.visualization.AreaChart(document.getElementById('product_chart_div'));
+
+            chart.draw(data, options);
+            document.getElementById('advanced_report_main_ajax_load').style.display = "none";
+        }
+
+        // calculating week chart report for product
+        function productloadChartWeek()
+        {
+            document.getElementById('advanced_report_main_ajax_load').style.display = "block";
+            document.getElementById("product_report_day_select").className = "";
+            document.getElementById("product_report_week_select").className = "active";
+            document.getElementById("product_report_month_select").className = "";
+
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', '<?php echo Mage::helper('advancedreports')->__("Date"); ?>');
+            data.addColumn('number', '<?php echo Mage::helper('advancedreports')->__("Quantity"); ?>');
+            data.addColumn({type: 'string', role: 'tooltip'});
+
+    <?php
+    echo $product_week_data;
+    ?>
+            var options = {width: 940, height: 250,
+                colors: ['#058dc7', '#e6f4fa'],
+                areaOpacity: 0.1,
+                vAxis: {textPosition: 'in', showTextEvery: 5, slantedText: false, textStyle: {color: '#000000', fontSize: 11}},
+                hAxis: {title: '<?php echo Mage::helper('advancedreports')->__("Week"); ?>', titleTextStyle: {color: '#000000', fontSize: 12, italic: false, bold: true}, textPosition: 'out', showTextEvery: 1, slantedText: false, textStyle: {color: '#000000', fontSize: 10}},
+                pointSize: 5,
+                legend: 'top',
+                chartArea: {left: 40, top: 30, width: "100%", height: "75%"},
+                tooltip: {isHtml: true}
+
+            };
+
+            var chart = new google.visualization.AreaChart(document.getElementById('product_chart_div'));
+
+            chart.draw(data, options);
+            document.getElementById('advanced_report_main_ajax_load').style.display = "none";
+        }
+
+
+    </script>
+
+    <!-- Calling product chart based on product option -->
+    <?php
+    if (Mage::app()->getRequest()->getParam('product_option')) {
+
+        if (Mage::app()->getRequest()->getParam('active') == 'day') {
+            ?>
+            <script type="text/javascript">
+                jq(document).ready(function() {
+                    setTimeout(productloadChart, 200);
+                });
+            </script>
+            <?php
+        }
+        if (Mage::app()->getRequest()->getParam('active') == 'week') {
+            ?>
+
+            <script type="text/javascript">
+                jq(document).ready(function() {
+                    setTimeout(productloadChartWeek, 200);
+                });
+            </script>
+
+            <?php
+        }
+        if (Mage::app()->getRequest()->getParam('active') == 'month') {
+            ?>
+            <script type="text/javascript">
+                jq(document).ready(function() {
+                    setTimeout(productloadChartMonth, 200);
+                });
+            </script>
+            <?php
+        }
+    }
+    ?>
+
+
+    <script type="text/javascript">
+
+        jq(document).ready(function() {
+            // Assign dates in text fields.
+            jq("#product-report-date-range").click(function() {
+
+                jq("#product-custom-date-from").val(jq("#product-revenue-custom-date-from").val());
+                jq("#product-custom-date-to").val(jq("#product-revenue-custom-date-to").val());
+
+            });
+            jq("#product-report-date-cancel").click(function() {
+                jq("#product-custom-date-from").val(jq("#product-revenue-custom-date-from").val());
+                jq("#product-custom-date-to").val(jq("#product-revenue-custom-date-to").val());
+            });
+
+            // Refresh date picker
+            jq("#product-report-date-cancel").click(function() {
+                jq("#product-advanced-report-datepicker").datepicker("refresh");
+                jq("#product-report-todate-err-msg").hide();
+                jq("#product-report-disable-click-event").show();
+            });
+            jq('#product-date-range-select').change(function() {
+
+                jq("#product-report-disable-click-event").hide();
+                if (jq(this).val() != "Custom")
+                {
+                    jq("#product-advanced-report-datepicker").datepicker("destroy");
+
+                    jq("#product-advanced-report-datepicker").datepicker({
+                        monthNames: ['<?php echo Mage::helper('advancedreports')->__('January'); ?>', '<?php echo Mage::helper('advancedreports')->__('February'); ?>', '<?php echo Mage::helper('advancedreports')->__('March'); ?>', '<?php echo Mage::helper('advancedreports')->__('April'); ?>', '<?php echo Mage::helper('advancedreports')->__('May'); ?>', '<?php echo Mage::helper('advancedreports')->__('June'); ?>',
+                            '<?php echo Mage::helper('advancedreports')->__('July'); ?>', '<?php echo Mage::helper('advancedreports')->__('August'); ?>', '<?php echo Mage::helper('advancedreports')->__('September'); ?>', '<?php echo Mage::helper('advancedreports')->__('October'); ?>', '<?php echo Mage::helper('advancedreports')->__('November'); ?>', '<?php echo Mage::helper('advancedreports')->__('December'); ?>'],
+                       // dayNamesMin: ['Mo', 'Tu','We','Th','Fr','Sa','Su'],
+                        maxDate: 0,
+                        yearRange: "-100:+0",
+                        numberOfMonths: 3,
+                        beforeShowDay: function(date) {
+
+                            if (jq("#product-date-range-select").val() == "Today")
+                            {
+                                var from = jq("#product-revenue-today-date-from").val();
+                                var to = jq("#product-revenue-today-date-to").val();
+                                jq("#product-custom-date-from").val(from);
+                                jq("#product-custom-date-to").val(to);
+                            }
+                            else if (jq("#product-date-range-select").val() == "Yesterday")
+                            {
+                                var from = jq("#product-revenue-yesterday-date-from").val();
+                                var to = jq("#product-revenue-yesterday-date-to").val();
+                                jq("#product-custom-date-from").val(from);
+                                jq("#product-custom-date-to").val(to);
+                            }
+                            else if (jq("#product-date-range-select").val() == "LastWeek")
+                            {
+                                var from = jq("#product-revenue-lastweek-date-from").val();
+                                var to = jq("#product-revenue-lastweek-date-to").val();
+                                jq("#product-custom-date-from").val(from);
+                                jq("#product-custom-date-to").val(to);
+                            }
+                            else if (jq("#product-date-range-select").val() == "LastMonth")
+                            {
+                                var from = jq("#product-revenue-lastmonth-date-from").val();
+                                var to = jq("#product-revenue-lastmonth-date-to").val();
+                                jq("#product-custom-date-from").val(from);
+                                jq("#product-custom-date-to").val(to);
+
+                            }
+                            else
+                            {
+                            }
+
+                            var date1 = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, jq("#product-custom-date-from").val());
+                            var date2 = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, jq("#product-custom-date-to").val());
+                            return [true, date1 && ((date.getTime() == date1.getTime()) || (date2 && date >= date1 && date <= date2)) ? "dp-highlight" : ""];
+
+
+                        },
+                        onSelect: function(dateText, inst) {
+                            var date1 = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, jq("#product-custom-date-from").val());
+                            var date2 = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, jq("#product-custom-date-to").val());
+                            jq("#product-date-range-select").val("Custom");
+                            jq("#product-custom-date-from").removeAttr("disabled");
+                            jq("#product-custom-date-to").removeAttr("disabled");
+                            jq("#product-report-disable-click-event").hide();
+                            if (!date1 || date2) {
+                                jq("#product-custom-date-from").val(dateText);
+                                jq("#product-custom-date-to").val("");
+                                jq(this).datepicker();
+                            } else {
+
+                                var checkdate = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, jq("#product-custom-date-from").val());
+                                var checkdateText = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, dateText);
+                                if (checkdate > checkdateText)
+                                {
+                                    jq("#product-report-todate-err-msg").show();
+                                    return;
+                                }
+                                jq("#product-report-todate-err-msg").hide();
+                                jq("#product-custom-date-to").val(dateText);
+                                jq(this).datepicker();
+                            }
+                            jq("#product-report-err-msg").hide();
+
+                        }
+                    }
+                    );
+                }
+                jq("#product-report-todate-err-msg").hide();
+            });
+
+            // For show and hide date picker div
+            jq('#product-report-date-range').click(function() {
+                jq('#product-report-date-picker').slideToggle('fast');
+                jq('#product-report-date-range').toggleClass('arrowdown');
+            });
+
+            // For date picker div
+            jq(document).click(function() {
+                jq("#product-report-date-picker").hide();
+                jq('#product-report-date-range').removeClass('arrowdown');
+            });
+            jq('#product-report-date-picker,#product-report-date-range').click(function(event) {
+                event.stopPropagation();
+            });
+
+            // For display products list
+            jq('#show-advanced-all-product').click(function() {
+                jq('#advanced-all-product-list').show('fast');
+            });
+
+            // hide products list
+            jq(document).click(function() {
+                jq("#advanced-all-product-list").hide();
+            });
+            jq('#show-advanced-all-product').click(function(event) {
+                event.stopPropagation();
+            });
+
+            // Enable or disable date picker text field
+            jq("#product-date-range-select").change(function() {
+
+                if (jq("#product-date-range-select").val() == 'Custom')
+                {
+                    jq("#product-custom-date-from").removeAttr("disabled");
+                    jq("#product-custom-date-to").removeAttr("disabled");
+
+                    jq("#product-custom-date-from").val('');
+                    jq("#product-custom-date-to").val('');
+                    jq("#product-advanced-report-datepicker").datepicker("refresh");
+
+                }
+                else
+                {
+                    jq("#product-custom-date-from").attr("disabled", "disabled");
+                    jq("#product-custom-date-to").attr("disabled", "disabled");
+
+                }
+            });
+
+        });
+
+    // Product report  date picker
+        jq(function() {
+            jq("#product-advanced-report-datepicker").datepicker({
+                monthNames: ['<?php echo Mage::helper('advancedreports')->__('January'); ?>', '<?php echo Mage::helper('advancedreports')->__('February'); ?>', '<?php echo Mage::helper('advancedreports')->__('March'); ?>', '<?php echo Mage::helper('advancedreports')->__('April'); ?>', '<?php echo Mage::helper('advancedreports')->__('May'); ?>', '<?php echo Mage::helper('advancedreports')->__('June'); ?>',
+                    '<?php echo Mage::helper('advancedreports')->__('July'); ?>', '<?php echo Mage::helper('advancedreports')->__('August'); ?>', '<?php echo Mage::helper('advancedreports')->__('September'); ?>', '<?php echo Mage::helper('advancedreports')->__('October'); ?>', '<?php echo Mage::helper('advancedreports')->__('November'); ?>', '<?php echo Mage::helper('advancedreports')->__('December'); ?>'],
+               // dayNamesMin: ['Mo', 'Tu','We','Th','Fr','Sa','Su'],
+                maxDate: 0,
+                yearRange: "-100:+0",
+                numberOfMonths: 3,
+                beforeShowDay: function(date) {
+
+
+                    if (jq("#product-custom-date-from").val() == '' && jq("#product-custom-date-to").val() == '')
+                    {
+                        var d_h1 = jq("#product-revenue-custom-date-from").val();
+                        var d_h2 = jq("#product-revenue-custom-date-to").val();
+                        var date1 = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, d_h1);
+                        var date2 = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, d_h2);
+                        return [true, date1 && ((date.getTime() == date1.getTime()) || (date2 && date >= date1 && date <= date2)) ? "dp-highlight" : ""];
+                    }
+
+
+                    var date1 = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, jq("#product-custom-date-from").val());
+                    var date2 = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, jq("#product-custom-date-to").val());
+                    return [true, date1 && ((date.getTime() == date1.getTime()) || (date2 && date >= date1 && date <= date2)) ? "dp-highlight" : ""];
+                },
+                onSelect: function(dateText, inst) {
+                    var date1 = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, jq("#product-custom-date-from").val());
+                    var date2 = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, jq("#product-custom-date-to").val());
+                    jq("#product-date-range-select").val("Custom");
+                    jq("#product-custom-date-from").removeAttr("disabled");
+                    jq("#product-custom-date-to").removeAttr("disabled");
+                    jq("#product-report-disable-click-event").hide();
+                    if (!date1 || date2) {
+                        jq("#product-custom-date-from").val(dateText);
+                        jq("#product-custom-date-to").val("");
+                        jq(this).datepicker();
+                    } else {
+
+                        var checkdate = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, jq("#product-custom-date-from").val());
+                        var checkdateText = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, dateText);
+                        if (checkdate > checkdateText)
+                        {
+                            jq("#product-report-todate-err-msg").show();
+                            return;
+                        }
+                        jq("#product-report-todate-err-msg").hide();
+
+
+                        jq("#product-custom-date-to").val(dateText);
+                        jq(this).datepicker();
+                    }
+
+                    // hide date fields error message
+                    jq("#product-report-err-msg").hide();
+
+                }
+            }
+            );
+        });
+    </script>
+
+
+    <?php
+// Setting session for advanced report date
+    if (Mage::app()->getRequest()->getParam('advanced_session') == 1) {
+        if (Mage::getSingleton('core/session')->getAdvancedReportDateOption()) {
+            Mage::getSingleton('core/session')->unsAdvancedReportDateOption();
+            Mage::getSingleton('core/session')->unsAdvancedReportDateFrom();
+            Mage::getSingleton('core/session')->unsAdvancedReportDateTo();
+        }
+        $advanced_report_date_option = Mage::app()->getRequest()->getParam('date_range_option');
+        $advanced_report_date_from = Mage::app()->getRequest()->getParam('from');
+        $advanced_report_date_to = Mage::app()->getRequest()->getParam('to');
+        Mage::getSingleton('core/session')->setAdvancedReportDateOption($advanced_report_date_option);
+        Mage::getSingleton('core/session')->setAdvancedReportDateFrom($advanced_report_date_from);
+        Mage::getSingleton('core/session')->setAdvancedReportDateTo($advanced_report_date_to);
+    }
+    ?>

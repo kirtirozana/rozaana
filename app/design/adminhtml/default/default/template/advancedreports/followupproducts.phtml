@@ -1,0 +1,357 @@
+<?php
+
+/**
+ * Apptha
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the EULA
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://www.apptha.com/LICENSE.txt
+ *
+ * ==============================================================
+ *                 MAGENTO EDITION USAGE NOTICE
+ * ==============================================================
+ * This package designed for Magento COMMUNITY edition
+ * Apptha does not guarantee correct work of this extension
+ * on any other Magento edition except Magento COMMUNITY edition.
+ * Apptha does not provide extension support in case of
+ * incorrect edition usage.
+ * ==============================================================
+ *
+ * @category    Apptha
+ * @package     Apptha_Advancedreports
+ * @version     0.2.1
+ * @author      Apptha Team <developers@contus.in>
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
+ * @license     http://www.apptha.com/LICENSE.txt
+ *
+ */
+
+?>
+
+<?php
+if (Mage::app()->getRequest()->getParam('date_range_option')) {
+    $_advanced_get_option = Mage::app()->getRequest()->getParam('date_range_option');
+}
+
+if (!empty($_advanced_get_option)) {
+    switch ($_advanced_get_option) {
+        case "Today":
+            // today interval
+            $start_day = strtotime("-1 today midnight");
+            $end_day = strtotime("-1 tomorrow midnight");
+            $from = date("Y-m-d", $start_day);
+            $to = date("Y-m-d", $end_day);
+            $from_display = date("Y-m-d", $start_day);
+            $to_display = date("Y-m-d", $start_day);
+            break;
+
+        case "LastWeek":
+            // last week interval
+            $t = date('d-m-Y');
+            $to_day = date('l', strtotime($t));
+            // if today is monday, take last monday
+            if ($to_day == 'Monday') {
+                $start_day = strtotime("-1 monday midnight");
+                $end_day = strtotime("yesterday");
+            } else {
+                $start_day = strtotime("-2 monday midnight");
+                $end_day = strtotime("-1 sunday midnight");
+            }
+            $from = date("Y-m-d", $start_day);
+            $to = date("Y-m-d", $end_day);
+            $to = date('Y-m-d', strtotime($to . ' + 1 day'));
+            $from_display = $from;
+            $to_display = date("Y-m-d", $end_day);
+            break;
+        case "LastMonth":
+            // last month interval
+            $from = date('Y-m-01', strtotime('last month'));
+            $to = date('Y-m-t', strtotime('last month'));
+            $to = date('Y-m-d', strtotime($to . ' + 1 day'));
+            $from_display = $from;
+            $to_display = date('Y-m-t', strtotime('last month'));
+
+        default:
+            // last month interval
+            $from = date('Y-m-01', strtotime('last month'));
+            $to = date('Y-m-t', strtotime('last month'));
+            $to = date('Y-m-d', strtotime($to . ' + 1 day'));
+            $from_display = $from;
+            $to_display = date('Y-m-t', strtotime('last month'));
+    }
+} else {
+    // last month interval
+    $from = date('Y-m-01', strtotime('last month'));
+    $to = date('Y-m-t', strtotime('last month'));
+    $to = date('Y-m-d', strtotime($to . ' + 1 day'));
+    $from_display = $from;
+    $to_display = date('Y-m-t', strtotime('last month'));
+}
+
+
+$followup_start_date = $from;
+$followup_end_date = $from;
+
+if (!empty($_advanced_get_option)) {
+    if ($_advanced_get_option == 'Today') {
+        $followup_start_date = date('Y-m-d', strtotime($followup_end_date . ' - 1 day'));
+    } elseif ($_advanced_get_option == 'LastWeek') {
+        $followup_start_date = date('Y-m-d', strtotime($followup_end_date . ' - 7 day'));
+    } else {
+        $followup_start_date = date('Y-m-d', strtotime($followup_end_date . ' - 1 month'));
+    }
+} else {
+    $followup_start_date = date('Y-m-d', strtotime($followup_end_date . ' - 1 month'));
+}
+
+// For displaying dates
+$followup_from_display = $followup_start_date;
+$followup_to_display = date('Y-m-d', strtotime($followup_end_date . ' - 1 day'));
+
+// Converting local time to db time
+$db_from = Mage::getModel('core/date')->gmtDate(null, strtotime($followup_start_date));
+$db_to = Mage::getModel('core/date')->gmtDate(null, strtotime($to));
+
+// Getting all followup products
+$followup_products = Mage::helper('advancedreports')->getFollowupproductsCollection();
+$collections = $this->getProductDetailsCollection($followup_products, $db_from, $db_to);
+
+// Redeclaring collection value empty
+if(empty($collections))
+{
+    $collections=array();
+}
+
+// Product collection for getting product name
+$obj = Mage::getModel('catalog/product');
+$followup_report = array();
+
+// Assinging from and to date value for calculating product data
+$from_value = strtotime($from);
+$to_value = strtotime($to);
+
+// Calculating product data
+foreach ($collections as $value) {
+    $_product = $obj->load($value->getProductId());
+    $_product_name = $_product->getName();
+
+    // Assigning product name
+    if (empty($followup_report[$_product_name]['name'])) {
+        $followup_report[$_product_name]['name'] = $_product->getName();
+        $followup_report[$_product_name]['id'] = $value->getProductId();
+        $followup_report[$_product_name]['revenue_diff'] = 0;
+        $followup_report[$_product_name]['revenue_first'] = 0;
+        $followup_report[$_product_name]['revenue_second'] = 0;
+    }
+
+    if (array_key_exists($_product_name, $followup_report)) {
+        $purchased_date = Mage::getModel('core/date')->date(null, strtotime($value->getSfogCreatedAt()));
+        $purchased_date_value = strtotime($purchased_date);
+
+        if ($purchased_date_value >= $from_value && $purchased_date_value <= $to_value) {
+            $followup_report[$_product_name]['revenue_second'] = $followup_report[$_product_name]['revenue_second'] + ($value->getBaseOriginalPrice() * $value->getQtyOrdered()) - $value->getBaseDiscountAmount();
+        } else {
+            $followup_report[$_product_name]['revenue_first'] = $followup_report[$_product_name]['revenue_first'] + ($value->getBaseOriginalPrice() * $value->getQtyOrdered()) - $value->getBaseDiscountAmount();
+        }
+
+    }
+}
+
+// Assinging defualt values for unsold products
+
+foreach ($followup_products as $fproduct) {
+    $_product = $obj->load($fproduct);
+    $_product_name = $_product->getName();
+    if (!array_key_exists($_product_name, $followup_report)) {
+        $followup_report[$_product_name]['name'] = $_product->getName();
+        $followup_report[$_product_name]['id'] = $fproduct;
+        $followup_report[$_product_name]['revenue_diff'] = 0;
+        $followup_report[$_product_name]['revenue_first'] = 0;
+        $followup_report[$_product_name]['revenue_second'] = 0;
+    }
+}
+
+
+
+$followup_report_data = array();
+$revenue_diff = 0;
+foreach ($followup_report as $value) {
+    // Calculating gain percentage
+    if ($value['revenue_second'] > $value['revenue_first']) {
+        $followup_product = $value['name'];
+        $followup_report_data[$followup_product]['name'] = $value['name'];
+        $followup_report_data[$followup_product]['id'] = $value['id'];
+        $followup_report_data[$followup_product]['revenue_first'] = $value['revenue_first'];
+        $followup_report_data[$followup_product]['revenue_second'] = $value['revenue_second'];
+        $followup_report_data[$followup_product]['revenue_diff'] = $value['revenue_second'] - $value['revenue_first'];
+        $revenue_diff = $value['revenue_second'] - $value['revenue_first'];
+        $followup_report_data[$followup_product]['comparison'] = 'gainer';
+
+        // For division by zero issue
+        if ($value['revenue_first'] != 0) {
+            $followup_report_data[$followup_product]['percent'] = $revenue_diff / $value['revenue_first'] * 100;
+        }elseif ($value['revenue_first'] == 0 && $revenue_diff !=0 ) {
+          $followup_report_data[$followup_product]['percent'] = 100;
+    } else {
+            $followup_report_data[$followup_product]['percent'] = 0;
+        }
+    } else {
+        // Calculating lose percentage
+        $followup_product = $value['name'];
+        $followup_report_data[$followup_product]['name'] = $value['name'];
+        $followup_report_data[$followup_product]['id'] = $value['id'];
+        $followup_report_data[$followup_product]['revenue_first'] = $value['revenue_first'];
+        $followup_report_data[$followup_product]['revenue_second'] = $value['revenue_second'];
+        $followup_report_data[$followup_product]['revenue_diff'] = $value['revenue_first'] - $value['revenue_second'];
+        $revenue_diff = $value['revenue_first'] - $value['revenue_second'];
+        $followup_report_data[$followup_product]['comparison'] = 'loser';
+
+        // For division by zero issue
+        if ($value['revenue_first'] != 0) {
+            $followup_report_data[$followup_product]['percent'] = $revenue_diff / $value['revenue_first'] * 100;
+        }
+        elseif($value['revenue_second'] == 0 && $revenue_diff != 0) {
+              $followup_report_data[$followup_product]['percent'] = 100;
+        }
+        else {
+            $followup_report_data[$followup_product]['percent'] = 0;
+        }
+    }
+}
+?>
+
+<!--<input type="hidden" id="advancedreports_updatefollowupproducts" value="<?php echo Mage::helper("adminhtml")->getUrl("advancedreports/adminhtml_advancedreports/updatefollowupproducts/") . 'followup_product_id/'; ?>"/>
+<input type="hidden" id="advancedreports_removefollowupproducts" value="<?php echo Mage::helper("adminhtml")->getUrl("advancedreports/adminhtml_advancedreports/removefollowupproducts/") . 'followup_product_id/'; ?>"/>
+<input type="hidden" id="followupproducts_ajax_url" value="<?php echo Mage::helper("adminhtml")->getUrl("advancedreports/adminhtml_advancedreports/followupproducts"); ?>" />-->
+
+    <!-- Follow up products report wrapper -->
+    <div id="followupproducts_advanced_report_wrapper" class="advanced_report_wrapper">
+
+        <!-- Follow up products report header -->
+        <h3 class="advanced_report_header content-header"> <span class="title_head"><?php echo Mage::helper('advancedreports')->__('Follow Up Products Report'); ?> </span>
+<!--            <div id="followupproducts_report_ajax_load" style="display: none;" class="loading_img">
+                <p><?php echo Mage::helper('advancedreports')->__('Please wait') . '...'; ?></p>
+            </div>-->
+
+            <!-- Follow up products report day, week & month wise report -->
+            <div class="chart-button-options">
+                <a href="javascript:void(0)" id="followup_report_day_select" onclick="followupProductsOption('Today');" class="<?php
+    if (Mage::app()->getRequest()->getParam('date_range_option') == 'Today') {
+        echo 'active';
+    }
+    ?>"><?php echo Mage::helper('advancedreports')->__('Day'); ?></a>
+                <a href="javascript:void(0)" id="followup_report_week_select" onclick="followupProductsOption('LastWeek');" class="<?php
+    if (Mage::app()->getRequest()->getParam('date_range_option') == 'LastWeek') {
+        echo 'active';
+    }
+    ?>"><?php echo Mage::helper('advancedreports')->__('Week'); ?></a>
+                <a href="javascript:void(0)" id="followup_report_month_select" onclick="followupProductsOption('LastMonth');" class="<?php
+                if (Mage::app()->getRequest()->getParam('date_range_option') == 'LastMonth') {
+                    echo 'active';
+                } if (!Mage::app()->getRequest()->getParam('date_range_option')) {
+                    echo 'active';
+                }
+                ?>"><?php echo Mage::helper('advancedreports')->__('Month'); ?></a>
+            </div>
+            <!-- Follow up products report chart container -->
+
+            <!-- Follow up products report export option -->
+            <div id="followupproductsexport">
+                <span><?php echo Mage::helper('advancedreports')->__('Export As:'); ?></span>
+                <a href="<?php echo Mage::helper("adminhtml")->getUrl("advancedreports/adminhtml_advancedreports/advancedReports/", array("from" => $from, "to" => $to, "report" => 'followupproducts_csv')); ?>" class="csv"><img src="<?php echo $this->getSkinUrl('advancedreports/images/export_csv.png') ?>" width="25"  height="24" alt="<?php echo Mage::helper('advancedreports')->__('CSV'); ?>" title="<?php echo Mage::helper('advancedreports')->__('CSV'); ?>" /></a>
+                <a href="<?php echo Mage::helper("adminhtml")->getUrl("advancedreports/adminhtml_advancedreports/advancedReports/", array("from" => $from, "to" => $to, "report" => 'followupproducts_xml')); ?>" class="excel"><img src="<?php echo $this->getSkinUrl('advancedreports/images/export_xml.png') ?>" width="25"  height="24" alt="<?php echo Mage::helper('advancedreports')->__('XML'); ?>" title="<?php echo Mage::helper('advancedreports')->__('XML'); ?>" /></a>
+            </div>
+        </h3>
+        <!-- Follow up products table -->
+        <div class="followup_chart_table">
+            <table id="followup-advanced-report-table"  border="0"  cellpadding="0" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th align="left" class="text_left sort-order-none" data-sorter="false" width="50%"><?php echo Mage::helper('advancedreports')->__('Product'); ?></th>
+                        <th align="right" class="text_right sort-order-none center_td" data-sorter="false" width="25%"><?php echo Date('M j, Y', strtotime($followup_from_display)) . ' - ' . Date('M j, Y', strtotime($followup_to_display)); ?></th>
+                        <th align="right" class="text_right last_td sort-order-none center_td" data-sorter="false" width="25%"><?php echo Date('M j, Y', strtotime($from_display)) . ' - ' . Date('M j, Y', strtotime($to_display)); ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $sno = 1;
+                    if (count($followup_report_data) >= 1) {
+                        foreach ($followup_report_data as $value) {
+                            ?>
+                            <tr class="advanced-report-data <?php
+                if ($sno % 2 == 0) {
+                    echo 'advanced-report-even';
+                }
+                            ?>">
+                                <td align="left" ><?php echo $value['name']; ?></td>
+                                <td align="right" ><?php echo Mage::helper('core')->currency(round($value['revenue_first'], 2), true); ?></td>
+                                <td align="right" ><?php echo Mage::helper('core')->currency(round($value['revenue_second'], 2), true); ?><?php if ($value['percent'] != 0) {
+                        if ($value['comparison'] == 'gainer') { ?><span class="folllowpgain"><?php echo ' (+' . round($value['percent'], 2) . '%)' ?></span><?php } else { ?><span class="folllowplose"><?php echo ' (-' . round($value['percent'], 2) . '%)' ?></span><?php }
+                    } else { ?>
+                        <span class="emptycell">
+                        <?php
+                        echo ' (' . round($value['percent'], 2) . '%)';?>
+                            </span>
+                        <?php
+                    } ?></td>
+                            </tr>
+                            <?php
+                            $sno = $sno + 1;
+                        }
+                    }
+                    ?>
+                </tbody>
+                <?php
+                    // checking for table data
+                    if (count($followup_report_data) < 1) {
+                        ?>
+                <tfoot><tr><td colspan="3" align="center"> <?php echo Mage::helper('advancedreports')->__('No data found') . '.'; ?> </td></tr></tfoot>
+    <?php } // end if for checking table data     ?>
+            </table>
+            <?php
+            // checking for pagination and sorting
+            if (count($followup_report_data) > 5) {
+                ?>
+                <script type="text/javascript">
+                        jq(function() {
+                            jq("#followup-advanced-report-table")
+                                    .tablesorter({widthFixed: true, widgets: ['zebra']})
+                                    .advancedtablesorterPager({container: jq("#advanced_followupproducts_report_pager")});
+                        });
+                </script>
+                 <!-- Follow up products report table pagination -->
+                <div id="advanced_followupproducts_report_pager" class="pager">
+                    <form>
+                        <span class="goto_row"> <?php echo Mage::helper('advancedreports')->__('Show rows') . ' : '; ?> </span>
+                        <select class="pagesize">
+                            <option selected="selected" value="5">5</option>
+                            <option value="10">10</option>
+                            <option  value="25">25</option>
+                            <option  value="100">100</option>
+                            <option  value="500">500</option>
+                        </select>
+                        <span class="goto_span"> <?php echo Mage::helper('advancedreports')->__('Go to') . ' : '; ?> </span>
+                        <input value="1" type="text" class="goto"/>
+                        <span class="nopage"></span>
+                        <span class="page_arrow">
+                            <span class="tablePagination_firstPage first" >&#171;</span>
+                            <span class="tablePagination_prevPage prev">&#8249;</span>
+                            <span class="tablePagination_nextPage next" >&#8250;</span>
+                            <span class="tablePagination_lastPage last" >&#187;</span>
+                        </span>
+                    </form>
+                </div>
+    <?php } else { ?>
+                <script type="text/javascript">
+                    jq(function()
+                    {
+                        jq("#followup-advanced-report-table")
+                                .tablesorter({widthFixed: true, widgets: ['zebra']});
+                    });
+                </script>
+    <?php } // end if for checking paginatin and sorting ?>
+        </div>
+    </div>

@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<!--  
+/**
+ * Apptha
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the EULA
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://www.apptha.com/LICENSE.txt
+ *
+ * ==============================================================
+ *                 MAGENTO EDITION USAGE NOTICE
+ * ==============================================================
+ * This package designed for Magento COMMUNITY edition
+ * Apptha does not guarantee correct work of this extension
+ * on any other Magento edition except Magento COMMUNITY edition.
+ * Apptha does not provide extension support in case of
+ * incorrect edition usage.
+ * ==============================================================
+ *
+ * @category    Apptha
+ * @package     Apptha_Advancedreports
+ * @version     0.2.1
+ * @author      Apptha Team <developers@contus.in>
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
+ * @license     http://www.apptha.com/LICENSE.txt
+ * 
+ */
+-->
+<layout version="0.1.0">
+   
+    <!-- Setting advanced reports page block -->
+    <advancedreports_adminhtml_advancedreports_index>       
+        <reference name="content">
+            <block type="advancedreports/adminhtml_advancedreports" name="advancedreports" />
+        </reference>
+    </advancedreports_adminhtml_advancedreports_index>
+    
+    <!-- Calling js and css files for advanced reports page -->
+    <advancedreports_adminhtml_advancedreports_edit>
+        <reference name="head">                       
+            <action method="addCss">
+                <script>advancedreports/css/style.css</script>
+            </action>                                 
+            <action method="addJs">
+                <script>advancedreports/jquery-1.8.3.min.js</script>
+            </action>
+            <action method="addJs">
+                <script>advancedreports/jquery-ui.js</script>
+            </action>
+            <action method="addJs">
+                <script>advancedreports/advancedreportsorter.js</script>
+            </action> 
+            <action method="addJs">
+                <script>advancedreports/advanedreportpagination.js</script>
+            </action>
+            <action method="addJs">
+                <script>advancedreports/noconflictjquery.js</script>
+            </action>    
+            <action method="addJs">
+                <script>advancedreports/advancedreports.js</script>
+            </action>    
+        </reference>        
+          <reference name="left">
+          <block type="advancedreports/adminhtml_advancedreports_advancedswitcher" name="advancedswitcher" before="-"></block>    
+          </reference>
+        
+    </advancedreports_adminhtml_advancedreports_edit> 
+</layout>

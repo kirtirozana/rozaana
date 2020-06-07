@@ -1,0 +1,299 @@
+<?php
+
+/**
+ * Apptha
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the EULA
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://www.apptha.com/LICENSE.txt
+ *
+ * ==============================================================
+ *                 MAGENTO EDITION USAGE NOTICE
+ * ==============================================================
+ * This package designed for Magento COMMUNITY edition
+ * Apptha does not guarantee correct work of this extension
+ * on any other Magento edition except Magento COMMUNITY edition.
+ * Apptha does not provide extension support in case of
+ * incorrect edition usage.
+ * ==============================================================
+ *
+ * @category    Apptha
+ * @package     Apptha_Advancedreports
+ * @version     0.2.1
+ * @author      Apptha Team <developers@contus.in>
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
+ * @license     http://www.apptha.com/LICENSE.txt
+ *
+ */
+
+// Assigning from and to date.
+$from = date('Y-m-d', strtotime(Mage::app()->getRequest()->getParam('individual_date')));
+$to = date('Y-m-d', strtotime(Mage::app()->getRequest()->getParam('individual_date') . ' + 1 day'));
+$from_display = $from;
+$to_display = date('Y-m-d', strtotime(Mage::app()->getRequest()->getParam('to')));
+
+// Sales order item collection
+$db_from = Mage::getModel('core/date')->gmtDate(null, strtotime($from));
+$db_to = Mage::getModel('core/date')->gmtDate(null, strtotime($to));
+
+// Initializing sales wise option for gross and net revenue
+$sales_wise_option = 0;
+
+// Getting datewise sales report collection
+$orderTotals = $orderTotals = $this->advancedProductReportCollection($db_from, $db_to);
+
+// Product collection for getting product name
+$obj = Mage::getModel('catalog/product');
+$product_report = array();
+
+// Initializing array for qty, qty_month and qty_week
+$qty = array();
+$qty_month = array();
+$qty_week = array();
+
+// Calculating product data
+foreach ($orderTotals as $value) {
+
+    $_product = $obj->load($value->getProductId());
+    $_product_name = $_product->getName();
+
+    // Assigning product name
+    if (empty($product_report[$_product_name]['name'])) {
+        $product_report[$_product_name]['name'] = $_product->getName();
+        $product_report[$_product_name]['id'] = $value->getProductId();
+        $product_report[$_product_name]['qty'] = 0;
+        $product_report[$_product_name]['price'] = 0;
+        $product_report[$_product_name]['price_net'] = 0;
+        $product_report[$_product_name]['uni_qty'] = 0;
+    }
+
+    if (array_key_exists($_product_name, $product_report)) {
+        $product_report[$_product_name]['qty'] = $product_report[$_product_name]['qty'] + round($value->getQtyOrdered());
+        $product_report[$_product_name]['price'] = $product_report[$_product_name]['price'] + ($value->getBaseOriginalPrice() * $value->getQtyOrdered()) - $value->getBaseDiscountAmount() + $value->getBaseTaxAmount();
+        $product_report[$_product_name]['price_net'] = $product_report[$_product_name]['price_net'] + ($value->getBaseOriginalPrice() * $value->getQtyOrdered()) - $value->getBaseDiscountAmount();
+        $product_report[$_product_name]['uni_qty'] = $product_report[$_product_name]['uni_qty'] + 1;
+    } else {
+        $product_report[$_product_name]['qty'] = round($value->getQtyOrdered());
+        $product_report[$_product_name]['price'] = ($value->getBaseOriginalPrice() * $value->getQtyOrdered()) - $value->getBaseDiscountAmount() + $value->getBaseTaxAmount();
+        $product_report[$_product_name]['price_net'] = ($value->getBaseOriginalPrice() * $value->getQtyOrdered()) - $value->getBaseDiscountAmount();
+        $product_report[$_product_name]['uni_qty'] = 1;
+    }
+}
+
+// sorting for product report by qty
+function sort_array_by_key($arr, $key) {
+    $keys = array();
+    foreach ($arr as $k => $value) {
+        $keys[$k] = strtolower($value[$key]);
+    }
+    asort($keys);
+    $result = array();
+    foreach ($keys as $k => $value) {
+        $result[] = $arr[$k];
+    }
+
+    $result = array_reverse($result);
+    return $result;
+}
+
+$product_report = sort_array_by_key($product_report, 'qty');
+
+// Total revenue
+$total_datewise_revenue = 0;
+$total_datewise_revenue_net = 0;
+
+// Total quantity
+$total_qty = 0;
+
+foreach ($product_report as $value) {
+    $total_datewise_revenue = $total_datewise_revenue + $value['price'];
+    $total_datewise_revenue_net = $total_datewise_revenue_net + $value['price_net'];
+    $total_qty = $total_qty + $value['qty'];
+}
+?>
+
+<!-- Hidden value for return sales report -->
+<input type="hidden" id="sales-wise-custom-date-from" value="<?php echo Mage::app()->getRequest()->getParam('from'); ?>" />
+<input type="hidden" id="sales-wise-custom-date-to" value="<?php echo Mage::app()->getRequest()->getParam('to'); ?>" />
+<input type="hidden" id="sales-wise-date-range-option" value="<?php echo Mage::app()->getRequest()->getParam('date_range_option'); ?>" />
+<input type="hidden" id="sales-wise-revenue-option" value="<?php echo Mage::app()->getRequest()->getParam('revenue_option'); ?>" />
+<input type="hidden" id="sales-wise-active" value="<?php echo Mage::app()->getRequest()->getParam('active'); ?>" />
+<!-- Sales report ajax url -->
+<!--<input type="hidden" id="sales_ajax_url" value="<?php echo Mage::helper("adminhtml")->getUrl("advancedreports/adminhtml_advancedreports/sales"); ?>" />     -->
+<!-- Sales date wise report wrapper -->
+    <div class="advanced_report_wrapper" id="sales_wise_advanced_report_wrapper">
+
+        <!-- Sale report ajax loader -->
+<!--        <div id="sales_report_ajax_load" style="display: none;" class="loading_img">
+            <p><?php echo Mage::helper('advancedreports')->__('Please wait') . ' ...'; ?></p>
+        </div>-->
+
+        <h3 class="advanced_report_header content-header"> <?php echo Mage::helper('advancedreports')->__('Sales Report'); ?></h3>
+
+        <a class="back_to" href="javascript:void(0)" onclick="backtosalesreport();">&#171; <span><?php echo Mage::helper('advancedreports')->__('Back to Sales Report'); ?></span></a>
+        <p class="current_report_date">
+            <?php
+            if (!empty($from)) {
+                echo Date('M j, Y', strtotime($from));
+            }
+            ?>
+        </p>
+        <!-- Sales date wise report revenue container -->
+        <div class="report-chart">
+            <div class="chart_top">
+                <div id="advanced_sales_date_wise_data">
+                    <div class="revenue_transaction_report">
+                        <div class="total-revenue sales_report third_child">
+                            <p class="text">
+                                <?php echo Mage::helper('advancedreports')->__('Product Revenue'); ?>
+                            </p>
+                            <p class="number">
+                                <?php
+                                echo Mage::helper('core')->currency(round($total_datewise_revenue, 2), true);
+                                ?>
+                            </p>
+
+                            <!-- Shipping excluded message -->
+                            <div class="shipping_exl_msg" style="font-size:9px;"><?php echo '(' . Mage::helper('advancedreports')->__('Shipping Excluded') . ')'; ?></div>
+
+                        </div>
+
+                        <div class="total-transaction">
+                            <p class="text">
+                                <?php echo Mage::helper('advancedreports')->__('No of Purchases'); ?>
+                            </p>
+                            <p class="number">
+                                <?php echo count($orderTotals); ?>
+                            </p>
+                        </div>
+                        <div class="total-revenue">
+                            <p class="text">
+                                <?php echo Mage::helper('advancedreports')->__('Quantity'); ?>
+                            </p>
+                            <p class="number">
+                                <?php echo $total_qty; ?>
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sales date wise report table -->
+        <table id="sales-datewise-advanced-report-table" border="0" width="960px" cellpadding="0" cellspacing="0">
+            <thead>
+                <tr>
+                    <th align="left" class="text_left" width="33%"><?php echo Mage::helper('advancedreports')->__('Product'); ?></th>
+                    <th align="right" class="text_right advancedreports-headerDesc" width="10%"><?php echo Mage::helper('advancedreports')->__('Quantity'); ?></th>
+                    <th align="right" class="text_right" width="15%"><?php echo Mage::helper('advancedreports')->__('Unique Purchases'); ?></th>
+                    <th align="right" class="text_right" width="15%"><?php echo Mage::helper('advancedreports')->__('Product Revenue'); ?></th>
+                    <th align="right" class="text_right" width="14%"><?php echo Mage::helper('advancedreports')->__('Average Price'); ?></th>
+                    <th align="right" class="text_right border" width="13%"><?php echo Mage::helper('advancedreports')->__('Average QTY'); ?></th>
+
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                $sno = 1;
+
+
+                foreach ($product_report as $value) {
+
+                    if ($sales_wise_option == 0) {
+                        $product_revenue = Mage::helper('core')->currency(round($value['price'], 2), true);
+                        $avg_price = $value['price'] / $value['qty'];
+                        $avg_price = Mage::helper('core')->currency(round($avg_price, 2), true);
+                    } else {
+                        $product_revenue = Mage::helper('core')->currency(round($value['price_net'], 2), true);
+                        $avg_price = $value['price_net'] / $value['qty'];
+                        $avg_price = Mage::helper('core')->currency(round($avg_price, 2), true);
+                    }
+                    ?>
+                    <tr class="advanced-report-data">
+                        <td align="left" ><?php echo $value['name']; ?></td>
+                        <td align="right" class="revenue_amt"><?php echo $value['qty']; ?></td>
+                        <td align="right" ><?php echo $value['uni_qty']; ?></td>
+                        <td align="right" ><?php
+                            if (isset($product_revenue)) {
+                                echo $product_revenue;
+                            }
+                            ?></td>
+                        <td align="right" ><?php
+                            if (isset($avg_price)) {
+                                echo $avg_price;
+                            }
+                            ?></td>
+                        <td align="right" class="border"><?php echo round($value['qty'] / $value['uni_qty'], 2); ?></td>
+
+                    </tr>
+                    <?php
+                    $sno = $sno + 1;
+                }
+                ?>
+
+
+            </tbody>
+            <?php
+// Checking for table data
+            if (count($product_report) < 1) {
+                ?>
+                <tfoot><tr><td colspan="6" align="center"> <?php echo Mage::helper('advancedreports')->__('No data found') . '.'; ?> </td></tr></tfoot>
+            <?php } // end if for checking table data    ?>
+        </table>
+
+
+        <?php
+// Checking for pagination
+        if (count($product_report) > 5) {
+            ?>
+
+            <!-- Calling sales date wise report sorting and pagination functionality -->
+            <script type="text/javascript">
+                jq(function() {
+                    jq("#sales-datewise-advanced-report-table")
+                            .tablesorter({widthFixed: true, widgets: ['zebra']})
+                            .advancedtablesorterPager({container: jq("#advanced_sales_wise_report_pager")});
+                });
+
+            </script>
+
+            <!-- Sales date wise report pagination div -->
+            <div id="advanced_sales_wise_report_pager" class="pager">
+                <form>
+                    <span class="goto_row"> <?php echo Mage::helper('advancedreports')->__('Show rows') . ' : '; ?> </span>
+                    <select class="pagesize">
+                        <option selected="selected"  value="5">5</option>
+                        <option value="10">10</option>
+                        <option  value="25">25</option>
+                        <option  value="100">100</option>
+                        <option  value="500">500</option>
+                    </select>
+                    <span class="goto_span"> <?php echo Mage::helper('advancedreports')->__('Go to') . ' : '; ?> </span>
+                    <input value="1" type="text" class="goto"/>
+                    <span class="nopage"></span>
+                    <span class="page_arrow">
+                        <span class="tablePagination_firstPage first" >&#171;</span>
+                        <span class="tablePagination_prevPage prev">&#8249;</span>
+                        <span class="tablePagination_nextPage next" >&#8250;</span>
+                        <span class="tablePagination_lastPage last" >&#187;</span>
+                    </span>
+                </form>
+            </div>
+
+        <?php } else { ?>
+
+            <!-- Calling sales date wise report sorting functionality -->
+            <script type="text/javascript">
+                jq(function() {
+                    jq("#sales-datewise-advanced-report-table")
+                            .tablesorter({widthFixed: true, widgets: ['zebra']});
+                });
+
+            </script>
+
+        <?php } // end if for checking paginatin and sorting    ?>
+    </div>

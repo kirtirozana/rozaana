@@ -1,0 +1,119 @@
+<?php
+
+/**
+ * Apptha
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the EULA
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://www.apptha.com/LICENSE.txt
+ *
+ * ==============================================================
+ *                 MAGENTO EDITION USAGE NOTICE
+ * ==============================================================
+ * This package designed for Magento COMMUNITY edition
+ * Apptha does not guarantee correct work of this extension
+ * on any other Magento edition except Magento COMMUNITY edition.
+ * Apptha does not provide extension support in case of
+ * incorrect edition usage.
+ * ==============================================================
+ *
+ * @category    Apptha
+ * @package     Apptha_Advancedreports
+ * @version     0.2.1
+ * @author      Apptha Team <developers@contus.in>
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
+ * @license     http://www.apptha.com/LICENSE.txt
+ * 
+ */
+
+?>
+
+<p class="advancedreports_switcher">    
+    <?php
+// Getting all websites
+    $websites = Mage::app()->getWebsites();
+    if (count($websites) >= 1) {
+        ?>
+        <!-- Displaying store view title -->   
+        <label for="advancedreports_switcher"><?php echo Mage::helper('advancedreports')->__('Choose Store View'); ?>:</label>    
+        <select name="advancedreports_switcher" id="advancedreports_switcher" onchange="return advancedreports_switcher_change(this.value);">
+            <!-- Selecting option for store view -->
+            <option value="0" <?php
+            if (Mage::getSingleton('core/session')->getAdvancedReportStore() == 0) {
+                echo 'selected';
+            }
+            ?>><?php echo Mage::helper('advancedreports')->__('All Store Views'); ?></option>
+                    <?php
+                    foreach ($websites as $website) {
+                        ?>
+                <!-- Displaying web site name -->
+                <optgroup label="<?php echo $website->getName(); ?>">
+                    <?php
+                    foreach ($website->getGroups() as $group) {
+                        $stores = $group->getStores();
+                        ?>
+                        <!-- Displaying store group -->
+                    <optgroup label="<?php echo $group->getName(); ?>">
+                        <?php
+                        foreach ($stores as $store) {
+                            ?>     
+                            <!-- Displaying store name -->
+                            <option value="<?php echo $store->getId(); ?>" name="<?php echo $store->getCode(); ?>"  <?php
+                            if (Mage::getSingleton('core/session')->getAdvancedReportStore() != 0 && Mage::getSingleton('core/session')->getAdvancedReportStore() == $store->getId()) {
+                                echo 'selected';
+                            }
+                            ?>><?php echo $store->getName(); ?></option>   
+                                    <?php
+                                }
+                                ?>
+                    </optgroup>
+                    <?php
+                }
+                ?>
+            </optgroup>
+            <?php
+        }
+        ?>
+    </optgroup>
+    </select>
+
+<?php } ?>
+</p>
+
+<!-- Assigning advanced reports switcher url -->        
+<input id="advanced_switch_url" type="hidden" value="<?php echo $this->getSwitchUrl(); ?>" />  
+
+<!-- Sales and Sales wise report url and ajax image -->
+<input type="hidden" id="sales_ajax_url" value="<?php echo Mage::helper("adminhtml")->getUrl("advancedreports/adminhtml_advancedreports/sales"); ?>" />
+<input type="hidden" id="sales_datewise_ajax_url" value="<?php echo Mage::helper("adminhtml")->getUrl("advancedreports/adminhtml_advancedreports/salesdatewise"); ?>" />
+
+
+<!-- For product wise report url and ajax image -->
+<input type="hidden" id="product_ajax_url" value="<?php echo Mage::helper("adminhtml")->getUrl("advancedreports/adminhtml_advancedreports/product"); ?>" />
+
+<!-- Time to purchase url and ajax loader -->
+<input type="hidden" id="timetopurchase_ajax_url" value="<?php echo Mage::helper("adminhtml")->getUrl("advancedreports/adminhtml_advancedreports/timetopurchase"); ?>" />
+
+<!-- Transaction report url and ajax loader -->
+<input type="hidden" id="transactions_ajax_url" value="<?php echo Mage::helper("adminhtml")->getUrl("advancedreports/adminhtml_advancedreports/transactions"); ?>" />
+
+<!-- Top selling products report url and ajax loader -->
+<input type="hidden" id="topsellingproducts_ajax_url" value="<?php echo Mage::helper("adminhtml")->getUrl("advancedreports/adminhtml_advancedreports/topsellingproducts"); ?>" />   
+
+<!-- Gainer/Loser report url and ajax loader -->
+<input type="hidden" id="gainer_ajax_url" value="<?php echo Mage::helper("adminhtml")->getUrl("advancedreports/adminhtml_advancedreports/gainer"); ?>" />
+
+
+
+<!-- Gainer/Loser report url and ajax loader -->
+<input type="hidden" id="advancedreports_updatefollowupproducts" value="<?php echo Mage::helper("adminhtml")->getUrl("advancedreports/adminhtml_advancedreports/updatefollowupproducts/") . 'followup_product_id/'; ?>"/>
+<input type="hidden" id="advancedreports_removefollowupproducts" value="<?php echo Mage::helper("adminhtml")->getUrl("advancedreports/adminhtml_advancedreports/removefollowupproducts/") . 'followup_product_id/'; ?>"/>
+<input type="hidden" id="followupproducts_ajax_url" value="<?php echo Mage::helper("adminhtml")->getUrl("advancedreports/adminhtml_advancedreports/followupproducts"); ?>" />
+
+<div id="advanced_report_main_ajax_load" style="display: none;">
+<p><?php echo Mage::helper('advancedreports')->__('Please wait') . '...'; ?></p>
+</div>
+

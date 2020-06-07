@@ -1,0 +1,712 @@
+<?php
+
+/**
+ * Apptha
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the EULA
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://www.apptha.com/LICENSE.txt
+ *
+ * ==============================================================
+ *                 MAGENTO EDITION USAGE NOTICE
+ * ==============================================================
+ * This package designed for Magento COMMUNITY edition
+ * Apptha does not guarantee correct work of this extension
+ * on any other Magento edition except Magento COMMUNITY edition.
+ * Apptha does not provide extension support in case of
+ * incorrect edition usage.
+ * ==============================================================
+ *
+ * @category    Apptha
+ * @package     Apptha_Advancedreports
+ * @version     0.2.1
+ * @author      Apptha Team <developers@contus.in>
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
+ * @license     http://www.apptha.com/LICENSE.txt
+ *
+ */
+
+// Checking session dates for gainer report
+if (Mage::getSingleton('core/session')->getAdvancedReportDateOption() && Mage::app()->getRequest()->getParam('advanced_report_date_session') == 1) {
+    if (Mage::getSingleton('core/session')->getAdvancedReportDateOption() == "Custom") {
+        $_advanced_get_option = Mage::getSingleton('core/session')->getAdvancedReportDateOption();
+        $_advanced_get_from = Mage::getSingleton('core/session')->getAdvancedReportDateFrom();
+        $_advanced_get_to = Mage::getSingleton('core/session')->getAdvancedReportDateTo();
+    } else {
+        $_advanced_get_option = Mage::getSingleton('core/session')->getAdvancedReportDateOption();
+    }
+} else {
+    $_advanced_get_option = Mage::app()->getRequest()->getParam('date_range_option');
+    $_advanced_get_from = Mage::app()->getRequest()->getParam('from');
+    $_advanced_get_to = Mage::app()->getRequest()->getParam('to');
+}
+
+// Assigning from and to date
+if (!empty($_advanced_get_option)) {
+    switch ($_advanced_get_option) {
+        case "Today":
+            // today interval
+            $start_day = strtotime("-1 today midnight");
+            $end_day = strtotime("-1 tomorrow midnight");
+            $from = date("Y-m-d", $start_day);
+            $to = date("Y-m-d", $end_day);
+            $from_display = date("Y-m-d", $start_day);
+            $to_display = date("Y-m-d", $start_day);
+            break;
+        case "Yesterday":
+            // yesterday interval
+            $start_day = strtotime("-1 yesterday midnight");
+            $end_day = strtotime("-1 today midnight");
+            $from = date("Y-m-d", $start_day);
+            $to = date("Y-m-d", $end_day);
+            $from_display = date("Y-m-d", $start_day);
+            $to_display = date("Y-m-d", $start_day);
+            break;
+        case "LastWeek":
+            // last week interval
+            $t = date('d-m-Y');
+            $to_day = date('l', strtotime($t));
+            // if today is moday, take last monday
+            if ($to_day == 'Monday') {
+                $start_day = strtotime("-1 monday midnight");
+                $end_day = strtotime("yesterday");
+            } else {
+                $start_day = strtotime("-2 monday midnight");
+                $end_day = strtotime("-1 sunday midnight");
+            }
+            $from = date("Y-m-d", $start_day);
+            $to = date("Y-m-d", $end_day);
+            $to = date('Y-m-d', strtotime($to . ' + 1 day'));
+            $from_display = $from;
+            $to_display = date("Y-m-d", $end_day);
+            break;
+        case "LastMonth":
+            // last month interval
+            $from = date('Y-m-01', strtotime('last month'));
+            $to = date('Y-m-t', strtotime('last month'));
+            $to = date('Y-m-d', strtotime($to . ' + 1 day'));
+            $from_display = $from;
+            $to_display = date('Y-m-t', strtotime('last month'));
+            break;
+        case "Custom":
+            // last custom interval
+            $from = date('Y-m-d', strtotime($_advanced_get_from));
+            $to = date('Y-m-d', strtotime($_advanced_get_to . ' + 1 day'));
+            $from_display = $from;
+            $to_display = date('Y-m-d', strtotime($_advanced_get_to));
+            break;
+        default:
+            // last 30 interval
+            $from = date('Y-m-d', strtotime('-30 day'));
+            $to = date('Y-m-d', strtotime("-1 today midnight"));
+            $to = date('Y-m-d', strtotime($to . ' + 1 day'));
+            $from_display = $from;
+            $to_display = date('Y-m-d', strtotime("-1 today midnight"));
+    }
+} else {
+    // last 30 interval
+    $from = date('Y-m-d', strtotime('-30 day'));
+    $to = date('Y-m-d', strtotime("-1 today midnight"));
+    $to = date('Y-m-d', strtotime($to . ' + 1 day'));
+    $from_display = $from;
+    $to_display = date('Y-m-d', strtotime("-1 today midnight"));
+}
+
+$gainer_start_date = strtotime($from);
+$gainer_end_date = strtotime($to);
+
+$gainer_dates_diff = abs($gainer_end_date - $gainer_start_date);
+
+$gainer_no_days = $gainer_dates_diff / 86400;
+$gainer_no_days = 0 - $gainer_no_days;
+
+$gainer_compare_start_date = date('Y-m-d', strtotime($from . ' ' . $gainer_no_days . ' day'));
+$gainer_compare_end_date = date('Y-m-d', strtotime($from));
+$compare_from_display = date('Y-m-d', strtotime($from . ' ' . $gainer_no_days . ' day'));
+$compare_to_display = date('Y-m-d', strtotime($from . ' - 1 day'));
+
+// Converting local time to db time
+$db_from = Mage::getModel('core/date')->gmtDate(null, strtotime($gainer_compare_start_date));
+$db_to = Mage::getModel('core/date')->gmtDate(null, strtotime($to));
+
+// Gainer report collection
+$orderTotals = $this->advancedGainerProductsReportCollection($db_from, $db_to);
+
+// Product collection for getting product name
+$obj = Mage::getModel('catalog/product');
+$gainer_report = array();
+
+
+// Calculating product data
+foreach ($orderTotals as $value) {
+
+    $_product = $obj->load($value->getProductId());
+    $_product_name = $_product->getName();
+
+    // Assigning product name
+    if (empty($gainer_report[$_product_name]['name'])) {
+        $gainer_report[$_product_name]['name'] = $_product->getName();
+        $gainer_report[$_product_name]['id'] = $value->getProductId();
+        $gainer_report[$_product_name]['revenue_diff'] = 0;
+        $gainer_report[$_product_name]['revenue_first'] = 0;
+        $gainer_report[$_product_name]['revenue_second'] = 0;
+    }
+
+    if (array_key_exists($_product_name, $gainer_report)) {
+        $purchased_date = Mage::getModel('core/date')->date(null, strtotime($value->getSfogCreatedAt()));
+        $purchased_date_value = strtotime($purchased_date);
+
+        if ($purchased_date_value >= $gainer_start_date && $purchased_date_value <= $gainer_end_date) {
+            $gainer_report[$_product_name]['revenue_second'] = $gainer_report[$_product_name]['revenue_second'] + ($value->getBaseOriginalPrice() * $value->getQtyOrdered()) - $value->getBaseDiscountAmount();
+        } else {
+            $gainer_report[$_product_name]['revenue_first'] = $gainer_report[$_product_name]['revenue_first'] + ($value->getBaseOriginalPrice() * $value->getQtyOrdered()) - $value->getBaseDiscountAmount();
+        }
+    }
+}
+
+$gainer_report_data = array();
+$revenue_diff = 0;
+foreach ($gainer_report as $value) {
+    if ($value['revenue_second'] > $value['revenue_first']) {
+        $gainer_product = $value['name'];
+        $gainer_report_data[$gainer_product]['name'] = $value['name'];
+        $gainer_report_data[$gainer_product]['id'] = $value['id'];
+        $gainer_report_data[$gainer_product]['revenue_first'] = $value['revenue_first'];
+        $gainer_report_data[$gainer_product]['revenue_second'] = $value['revenue_second'];
+        $gainer_report_data[$gainer_product]['revenue_diff'] = $value['revenue_second'] - $value['revenue_first'];
+        $revenue_diff = $value['revenue_second'] - $value['revenue_first'];
+        if ($value['revenue_first'] != 0) {
+            $gainer_report_data[$gainer_product]['percent'] = $revenue_diff / $value['revenue_first'] * 100;
+        } else {
+            $gainer_report_data[$gainer_product]['percent'] = 100;
+        }
+    }
+}
+
+$sorted_gainer_report = Mage::helper('advancedreports')->sort_array_by_key($gainer_report_data, 'revenue_diff');
+
+
+$loser_report_data = array();
+$revenue_diff = 0;
+foreach ($gainer_report as $value) {
+    if ($value['revenue_first'] > $value['revenue_second']) {
+        $loser_product = $value['name'];
+        $loser_report_data[$loser_product]['name'] = $value['name'];
+        $loser_report_data[$loser_product]['id'] = $value['id'];
+        $loser_report_data[$loser_product]['revenue_first'] = $value['revenue_first'];
+        $loser_report_data[$loser_product]['revenue_second'] = $value['revenue_second'];
+        $loser_report_data[$loser_product]['revenue_diff'] = $value['revenue_first'] - $value['revenue_second'];
+        $revenue_diff = $value['revenue_first'] - $value['revenue_second'];
+        if ($value['revenue_second'] != 0) {
+            $loser_report_data[$loser_product]['percent'] = $revenue_diff / $value['revenue_first'] * 100;
+        } else {
+            $loser_report_data[$loser_product]['percent'] = 100;
+        }
+    }
+}
+$sorted_loser_report = Mage::helper('advancedreports')->sort_array_by_key($loser_report_data, 'percent');
+?>
+
+
+
+<?php
+// Today
+$today_start_day = strtotime("-1 today midnight");
+$today_from = date("Y-m-d", $today_start_day);
+$today_to = date("Y-m-d", $today_start_day);
+
+// Yesterday
+$yesterday_start_day = strtotime("-1 yesterday midnight");
+$yesterday_from = date("Y-m-d", $yesterday_start_day);
+$yesterday_to = date("Y-m-d", $yesterday_start_day);
+
+// Last week
+$t = date('d-m-Y');
+$to_day = date('l', strtotime($t));
+// if today is moday, take last monday
+if ($to_day == 'Monday') {
+    $start_day = strtotime("-1 monday midnight");
+    $end_day = strtotime("yesterday");
+} else {
+    $start_day = strtotime("-2 monday midnight");
+    $end_day = strtotime("-1 sunday midnight");
+}
+$lastweek_from = date("Y-m-d", $start_day);
+$lastweek_to = date("Y-m-d", $end_day);
+
+// Last Month
+$lastmonth_from = date('Y-m-01', strtotime('last month'));
+$lastmonth_to = date('Y-m-t', strtotime('last month'));
+?>
+
+<input type="hidden" id="gainer-revenue-today-date-from" value="<?php echo date('m/d/Y', strtotime($today_from)); ?>" />
+<input type="hidden" id="gainer-revenue-today-date-to" value="<?php echo date('m/d/Y', strtotime($today_to)); ?>" />
+<input type="hidden" id="gainer-revenue-yesterday-date-from" value="<?php echo date('m/d/Y', strtotime($yesterday_from)); ?>" />
+<input type="hidden" id="gainer-revenue-yesterday-date-to" value="<?php echo date('m/d/Y', strtotime($yesterday_to)); ?>" />
+<input type="hidden" id="gainer-revenue-lastweek-date-from" value="<?php echo date('m/d/Y', strtotime($lastweek_from)); ?>" />
+<input type="hidden" id="gainer-revenue-lastweek-date-to" value="<?php echo date('m/d/Y', strtotime($lastweek_to)); ?>" />
+<input type="hidden" id="gainer-revenue-lastmonth-date-from" value="<?php echo date('m/d/Y', strtotime($lastmonth_from)); ?>" />
+<input type="hidden" id="gainer-revenue-lastmonth-date-to" value="<?php echo date('m/d/Y', strtotime($lastmonth_to)); ?>" />
+<input type="hidden" id="gainer-revenue-compare-date-from" value="<?php echo date('m/d/Y', strtotime($gainer_compare_start_date)); ?>" />
+<input type="hidden" id="gainer-revenue-compare-date-to" value="<?php echo date('m/d/Y', strtotime($gainer_compare_end_date)); ?>" />
+<!-- Gainer report hidden value for report generation -->
+<input type="hidden" id="gainer-revenue-custom-date-from" value="<?php echo date('m/d/Y', strtotime($from_display)); ?>" />
+<input type="hidden" id="gainer-revenue-custom-date-to" value="<?php echo date('m/d/Y', strtotime($to_display)); ?>" />
+<!--<input type="hidden" id="gainer_ajax_url" value="<?php echo Mage::helper("adminhtml")->getUrl("advancedreports/adminhtml_advancedreports/gainer"); ?>" />-->
+<!-- For reset drop down -->
+<input type="hidden" id="gainer_reset_dropdown" value="<?php
+if (!empty($_advanced_get_option)) {
+    echo Mage::helper('advancedreports')->__($_advanced_get_option);
+} else {
+    echo Mage::helper('advancedreports')->__('Custom');
+}
+?>" />
+<!-- Gainer report wrapper -->
+    <div class="advanced_report_wrapper" id="gainer_advanced_report_wrapper">
+
+        <!-- Gainer ajax loader -->
+<!--        <div id="gainer_report_ajax_load" style="display: none;" class="loading_img">
+            <p><?php echo Mage::helper('advancedreports')->__('Please wait') . ' ...'; ?></p>
+        </div>-->
+
+
+
+        <h3 class="advanced_report_header content-header"> <span class="title_head"> <?php echo Mage::helper('advancedreports')->__('Gainer / Loser Report'); ?></span>
+
+            <!-- Date Picker -->
+
+            <!-- Gainer report date picker -->
+            <div class="advanced_date_picker">
+                <span id="gainer-report-date-range" class="report-date-range" >
+                    <?php echo Date('M j, Y', strtotime($from_display)) . ' - ' . Date('M j, Y', strtotime($to_display)); ?>
+                </span>
+                <div id="gainer-report-date-picker"  class="date_popup" style="display: none">
+
+                    <div id="gainer-advanced-report-datepicker"></div>
+
+                    <div class="advanced-report-right">
+                        <label for="daterange-select"><?php echo Mage::helper('advancedreports')->__('Date Range'); ?></label>
+                        <select id="gainer-date-range-select" name="daterange">
+
+                            <option value="Custom" <?php
+                            if (!empty($_advanced_get_option)) {
+                                if ($_advanced_get_option == 'Custom') {
+                                    echo 'selected';
+                                }
+                            }
+                            ?>><?php echo Mage::helper('advancedreports')->__('Custom'); ?></option>
+                            <option value="Today" <?php
+                            if (!empty($_advanced_get_option)) {
+                                if ($_advanced_get_option == 'Today') {
+                                    echo 'selected';
+                                }
+                            }
+                            ?>><?php echo Mage::helper('advancedreports')->__('Today'); ?></option>
+                            <option value="Yesterday" <?php
+                            if (!empty($_advanced_get_option)) {
+                                if ($_advanced_get_option == 'Yesterday') {
+                                    echo 'selected';
+                                }
+                            }
+                            ?>><?php echo Mage::helper('advancedreports')->__('Yesterday'); ?></option>
+                            <option value="LastWeek" <?php
+                            if (!empty($_advanced_get_option)) {
+                                if ($_advanced_get_option == 'LastWeek') {
+                                    echo 'selected';
+                                }
+                            }
+                            ?>><?php echo Mage::helper('advancedreports')->__('Last Week'); ?></option>
+                            <option value="LastMonth" <?php
+                            if (!empty($_advanced_get_option)) {
+                                if ($_advanced_get_option == 'LastMonth') {
+                                    echo 'selected';
+                                }
+                            }
+                            ?>><?php echo Mage::helper('advancedreports')->__('Last Month'); ?></option>
+
+                        </select>
+                        <div style="clear: both;margin-bottom: 10px;"></div>
+                        <input type="text" id="gainer-custom-date-from" size="10"  <?php
+                        if (!empty($_advanced_get_option)) {
+                            if ($_advanced_get_option != "Custom") {
+                                echo 'disabled';
+                            }
+                        }
+                        ?>/>
+                               <?php echo Mage::helper('advancedreports')->__('-'); ?>
+                        <input type="text" id="gainer-custom-date-to" size="10" <?php
+                        if (!empty($_advanced_get_option)) {
+                            if ($_advanced_get_option != "Custom") {
+                                echo 'disabled';
+                            }
+                        }
+                        ?>/>
+
+                        <!-- Gainer report date fields error message -->
+                        <span  id="gainer-report-err-msg" class="err-msg" style="display: none">
+                            <?php echo Mage::helper('advancedreports')->__('Please select') . ' '; ?>
+                            <b><?php echo Mage::helper('advancedreports')->__('from') . ' '; ?></b>
+                            <?php echo Mage::helper('advancedreports')->__('and') . ' '; ?>
+                            <b> <?php echo Mage::helper('advancedreports')->__('to') . ' '; ?></b>
+                            <?php echo Mage::helper('advancedreports')->__('dates'); ?>
+                        </span>
+                        <span  id="gainer-report-todate-err-msg" class="err-msg" style="display: none">
+                            <?php echo Mage::helper('advancedreports')->__('Please select valid') . ' '; ?>
+                            <b> <?php echo '"' . Mage::helper('advancedreports')->__('to') . '" '; ?></b>
+                            <?php echo Mage::helper('advancedreports')->__('date') . ' '; ?>
+                        </span>
+                        <div style="clear: both;padding-bottom: 10px;border-bottom: 1px dotted #666;margin-bottom: 10px;"></div>
+                        <a id="gainer_report_apply"  href="javascript:void(0)" class="apply" onclick="gainer_report_apply_click();" ><?php echo Mage::helper('advancedreports')->__('Apply'); ?></a>
+                        <div style="position: relative; float:left;">
+                            <div id="gainer-report-disable-click-event">
+                                <a><?php echo Mage::helper('advancedreports')->__('Cancel'); ?></a>
+                            </div>
+                            <a href="javascript:void(0)" id="gainer-report-date-cancel" onclick="gainercancel();"><?php echo Mage::helper('advancedreports')->__('Cancel'); ?></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gainer export option -->
+            <div id="gainerexport" class="export">
+                <span><?php echo Mage::helper('advancedreports')->__('Export As:'); ?></span>
+                <a href="<?php echo Mage::helper("adminhtml")->getUrl("advancedreports/adminhtml_advancedreports/advancedReports/", array("from" => $from, "to" => $to, "report" => 'gainer_csv')); ?>" class="csv"><img src="<?php echo $this->getSkinUrl('advancedreports/images/export_csv.png') ?>" width="25"  height="24" alt="<?php echo Mage::helper('advancedreports')->__('CSV'); ?>" title="<?php echo Mage::helper('advancedreports')->__('CSV'); ?>"/></a>
+                <a href="<?php echo Mage::helper("adminhtml")->getUrl("advancedreports/adminhtml_advancedreports/advancedReports/", array("from" => $from, "to" => $to, "report" => 'gainer_xml')); ?>" class="excel"><img src="<?php echo $this->getSkinUrl('advancedreports/images/export_xml.png') ?>" width="25"  height="24" alt="<?php echo Mage::helper('advancedreports')->__('XML'); ?>" title="<?php echo Mage::helper('advancedreports')->__('XML'); ?>" /></a>
+            </div>
+
+        </h3>
+
+
+        <!-- Gainer report chart container -->
+
+        <div class="gainer_chart_table">
+
+            <h4><?php echo Mage::helper('advancedreports')->__('Gainer Report'); ?></h4>
+            <table id="gainer-advanced-report-table"  border="0"  cellpadding="0" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th align="left" class="text_left" width="21%"><?php echo Mage::helper('advancedreports')->__('Product'); ?></th>
+                        <th align="right" class="text_right" width="24%"><?php echo Date('M j, Y', strtotime($compare_from_display)) . ' - ' . Date('M j, Y', strtotime($compare_to_display)); ?></th>
+                        <th align="right" class="text_right last_td" width="24%"><?php echo Date('M j, Y', strtotime($from_display)) . ' - ' . Date('M j, Y', strtotime($to_display)); ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $sno = 1;
+                    if (count($sorted_gainer_report) >= 1) {
+                        foreach ($sorted_gainer_report as $value) {
+                            ?>
+                            <tr class="advanced-report-data <?php
+                            if ($sno % 2 == 0) {
+                                echo 'advanced-report-even';
+                            }
+                            ?>">
+                                <td align="left" ><?php echo $value['name']; ?></td>
+                                <td align="right" ><?php echo Mage::helper('core')->currency(round($value['revenue_first'], 2), true); ?></td>
+                                <td align="right" ><?php echo Mage::helper('core')->currency(round($value['revenue_second'], 2), true); ?><span class="advancegain"><?php echo ' (+' . round($value['percent'], 2) . '%)'; ?></span></td>
+
+                            </tr>
+                            <?php
+                            $sno = $sno + 1;
+
+                            if ($sno > 10) {
+                                break;
+                            }
+                        }
+                    }
+                    ?>
+
+                </tbody>
+
+                <?php
+// checking for table data
+                if (count($sorted_gainer_report) < 1) {
+                    ?>
+                    <tfoot><tr><td colspan="3" align="center"> <?php echo Mage::helper('advancedreports')->__('No data found') . '.'; ?> </td></tr></tfoot>
+                <?php } // end if for checking table data     ?>
+            </table>
+
+        </div>
+
+
+        <div class="loser_chart_table">
+            <h4><?php echo Mage::helper('advancedreports')->__('Loser Report'); ?></h4>
+            <table id="loser-advanced-report-table"  border="0"  cellpadding="0" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th align="left" class="text_left" width="21%"><?php echo Mage::helper('advancedreports')->__('Product'); ?></th>
+                        <th align="right" class="text_right" width="24%"><?php echo Date('M j, Y', strtotime($compare_from_display)) . ' - ' . Date('M j, Y', strtotime($compare_to_display)); ?></th>
+                        <th align="right" class="text_right" width="24%"><?php echo Date('M j, Y', strtotime($from_display)) . ' - ' . Date('M j, Y', strtotime($to_display)); ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $sno = 1;
+                    if (count($sorted_loser_report) >= 1) {
+                        foreach ($sorted_loser_report as $value) {
+                            ?>
+                            <tr class="advanced-report-data <?php
+                            if ($sno % 2 == 0) {
+                                echo 'advanced-report-even';
+                            }
+                            ?>">
+                                <td align="left" ><?php echo $value['name']; ?>
+                                </td>
+                                <td align="right" ><?php echo Mage::helper('core')->currency(round($value['revenue_first'], 2), true); ?></td>
+                                <td align="right" ><?php echo Mage::helper('core')->currency(round($value['revenue_second'], 2), true); ?><span class="advancelose"><?php echo ' (-' . round($value['percent'], 2) . '%)'; ?></span></td>
+                            </tr>
+                            <?php
+                            $sno = $sno + 1;
+
+                            if ($sno > 10) {
+                                break;
+                            }
+                        }
+                    }
+                    ?>
+
+                </tbody>
+                <?php
+                // checking for table data
+                if (count($sorted_loser_report) < 1) {
+                    ?>
+                    <tfoot><tr><td colspan="3" align="center"> <?php echo Mage::helper('advancedreports')->__('No data found') . '.'; ?> </td></tr></tfoot>
+                <?php } // end if for checking table data    ?>
+            </table>
+
+        </div>
+
+        <script type="text/javascript">
+                            jq(document).ready(function() {
+                                // Reset gainer datepicker
+                                jq("#gainer-report-date-cancel").click(function() {
+                                    var gainer_reset = jq("#gainer_reset_dropdown").val();
+                                    jq("#gainer-advanced-report-datepicker").datepicker("refresh");
+                                    jq("#gainer-date-range-select").val(gainer_reset);
+                                    jq("#gainer-report-err-msg").hide();
+                                    jq("#gainer-custom-date-from").val('');
+                                    jq("#gainer-custom-date-to").val('');
+                                });
+
+                                // Assign date to text fields.
+                                jq("#gainer-report-date-range").click(function() {
+
+                                    jq("#gainer-custom-date-from").val(jq("#gainer-revenue-custom-date-from").val());
+                                    jq("#gainer-custom-date-to").val(jq("#gainer-revenue-custom-date-to").val());
+                                });
+                                jq("#gainer-report-date-cancel").click(function() {
+                                    jq("#gainer-custom-date-from").val(jq("#gainer-revenue-custom-date-from").val());
+                                    jq("#gainer-custom-date-to").val(jq("#gainer-revenue-custom-date-to").val());
+                                });
+
+                                // Reset gainer datepicker
+                                jq("#gainer-report-date-cancel").click(function() {
+                                    jq("#gainer-advanced-report-datepicker").datepicker("refresh");
+                                    jq("#gainer-report-todate-err-msg").hide();
+                                    jq("#gainer-report-disable-click-event").show();
+                                });
+                                jq('#gainer-date-range-select').change(function() {
+
+                                    jq("#gainer-report-disable-click-event").hide();
+                                    if (jq(this).val() != "Custom")
+                                    {
+
+                                        jq("#gainer-advanced-report-datepicker").datepicker("destroy");
+
+                                        jq("#gainer-advanced-report-datepicker").datepicker({
+                                            monthNames: ['<?php echo Mage::helper('advancedreports')->__('January'); ?>', '<?php echo Mage::helper('advancedreports')->__('February'); ?>', '<?php echo Mage::helper('advancedreports')->__('March'); ?>', '<?php echo Mage::helper('advancedreports')->__('April'); ?>', '<?php echo Mage::helper('advancedreports')->__('May'); ?>', '<?php echo Mage::helper('advancedreports')->__('June'); ?>',
+                                                '<?php echo Mage::helper('advancedreports')->__('July'); ?>', '<?php echo Mage::helper('advancedreports')->__('August'); ?>', '<?php echo Mage::helper('advancedreports')->__('September'); ?>', '<?php echo Mage::helper('advancedreports')->__('October'); ?>', '<?php echo Mage::helper('advancedreports')->__('November'); ?>', '<?php echo Mage::helper('advancedreports')->__('December'); ?>'],
+                                           // dayNamesMin: ['Mo', 'Tu','We','Th','Fr','Sa','Su'],
+                                            maxDate: 0,
+                                            yearRange: "-100:+0",
+                                            numberOfMonths: 3,
+                                            beforeShowDay: function(date) {
+
+                                                if (jq("#gainer-date-range-select").val() == "Today")
+                                                {
+                                                    var from = jq("#gainer-revenue-today-date-from").val();
+                                                    var to = jq("#gainer-revenue-today-date-to").val();
+                                                    jq("#gainer-custom-date-from").val(from);
+                                                    jq("#gainer-custom-date-to").val(to);
+                                                }
+                                                else if (jq("#gainer-date-range-select").val() == "Yesterday")
+                                                {
+                                                    var from = jq("#gainer-revenue-yesterday-date-from").val();
+                                                    var to = jq("#gainer-revenue-yesterday-date-to").val();
+                                                    jq("#gainer-custom-date-from").val(from);
+                                                    jq("#gainer-custom-date-to").val(to);
+                                                }
+                                                else if (jq("#gainer-date-range-select").val() == "LastWeek")
+                                                {
+                                                    var from = jq("#gainer-revenue-lastweek-date-from").val();
+                                                    var to = jq("#gainer-revenue-lastweek-date-to").val();
+                                                    jq("#gainer-custom-date-from").val(from);
+                                                    jq("#gainer-custom-date-to").val(to);
+                                                }
+                                                else if (jq("#gainer-date-range-select").val() == "LastMonth")
+                                                {
+                                                    var from = jq("#gainer-revenue-lastmonth-date-from").val();
+                                                    var to = jq("#gainer-revenue-lastmonth-date-to").val();
+                                                    jq("#gainer-custom-date-from").val(from);
+                                                    jq("#gainer-custom-date-to").val(to);
+
+                                                }
+                                                else
+                                                {
+                                                }
+
+                                                var date1 = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, jq("#gainer-custom-date-from").val());
+                                                var date2 = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, jq("#gainer-custom-date-to").val());
+                                                return [true, date1 && ((date.getTime() == date1.getTime()) || (date2 && date >= date1 && date <= date2)) ? "dp-highlight" : ""];
+
+
+                                            },
+                                            onSelect: function(dateText, inst) {
+                                                var date1 = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, jq("#gainer-custom-date-from").val());
+                                                var date2 = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, jq("#gainer-custom-date-to").val());
+                                                jq("#gainer-date-range-select").val("Custom");
+                                                jq("#gainer-custom-date-from").removeAttr("disabled");
+                                                jq("#gainer-custom-date-to").removeAttr("disabled");
+                                                jq("#gainer-report-disable-click-event").hide();
+                                                if (!date1 || date2) {
+                                                    jq("#gainer-custom-date-from").val(dateText);
+                                                    jq("#gainer-custom-date-to").val("");
+                                                    jq(this).datepicker();
+                                                } else {
+
+                                                    if (jq("#gainer-custom-date-from").val() > dateText)
+                                                    {
+                                                        jq("#gainer-report-todate-err-msg").show();
+                                                        return;
+                                                    }
+                                                    jq("#gainer-report-todate-err-msg").hide();
+                                                    jq("#gainer-custom-date-to").val(dateText);
+                                                    jq(this).datepicker();
+                                                }
+                                                jq("#gainer-report-err-msg").hide();
+
+                                            }
+                                        }
+                                        );
+
+                                    }
+                                    jq("#gainer-report-todate-err-msg").hide();
+                                });
+
+                                // Display and hide gainer datepicker
+                                jq('#gainer-report-date-range').click(function() {
+                                    jq('#gainer-report-date-picker').slideToggle('fast');
+                                    jq('#gainer-report-date-range').toggleClass('arrowdown');
+                                });
+
+                                // Hide gainer datepicker div
+
+                                jq(document).click(function() {
+                                    jq("#gainer-report-date-picker").hide();
+                                    jq('#gainer-report-date-range').removeClass('arrowdown');
+                                });
+
+                                jq('#gainer-report-date-picker,#gainer-report-date-range').click(function(event) {
+                                    event.stopPropagation();
+                                });
+
+                                // Enable or disable datepicker text fields
+
+                                jq("#gainer-date-range-select").change(function() {
+
+                                    if (jq("#gainer-date-range-select").val() == 'Custom')
+                                    {
+                                        jq("#gainer-custom-date-from").removeAttr("disabled");
+                                        jq("#gainer-custom-date-to").removeAttr("disabled");
+
+                                        jq("#gainer-custom-date-from").val('');
+                                        jq("#gainer-custom-date-to").val('');
+                                        jq("#gainer-advanced-report-datepicker").datepicker("refresh");
+
+                                    }
+                                    else
+                                    {
+                                        jq("#gainer-custom-date-from").attr("disabled", "disabled");
+                                        jq("#gainer-custom-date-to").attr("disabled", "disabled");
+                                    }
+                                });
+                            });
+
+                            //  Gainer report  date picker
+                            jq(function() {
+                                jq("#gainer-advanced-report-datepicker").datepicker({
+                                    monthNames: ['<?php echo Mage::helper('advancedreports')->__('January'); ?>', '<?php echo Mage::helper('advancedreports')->__('February'); ?>', '<?php echo Mage::helper('advancedreports')->__('March'); ?>', '<?php echo Mage::helper('advancedreports')->__('April'); ?>', '<?php echo Mage::helper('advancedreports')->__('May'); ?>', '<?php echo Mage::helper('advancedreports')->__('June'); ?>',
+                                        '<?php echo Mage::helper('advancedreports')->__('July'); ?>', '<?php echo Mage::helper('advancedreports')->__('August'); ?>', '<?php echo Mage::helper('advancedreports')->__('September'); ?>', '<?php echo Mage::helper('advancedreports')->__('October'); ?>', '<?php echo Mage::helper('advancedreports')->__('November'); ?>', '<?php echo Mage::helper('advancedreports')->__('December'); ?>'],
+                                   // dayNamesMin: ['Mo', 'Tu','We','Th','Fr','Sa','Su'],
+                                    maxDate: 0,
+                                    yearRange: "-100:+0",
+                                    numberOfMonths: 3,
+                                    beforeShowDay: function(date) {
+
+                                        if (jq("#gainer-custom-date-from").val() == '' && jq("#gainer-custom-date-to").val() == '')
+                                        {
+                                            var d_h1 = jq("#gainer-revenue-custom-date-from").val();
+                                            var d_h2 = jq("#gainer-revenue-custom-date-to").val();
+                                            var date1 = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, d_h1);
+                                            var date2 = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, d_h2);
+                                            return [true, date1 && ((date.getTime() == date1.getTime()) || (date2 && date >= date1 && date <= date2)) ? "dp-highlight" : ""];
+                                        }
+
+                                        var date1 = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, jq("#gainer-custom-date-from").val());
+                                        var date2 = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, jq("#gainer-custom-date-to").val());
+                                        return [true, date1 && ((date.getTime() == date1.getTime()) || (date2 && date >= date1 && date <= date2)) ? "dp-highlight" : ""];
+                                    },
+                                    onSelect: function(dateText, inst) {
+                                        var date1 = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, jq("#gainer-custom-date-from").val());
+                                        var date2 = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, jq("#gainer-custom-date-to").val());
+                                        jq("#gainer-date-range-select").val("Custom");
+                                        jq("#gainer-custom-date-from").removeAttr("disabled");
+                                        jq("#gainer-custom-date-to").removeAttr("disabled");
+                                        jq("#gainer-report-disable-click-event").hide();
+                                        if (!date1 || date2) {
+                                            jq("#gainer-custom-date-from").val(dateText);
+                                            jq("#gainer-custom-date-to").val("");
+                                            jq(this).datepicker();
+                                        } else {
+
+                                            var checkdate = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, jq("#gainer-custom-date-from").val());
+                                            var checkdateText = jq.datepicker.parseDate(jq.datepicker._defaults.dateFormat, dateText);
+
+                                            if (checkdate > checkdateText)
+                                            {
+                                                jq("#gainer-report-todate-err-msg").show();
+                                                return;
+                                            }
+                                            jq("#gainer-report-todate-err-msg").hide();
+
+                                            jq("#gainer-custom-date-to").val(dateText);
+                                            jq(this).datepicker();
+                                        }
+                                        jq("#gainer-report-err-msg").hide();
+
+                                    }
+                                }
+                                );
+                            });
+        </script>
+
+
+        <?php
+// Setting session for advanced report date
+        if (Mage::app()->getRequest()->getParam('advanced_session') == 1) {
+            if (Mage::getSingleton('core/session')->getAdvancedReportDateOption()) {
+                Mage::getSingleton('core/session')->unsAdvancedReportDateOption();
+                Mage::getSingleton('core/session')->unsAdvancedReportDateFrom();
+                Mage::getSingleton('core/session')->unsAdvancedReportDateTo();
+            }
+            $advanced_report_date_option = Mage::app()->getRequest()->getParam('date_range_option');
+            $advanced_report_date_from = Mage::app()->getRequest()->getParam('from');
+            $advanced_report_date_to = Mage::app()->getRequest()->getParam('to');
+            Mage::getSingleton('core/session')->setAdvancedReportDateOption($advanced_report_date_option);
+            Mage::getSingleton('core/session')->setAdvancedReportDateFrom($advanced_report_date_from);
+            Mage::getSingleton('core/session')->setAdvancedReportDateTo($advanced_report_date_to);
+        }
+        ?>

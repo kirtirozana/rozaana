@@ -1,0 +1,851 @@
+/**
+ * Apptha
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the EULA
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://www.apptha.com/LICENSE.txt
+ *
+ * ==============================================================
+ *                 MAGENTO EDITION USAGE NOTICE
+ * ==============================================================
+ * This package designed for Magento COMMUNITY edition
+ * Apptha does not guarantee correct work of this extension
+ * on any other Magento edition except Magento COMMUNITY edition.
+ * Apptha does not provide extension support in case of
+ * incorrect edition usage.
+ * ==============================================================
+ *
+ * @category    Apptha
+ * @package     Apptha_Advancedreports
+ * @version     0.2.1
+ * @author      Apptha Team <developers@contus.in>
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
+ * @license     http://www.apptha.com/LICENSE.txt
+ * 
+ */
+
+.dp-highlight .ui-state-default{
+background: #0076cb;
+color: #FFF;
+}
+#advanced-report-datepicker,
+#product-advanced-report-datepicker,
+#transactions-advanced-report-datepicker,
+#timetopurchase-advanced-report-datepicker
+{
+font-size:8px;
+float: left;
+}
+.advanced_report_wrapper{}
+.report-chart
+{
+clear: both;margin-bottom: 10px;
+padding: 10px;
+border: 1px solid #e5e5e5; overflow: hidden;
+}
+
+
+.advanced_report_wrapper{}
+.timetopurchase-report-chart
+{
+clear: both;margin-bottom: 10px;
+/*height:400px;*/
+padding: 10px;
+-webkit-border-radius: 4px 4px;
+-moz-border-radius: 4px 4px;
+border-radius: 4px 4px;
+padding: 62px;
+}
+
+
+.total-revenue
+{
+border: 1px solid #bdbdbd;
+}
+.total-revenue.sales_report{}
+
+.total-revenue p.active a,
+.total-revenue p.inactive a{text-decoration: none;}
+.total-revenue p.active a{color: #058dc7; cursor: default;}
+.total-revenue p.inactive a{color: #2f2f2f;}
+.advanced_report_wrapper .total-revenue p.active.include,
+.advanced_report_wrapper .total-revenue p.inactive.include{margin-left: -11px;margin-right: -1px; width: 142px;}
+.advanced_report_wrapper .total-revenue p.active span.tex_text{text-decoration: underline;}
+.advanced_report_wrapper .total-revenue p.active span,
+.advanced_report_wrapper .total-revenue p.inactive span{clear: both;display: block;}
+.advanced_report_wrapper .total-revenue p.active span.price,
+.advanced_report_wrapper .total-revenue p.inactive span.price{font-size: 18px;}
+.advanced_report_wrapper .total-revenue p.active,
+.advanced_report_wrapper .total-revenue p.inactive{font-size: 9px;float: left;width: 141px; border: 1px solid #e8e8e8;margin-bottom: 0;border-bottom-width: 0px;
+background: #fefefe;
+background: -moz-linear-gradient(top, #fefefe 0%, #f3f3f3 100%);
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fefefe), color-stop(100%,#f3f3f3));
+background: -webkit-linear-gradient(top, #fefefe 0%,#f3f3f3 100%);
+background: -o-linear-gradient(top, #fefefe 0%,#f3f3f3 100%);
+background: -ms-linear-gradient(top, #fefefe 0%,#f3f3f3 100%);
+background: linear-gradient(to bottom, #fefefe 0%,#f3f3f3 100%);
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fefefe', endColorstr='#f3f3f3',GradientType=0 );
+padding: 5px 0;
+}
+.advanced_report_wrapper .total-revenue p.active{color: #058dc7;
+background-color: #dfdfdf;
+background-image: -webkit-linear-gradient(top,#f0f0f0,#dfdfdf);
+background-image: -moz-linear-gradient(top,#f0f0f0,#dfdfdf);
+border-color: #ccc;
+box-shadow: inset 0px 1px 10px rgba(0,0,0,.05);
+}
+.total-revenue p.inactive{color: #2f2f2f; }
+
+.revenue-list
+{
+border: 1px solid #bdbdbd;
+}
+.date_popup
+{
+color: #FFFFFF;
+width: 625px;
+position: absolute;
+padding: 10px;
+background-color: #f7f7f7;
+border: 1px solid #ccc;
+top: 33px;
+right:0px;
+display: none;
+z-index: 10;
+background: #f7f7f7;
+-moz-box-shadow: -1px 1px 2px #dfdfdf;
+-webkit-box-shadow: -1px 1px 2px #dfdfdf;
+box-shadow: -1px 1px 2px #dfdfdf;
+}
+
+.report-date-range {
+border: 1px solid #bdbdbd;
+height: 22px; color: #1c2e3d;
+font: 18px/22px Arial, Helvetica, sans-serif;
+padding: 5px 25px 5px 10px;
+cursor: pointer;
+background: #fff;
+float: right;
+position: relative;
+text-align:center; 
+margin: 0 0 5px 0;
+}
+.report-date-range {background: url(../images/date_down.png) 100% 0px no-repeat;}
+.report-date-range.arrowdown{background: url(../images/date_up.png) 100% 0px no-repeat; }
+.err-msg
+{
+color: red;
+}
+.advanced_report_wrapper{clear: both; position: relative;}
+.advanced_date_picker{float: right; margin-bottom: -1px;  width: 310px;z-index: 1;position: relative;}
+#topsellingproductsexport.advanced_date_picker{width: auto;}
+
+/* button text element */
+.ui-button .ui-button-text {
+display: block;
+line-height: normal;
+}
+.ui-button-text-only .ui-button-text {
+padding: .4em 1em;
+}
+.ui-button-icon-only .ui-button-text,
+.ui-button-icons-only .ui-button-text {
+padding: .4em;
+text-indent: -9999999px;
+}
+.ui-button-text-icon-primary .ui-button-text,
+.ui-button-text-icons .ui-button-text {
+padding: .4em 1em .4em 2.1em;
+}
+.ui-button-text-icon-secondary .ui-button-text,
+.ui-button-text-icons .ui-button-text {
+padding: .4em 2.1em .4em 1em;
+}
+.ui-button-text-icons .ui-button-text {
+padding-left: 2.1em;
+padding-right: 2.1em;
+}
+/* no icon support for input elements, provide padding by default */
+input.ui-button {
+padding: .4em 1em;
+}
+.ui-datepicker .ui-datepicker-header {
+position: relative;
+padding: .2em 0;
+}
+.ui-datepicker .ui-datepicker-prev:hover,
+.ui-datepicker .ui-datepicker-next:hover {border: 1px solid #999;}
+.ui-datepicker .ui-datepicker-prev,
+.ui-datepicker .ui-datepicker-next {
+position: absolute;
+top: 2px;
+width: 1.8em;border: 1px solid #CCC;
+height: 17px;text-indent: -9999px; cursor: pointer;
+}
+.ui-datepicker .ui-datepicker-prev{background: url(../images/cal_prev.png) center no-repeat;}
+.ui-datepicker .ui-datepicker-next{background: url(../images/cal_next.png) center no-repeat; right: 0;}
+.ui-datepicker .ui-datepicker-prev span,
+.ui-datepicker .ui-datepicker-next span {
+display: block;
+position: absolute;
+left: 50%;
+margin-left: -8px;
+top: 50%;
+margin-top: -8px;
+}
+.ui-datepicker .ui-datepicker-title {
+background: #ddd;
+line-height: 1.8em;
+text-align: center;
+color: #07c;
+font-size: 11px;
+}
+.ui-datepicker .ui-datepicker-title select {
+font-size: 1em;
+margin: 1px 0;
+}
+.ui-datepicker select.ui-datepicker-month-year {
+width: 100%;
+}
+.ui-datepicker select.ui-datepicker-month,
+.ui-datepicker select.ui-datepicker-year {
+width: 49%;
+}
+.ui-datepicker table {
+width: 100%;
+border-collapse: collapse;
+margin: 0 0 .4em;
+}
+.ui-datepicker th {
+padding: 0;
+text-align: center;
+font-weight: bold;font-size: 10px;
+border: 0;color: #000;border-bottom: #ccc solid 1px;border-right: #f7f7f7 solid 1px;
+}
+.ui-datepicker td {
+border: 0;
+padding: 1px;
+}
+.ui-datepicker td.ui-state-disabled span{background: #f1f1f1;color: #999;}
+.ui-datepicker td a:hover {background-color: #fc3;}
+.ui-datepicker td span,
+.ui-datepicker td a {
+display: block;
+background: #fff;
+padding: 0;
+text-align: center;text-decoration: none;border-bottom: #f7f7f7 solid 1px;border-right: #f7f7f7 solid 1px;
+}
+.ui-datepicker .ui-datepicker-buttonpane {
+background-image: none;
+margin: .7em 0 0 0;
+padding: 0 .2em;
+border-left: 0;
+border-right: 0;
+border-bottom: 0;
+}
+.ui-datepicker .ui-datepicker-buttonpane button {
+float: right;
+margin: .5em .2em .4em;
+cursor: pointer;
+padding: .2em .6em .3em .6em;
+width: auto;
+overflow: visible;
+}
+.ui-datepicker .ui-datepicker-buttonpane button.ui-datepicker-current {
+float: left;
+}
+/* with multiple calendars */
+.ui-datepicker.ui-datepicker-multi {
+width: auto;font-size: 9px;
+}
+.ui-datepicker-multi .ui-datepicker-group {
+float: left;
+}
+.ui-datepicker-multi .ui-datepicker-group table {
+background: #fff;
+}
+.dp-highlight{}
+.ui-datepicker-multi-2 .ui-datepicker-group {
+width: 50%;
+}
+.ui-datepicker-group a{color: #000;}
+.ui-datepicker-multi-3 .ui-datepicker-group {
+width: 32%;
+margin: 0 0px;
+}
+.ui-datepicker-multi-4 .ui-datepicker-group {
+width: 25%;
+}
+.advanced-report-datepicker{width: 455px;}
+.advanced-report-right{float: right; width: 165px;margin-top: 10px;color: #2f2f2f;}
+.advanced-report-right label{font-size: 10px;font-weight: bold;}
+.advanced-report-right select{font-size: 10px;}
+#report-err-msg{clear: both;}
+#product-report-err-msg{clear: both;}
+#transactions-report-err-msg{clear: both;}
+#timetopurchase-report-err-msg{clear: both;}
+#loser-report-date-picker .err-msg, 
+#gainer-report-date-picker .err-msg, 
+#sales_advanced_report_wrapper #report-err-msg{font-weight: normal; font-size: 11px;color: #000;display: block;padding: 3px;background: #fff;border: 1px solid #ccc;text-align: center;line-height: 18px;}
+#loser-report-date-picker .err-msg b, 
+#gainer-report-date-picker .err-msg b, 
+#sales_advanced_report_wrapper #report-err-msg b{
+    color: red;
+}
+.advanced-report-right input[type="text"]{border: 1px solid #bdbdbd;width: 67px;padding-left: 0px;
+ text-align: center;
+
+margin: 5px 1px 5px 1px;-webkit-box-shadow: inset 0 1px 0 #d6d6d6;  -moz-box-shadow: inset 0 1px 0 #d6d6d6;  box-shadow: inset 0 1px 0 #d6d6d6;  color: #000;height: 19px;}
+.advanced-report-right .date_label{float: left;margin-top: 10px; color: #999;}
+.advanced-report-right a#loser-report-date-cancel, 
+.advanced-report-right a#gainer-report-date-cancel, 
+.advanced-report-right a#report-date-cancel{text-decoration: underline;color: #24b;cursor: pointer;font-size: 12px;padding-top: 4px;display: block;}
+.advanced-report-right a#product-report-date-cancel{text-decoration: underline;color: #24b;cursor: pointer;font-size: 12px;}
+.advanced-report-right a#transactions-report-date-cancel{text-decoration: underline;color: #24b;cursor: pointer;font-size: 12px;}
+.advanced-report-right a#timetopurchase-report-date-cancel{text-decoration: underline;color: #24b;cursor: pointer;font-size: 12px;}
+.advanced-report-right a.apply{background: #ffffff;background: -moz-linear-gradient(top, #ffffff 0%, #e5e5e5 100%);background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#e5e5e5));background: -webkit-linear-gradient(top, #ffffff 0%,#e5e5e5 100%);background: -o-linear-gradient(top, #ffffff 0%,#e5e5e5 100%);background: -ms-linear-gradient(top, #ffffff 0%,#e5e5e5 100%);background: linear-gradient(to bottom, #ffffff 0%,#e5e5e5 100%);filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#e5e5e5',GradientType=0 );border: 1px solid #bdbdbd;color: #666;padding: 4px 13px;-webkit-border-radius: 3px;-moz-border-radius: 3px;border-radius: 3px;text-decoration: none;float: left;
+margin-right: 5px;}
+.advanced_report_wrapper .chart-button-options{float: right;
+background: #fefefe; /* Old browsers */
+background: -moz-linear-gradient(top,  #fefefe 0%, #f3f3f3 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fefefe), color-stop(100%,#f3f3f3)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top,  #fefefe 0%,#f3f3f3 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top,  #fefefe 0%,#f3f3f3 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top,  #fefefe 0%,#f3f3f3 100%); /* IE10+ */
+background: linear-gradient(to bottom,  #fefefe 0%,#f3f3f3 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fefefe', endColorstr='#f3f3f3',GradientType=0 ); /* IE6-9 */
+overflow: hidden;
+border: 1px solid #cbcbcb;
+
+
+
+}
+.advanced_report_wrapper .chart-button-options a.active{background-color: #dfdfdf;
+background-image: -webkit-linear-gradient(top,#f0f0f0,#dfdfdf);
+background-image: -moz-linear-gradient(top,#f0f0f0,#dfdfdf);
+border-color: #ccc;
+box-shadow: inset 0px 1px 5px rgba(0,0,0,.3);
+color: #222;}
+.advanced_report_wrapper .chart-button-options a:hover{border-color: #ccc;
+box-shadow: inset 0px 1px 2px rgba(0,0,0,.2);}
+.advanced_report_wrapper .chart-button-options a#report_week_select{border: 1px solid #ccc;border-width: 0 1px;float: left;}
+.advanced_report_wrapper .chart-button-options a#product_report_week_select{border: 1px solid #ccc;border-width: 0 1px;float: left;}
+.advanced_report_wrapper .chart-button-options a#transactions_report_week_select{border: 1px solid #ccc;border-width: 0 1px;float: left;}
+.advanced_report_wrapper .chart-button-options a{padding: 8px 8px;float: left;display: inline-block;font: bold 11px Arial;color: #444; text-decoration: none;}
+.advanced_report_wrapper #timetopurchase_chart_div,
+.advanced_report_wrapper #sales_chart_div,
+.advanced_report_wrapper #product_chart_div,
+.advanced_report_wrapper #transactions_chart_div{clear: both; margin-left: 20px;}
+.advanced_report_wrapper .total-transaction.timetopurchase{width: auto;
+float: left; margin-top: -6px;
+padding: 5px 10px;border: 1px solid #e8e8e8;}
+.advanced_report_wrapper .total-transaction.timetopurchase p{display: block;margin: 0 !important;padding: 0;}
+.advanced_report_wrapper .total-transaction.timetopurchase p.number {}
+.advanced_report_wrapper .total-transaction.timetopurchase li{float: left; font-size: 12px; font-weight: bold;}
+.advanced_report_wrapper .total-transaction.timetopurchase li.number{color: #058dc7; padding-left: 5px;}
+.advanced_report_wrapper .total-revenue p.number,
+.advanced_report_wrapper .total-transaction p.number{color: #058dc7;font-weight: bold;}
+.advanced_report_wrapper .total-revenue p.text,
+.advanced_report_wrapper .total-transaction p.text{font-size: 12px;margin: 5px 0 0 0;font-weight: bold;}
+.advanced_report_wrapper .total-revenue p,
+.advanced_report_wrapper .total-transaction p{margin: 5px 0;}
+.total-revenue, .total-transaction{border: 1px solid #e8e8e8; float: right;text-align: center;font-size: 18px;padding: 0 10px;background: #fefefe;  background: -moz-linear-gradient(top, #fefefe 0%, #f3f3f3 100%);  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fefefe), color-stop(100%,#f3f3f3));  background: -webkit-linear-gradient(top, #fefefe 0%,#f3f3f3 100%);  background: -o-linear-gradient(top, #fefefe 0%,#f3f3f3 100%);  background: -ms-linear-gradient(top, #fefefe 0%,#f3f3f3 100%);  background: linear-gradient(to bottom, #fefefe 0%,#f3f3f3 100%);  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fefefe', endColorstr='#f3f3f3',GradientType=0 );}
+#advanced_sales_date_wise_data .total-revenue, #advanced_sales_date_wise_data .total-transaction{height: 70px;}
+
+.advanced_report_wrapper .total-revenue{
+    border-right: 0;
+}
+.advanced_report_wrapper .total-transaction{
+    border-right: 0;
+}
+.advanced_report_wrapper  .product_rev_bottom .total-revenue{-webkit-border-radius: 4px;-moz-border-radius: 4px;border-radius: 4px; border-right-width: 1px;}
+.advanced_report_wrapper .sales.total-transaction{border: 1px solid #e8e8e8;}
+.advanced_report_wrapper .sales.total-transaction .number{}
+
+.advanced_report_wrapper #timetopurchase-advanced-report-table{clear: both;margin-top: 15px;}
+.advanced_report_wrapper th:hover{background-color: #f3f3f3 !important;box-shadow: inset 0px 1px 5px rgba(0,0,0,.2); cursor: pointer;}
+.advanced_report_wrapper #loser-advanced-report-table th:hover, 
+.advanced_report_wrapper #gainer-advanced-report-table th:hover, 
+.advanced_report_wrapper #topsellingproducts-advanced-report-table th:hover{cursor: default;}
+
+.advanced_report_wrapper th.sort-order{}
+.advanced_report_wrapper th.sort-order-none:hover{cursor: default;}
+
+.advanced_report_wrapper #loser-advanced-report-table,
+.advanced_report_wrapper #gainer-advanced-report-table,
+.advanced_report_wrapper #topsellingproducts-advanced-report-table,
+.advanced_report_wrapper #sales-datewise-advanced-report-table,
+.advanced_report_wrapper #transactions-advanced-report-table,
+.advanced_report_wrapper #timetopurchase-advanced-report-table,
+.advanced_report_wrapper #product-advanced-report-table,
+.advanced_report_wrapper #advanced-report-table,.advanced_report_wrapper #followup-advanced-report-table{border: 1px solid #e5e5e5;border-bottom-width: 0;width: 100%;table-layout: fixed;}
+.advanced_report_wrapper #loser-advanced-report-table th,
+.advanced_report_wrapper #gainer-advanced-report-table th,
+.advanced_report_wrapper #topsellingproducts-advanced-report-table th,
+.advanced_report_wrapper #sales-datewise-advanced-report-table th,
+.advanced_report_wrapper #timetopurchase-advanced-report-table th,
+.advanced_report_wrapper #transactions-advanced-report-table th,
+.advanced_report_wrapper #product-advanced-report-table th,
+.advanced_report_wrapper #advanced-report-table th,
+.advanced_report_wrapper #product-advanced-report-table th,.advanced_report_wrapper #followup-advanced-report-table th{background-color: #e9e9e9;height: 16px;padding: 8px 20px 8px 10px;border-right: 1px solid #ccc;font-size: 11px;font-family: Arial,Helvetica,Geneva,sans-serif;position: relative;vertical-align: middle;border: solid 1px #ccc;}
+.advanced_report_wrapper #topsellingproducts-advanced-report-table th.last_td{border-right:0;}
+.advanced_report_wrapper #timetopurchase-advanced-report-table th.last_td{border-right:0;}
+.advanced_report_wrapper #loser-advanced-report-table .text_center,
+.advanced_report_wrapper #gainer-advanced-report-table .text_center,
+.advanced_report_wrapper #topsellingproducts-advanced-report-table .text_center,
+.advanced_report_wrapper #transactions-report-table .text_center,
+.advanced_report_wrapper #timetopurchase-report-table .text_center,
+.advanced_report_wrapper #advanced-report-table .text_center,
+.advanced_report_wrapper #product-advanced-report-table .text_center{text-align: center;}
+.advanced_report_wrapper #loser-advanced-report-table .text_left,
+.advanced_report_wrapper #topsellingproducts-advanced-report-table .text_left,
+.advanced_report_wrapper #product-advanced-report-table .text_left,
+.advanced_report_wrapper #transactions-advanced-report-table .text_left,
+.advanced_report_wrapper #gainer-advanced-report-table .text_left{text-align: left;}
+.advanced_report_wrapper #advanced-report-table .text_left{text-align: left;}
+.advanced_report_wrapper #loser-advanced-report-table .border,
+.advanced_report_wrapper #gainer-advanced-report-table .border,
+.advanced_report_wrapper #topsellingproducts-advanced-report-table .border,
+.advanced_report_wrapper #product-advanced-report-table .border,
+.advanced_report_wrapper #advanced-report-table .text_left.border{border-right-width: 0;}
+.advanced_report_wrapper #loser-advanced-report-table .text_right,
+.advanced_report_wrapper #gainer-advanced-report-table .text_right,
+.advanced_report_wrapper #topsellingproducts-advanced-report-table .text_right,
+.advanced_report_wrapper #sales-datewise-advanced-report-table .text_right,
+.advanced_report_wrapper #advanced-report-table .text_right,
+.advanced_report_wrapper #product-advanced-report-table .text_right{text-align: right;}
+.advanced_report_wrapper #loser-advanced-report-table td,
+.advanced_report_wrapper #gainer-advanced-report-table td,
+.advanced_report_wrapper #topsellingproducts-advanced-report-table td,
+.advanced_report_wrapper #sales-datewise-advanced-report-table td,
+.advanced_report_wrapper #product-advanced-report-table td,
+.advanced_report_wrapper #timetopurchase-advanced-report-table td,
+.advanced_report_wrapper #advanced-report-table td,.advanced_report_wrapper #followup-advanced-report-table td{height: 17px;border-bottom: 1px solid #e5e5e5;font-family: Arial,Helvetica,Geneva,sans-serif;font-size: 13px;color:#000;padding: 8px 10px 8px;position: relative;vertical-align: middle;border-right: solid 1px #ccc;}
+.advanced_report_wrapper #transactions-advanced-report-table td{height: 17px;border-bottom: 1px solid #e5e5e5;font-family: Arial,Helvetica,Geneva,sans-serif;font-size: 13px;color:#000;padding: 0;position: relative;vertical-align: middle;border-right: solid 1px #ccc;}
+.advanced_report_wrapper td:first-child{border-right: solid 0px #ccc;}
+.advanced_report_wrapper #product-advanced-report-table td.percentage,
+.advanced_report_wrapper #product-advanced-report-table td.percentage,
+.advanced_report_wrapper #advanced-report-table td.percentage{border-right-width: 0;}
+.advanced_report_wrapper #product-advanced-report-table td.revenue_amt,
+.advanced_report_wrapper #transactions-advanced-report-table td.revenue_amt,
+.advanced_report_wrapper #timetopurchase-advanced-report-table td.transactions,
+.advanced_report_wrapper #advanced-report-table td.revenue_amt{font-weight: bold;background-color: #fafafa;}
+.advanced_report_wrapper a, 
+.advanced_report_wrapper #transactions-advanced-report-table a,
+.advanced_report_wrapper #product-advanced-report-table a{color: #005c9c; text-decoration: none}
+.advanced_report_wrapper .advanced-report-even td{/*background: #f5f5f5;*/}
+.advanced_report_wrapper #tablePagination{padding: 10px 0 0;text-align: right;-webkit-border-radius: 0px 0px 4px 4px;-moz-border-radius: 0px 0px 4px 4px;border-radius: 0px 0px 4px 4px;}
+.advanced_report_wrapper #tablePagination_rowsPerPage{margin-right: 20px;}
+.advanced_report_wrapper #tablePagination_totalPages{padding: 0 15px 0 0;}
+.advanced_report_wrapper #tablePagination_currPage{vertical-align: initial;background: #fff;
+border-top: 1px solid #a3a3a3;
+border-left: 1px solid #a3a3a3;
+border-bottom: 1px solid #ccc;
+border-right: 1px solid #ccc;
+box-shadow: inset 0 1px 0 #d6d6d6;
+-webkit-box-shadow: inset 0 1px 0 #d6d6d6;
+-moz-box-shadow: inset 0 1px 0 #d6d6d6;
+color: #000;
+font: normal 12px Arial;
+height: 20px;
+margin: 0;
+padding-left: 5px;
+width: 25px;}
+.advanced_report_wrapper .page_arrow{background: #ffffff;background: -moz-linear-gradient(top, #ffffff 0%, #e5e5e5 100%);background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#e5e5e5));background: -webkit-linear-gradient(top, #ffffff 0%,#e5e5e5 100%);background: -o-linear-gradient(top, #ffffff 0%,#e5e5e5 100%);background: -ms-linear-gradient(top, #ffffff 0%,#e5e5e5 100%);background: linear-gradient(to bottom, #ffffff 0%,#e5e5e5 100%);filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#e5e5e5',GradientType=0 );border: 1px solid #bbb;-webkit-border-radius: 4px;-moz-border-radius: 4px;border-radius: 4px;height: 22px;display: inline-block;vertical-align: top;}
+.advanced_report_wrapper .page_arrow span{cursor: pointer;padding: 1px 8px 0; font-weight: bold; font-size: 16px;color: #000;border-right: 1px solid #bbb;height: 21px;display: inline-block;}
+.advanced_report_wrapper .tablePagination_firstPage{border-left-width: 0px;}
+.advanced_report_wrapper .tablePagination_prevPage{}
+.advanced_report_wrapper .tablePagination_nextPage{}
+.advanced_report_wrapper .tablePagination_lastPage{border-right-width: 0px;}
+.advanced_report_wrapper .advanced_progress_wrap{width: 245px;display: inline-block;float: left;margin-right: 10px;}
+.advanced_report_wrapper .advanced_progress_bar{height: 12px;width: 0px; ; display: inline-block; max-width: 72%;vertical-align: middle;
+    -webkit-transition: all 2s ease-out;
+    -moz-transition: all 2s ease-out;
+    -o-transition: all 2s ease-out;
+    transition: all 2s ease-out;
+overflow: hidden;}
+.advanced_report_wrapper .advanced-percentage{width: 50px;display: inline-block;}
+.advanced_report_wrapper .revenue_transaction{float: left;width: 595px;}
+.advanced_report_wrapper .revenue_transaction.product_rev_bottom{float: left;width: auto;margin-bottom: 10px;}
+.advanced_report_wrapper .timetopurchaserevenue_transaction{float: left;width: 500px;}
+.advanced_report_wrapper #advanced_product_report_pager, 
+.advanced_report_wrapper #advanced_timetopuchase_report_pager, 
+.advanced_report_wrapper #advanced_sales_report_pager, 
+.advanced_report_wrapper #advanced_transactions_report_pager{float: right;margin: 10px 0 0;}
+.advanced_report_wrapper #advanced_product_report_pager .goto, 
+.advanced_report_wrapper #advanced_timetopuchase_report_pager .goto, 
+.advanced_report_wrapper #advanced_sales_report_pager .goto, 
+.advanced_report_wrapper #advanced_transactions_report_pager .goto{width: 25px;border: 1px solid #ccc;margin: 2px 0 0 0;padding: 1px 5px;}
+.advanced_report_wrapper #advanced_product_report_pager .goto_span, 
+.advanced_report_wrapper #advanced_timetopuchase_report_pager .goto_span, 
+.advanced_report_wrapper #advanced_sales_report_pager .goto_span, 
+.advanced_report_wrapper #advanced_transactions_report_pager .goto_span{padding: 3px 5px 0;}
+.advanced_report_wrapper #advanced_product_report_pager .nopage, 
+.advanced_report_wrapper #advanced_timetopuchase_report_pager .nopage, 
+.advanced_report_wrapper #advanced_transactions_report_pager .nopage, 
+.advanced_report_wrapper #advanced_sales_report_pager .nopage{padding: 2px 7px 0;}
+.advanced_report_wrapper #advanced_product_report_pager span, 
+.advanced_report_wrapper #advanced_product_report_pager input, 
+.advanced_report_wrapper #advanced_product_report_pager select, 
+.advanced_report_wrapper #advanced_timetopuchase_report_pager span, 
+.advanced_report_wrapper #advanced_timetopuchase_report_pager input, 
+.advanced_report_wrapper #advanced_timetopuchase_report_pager select, 
+.advanced_report_wrapper #advanced_transactions_report_pager span, 
+.advanced_report_wrapper #advanced_transactions_report_pager input, 
+.advanced_report_wrapper #advanced_transactions_report_pager select, 
+.advanced_report_wrapper #advanced_sales_report_pager span, 
+.advanced_report_wrapper #advanced_sales_report_pager input, 
+.advanced_report_wrapper #advanced_sales_report_pager select{display: block; float: left;}
+.advanced_report_wrapper #advanced_product_report_pager select, 
+.advanced_report_wrapper #advanced_timetopuchase_report_pager select, 
+.advanced_report_wrapper #advanced_transactions_report_pager select, 
+.advanced_report_wrapper #advanced_sales_report_pager select{margin-top: 2px;}
+.advanced_report_wrapper #advanced_product_report_pager .goto_row, 
+.advanced_report_wrapper #advanced_timetopuchase_report_pager .goto_row, 
+.advanced_report_wrapper #advanced_transactions_report_pager .goto_row, 
+.advanced_report_wrapper #advanced_sales_report_pager .goto_row{margin-top: 3px;}
+.advanced_report_wrapper #product-advanced-report-table th.headerSortDown.headerSort, 
+.advanced_report_wrapper #transactions-advanced-report-table th.headerSortDown.headerSort, 
+.advanced_report_wrapper #timetopurchase-advanced-report-table th.headerSortDown.headerSort, 
+.advanced_report_wrapper #advanced-report-table th.headerSortDown.headerSort{background: #ccc url(../images/header_down.gif) center right no-repeat;}
+.advanced_report_wrapper #product-advanced-report-table th.headerSortUp.headerSort, 
+.advanced_report_wrapper #transactions-advanced-report-table th.headerSortUp.headerSort, 
+.advanced_report_wrapper #timetopurchase-advanced-report-table th.headerSortUp.headerSort, 
+.advanced_report_wrapper #advanced-report-table th.headerSortUp.headerSort{background: #ccc url(../images/header_up.gif) center right no-repeat;}
+.advanced_report_wrapper #product-advanced-report-table th.headerSort,  
+.advanced_report_wrapper #transactions-advanced-report-table th.headerSort, 
+.advanced_report_wrapper #timetopurchase-advanced-report-table th.headerSort, 
+.advanced_report_wrapper #advanced-report-table th.headerSort{background-image: url(../images/header_sort.gif); background-position: center right; background-repeat: no-repeat;}
+.advanced_report_wrapper .loading_img p{margin-top: 50px;}
+#transactions-advanced-report-table p{padding:8px 10px;}
+.advanced_report_wrapper .loading_img{
+background: #fff4e9 url(../images/report_loading.gif) center 10px no-repeat;
+position: absolute;
+z-index: 999;
+color: #d85909;
+font-size: 1.1em;
+font-weight: bold;
+text-align: center;
+opacity: 0.80;
+-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+top: 160px;
+left: 43%;
+height: 80px;
+width: 180px;
+border: 2px solid #f1af73;
+}
+
+#advanced_report_main_ajax_load p{margin-top: 50px;}
+#advanced_report_main_ajax_load {
+background: #fff4e9 url(../images/report_loading.gif) center 10px no-repeat;
+position: absolute;
+z-index: 999;
+color: #d85909;
+font-size: 1.1em;
+font-weight: bold;
+text-align: center;
+opacity: 0.80;
+-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+top: 160px;
+left: 43%;
+height: 80px;
+width: 180px;
+border: 2px solid #f1af73;
+}
+
+
+.advancedreports-adminhtml-advancedreports-edit .content-header{display: none;}
+.advancedreports-adminhtml-advancedreports-edit #advancedreports_tabs_sales_section_content .content-header,
+.advancedreports-adminhtml-advancedreports-edit .advanced_report_wrapper .content-header{display: block;}
+.advancedreports-adminhtml-advancedreports-edit h3.content-header span.title_head{line-height: 37px; float: left;}
+
+
+.advanced_report_wrapper th.advancedreports-headerDesc{background-image: url(../images/sort_asc.gif); background-position: right 50%; background-repeat: no-repeat;}
+.advanced_report_wrapper th.advancedreports-headerAsc{background-image: url(../images/sort_desc.gif); background-position: right 50%; background-repeat: no-repeat;}
+.advanced_report_wrapper #timetopurchaseexport a.excel,
+.advanced_report_wrapper #salesexport a.excel,
+.advanced_report_wrapper #transactionsexport a.excel,
+.advanced_report_wrapper #export a.excel{text-decoration: none;
+
+
+display: block;
+float: left;
+
+
+}
+
+.advanced_report_wrapper .back_to {margin-bottom: 10px; display: block; float: left;font-weight: bold;font-size: 15px;}
+.advanced_report_wrapper .back_to span{border-bottom: 1px solid #005c9c;font-size: 12px;}
+.advanced_report_wrapper .export span,
+.advanced_report_wrapper #timetopurchaseexport span,
+.advanced_report_wrapper #salesexport span,
+.advanced_report_wrapper #transactionsexport span,
+.advanced_report_wrapper #export span{float: left;padding-top: 4px;font-weight: bold;}
+
+.advanced_report_wrapper .export a.csv,
+.advanced_report_wrapper #timetopurchaseexport a.csv,
+.advanced_report_wrapper #salesexport a.csv,
+.advanced_report_wrapper #transactionsexport a.csv,
+.advanced_report_wrapper #export a.csv{text-decoration: none;
+
+
+display: block;
+float: left;
+margin: 0 10px;
+
+}
+
+
+.advanced_report_wrapper .export,
+.advanced_report_wrapper #timetopurchaseexport,
+.advanced_report_wrapper #salesexport,
+.advanced_report_wrapper #transactionsexport,
+.advanced_report_wrapper #export{float: right; position: relative;margin-top: 4px;cursor: default;}
+
+.advanced_report_wrapper .export li span,
+.advanced_report_wrapper #timetopurchaseexport li span,
+.advanced_report_wrapper #salesexport li span,
+.advanced_report_wrapper #transactionsexport li span,
+.advanced_report_wrapper #export li span{background: none repeat scroll 0 0 #f5f5f5;
+padding: 7px 10px 2px;
+margin: 0px 20px 0 0;
+display: block;
+border: 1px solid #bdbdbd;
+-webkit-border-radius: 2px;
+-moz-border-radius: 2px;
+border-radius: 2px;
+height: 22px;}
+
+.advanced_report_wrapper .export ul,
+.advanced_report_wrapper #timetopurchaseexport ul,
+.advanced_report_wrapper #salesexport ul,
+.advanced_report_wrapper #transactionsexport ul,
+.advanced_report_wrapper #export ul{display: none;}
+
+.advanced_report_wrapper .export li:hover ul,
+.advanced_report_wrapper #timetopurchaseexport li:hover ul,
+.advanced_report_wrapper #salesexport li:hover ul,
+.advanced_report_wrapper #transactionsexport li:hover ul,
+.advanced_report_wrapper #export li:hover ul{display: block; width: 140px;
+border: 1px solid #aeaeae;
+background: #fff;
+box-shadow: 0px 1px 2px rgba(0,0,0,.2);
+font: normal 13px Arial;
+margin: 0;
+text-align: left;
+position: absolute;left:0;
+z-index: 50; padding: 5px;}
+.advanced_report_wrapper .export li:hover ul a,
+.advanced_report_wrapper #timetopurchaseexport li:hover ul a,
+.advanced_report_wrapper #salesexport li:hover ul a,
+.advanced_report_wrapper #transactionsexport li:hover ul a,
+.advanced_report_wrapper #export li:hover ul a{color: #000;text-decoration: none;}
+
+.advanced_report_wrapper .export li:hover ul li,
+.advanced_report_wrapper #timetopurchaseexport li:hover ul li,
+.advanced_report_wrapper #salesexport li:hover ul li,
+.advanced_report_wrapper #transactionsexport li:hover ul li,
+.advanced_report_wrapper #export li:hover ul li{padding: 5px 10px;text-align: left;}
+
+.advanced_report_wrapper .export li:hover ul li:hover,
+.advanced_report_wrapper #timetopurchaseexport li:hover ul li:hover,
+.advanced_report_wrapper #salesexport li:hover ul li:hover,
+.advanced_report_wrapper #transactionsexport li:hover ul li:hover,
+.advanced_report_wrapper #export li:hover ul li:hover{background-color: #e9f1f5;}
+.advanced_report_wrapper .third_child{
+    border-right: 1px solid #e8e8e8;
+}
+.advanced_report_wrapper .current_report_date{float: right;font-size: 15px;border: 1px solid #e8e8e8;padding: 5px 10px;}
+.advanced_report_wrapper .revenue_transaction_report{float: left; width: 675px;}
+#nav ul{z-index: 1002;}
+.advanced_report_wrapper .timetopurchase_chart_container{overflow: hidden;}
+.advanced_report_wrapper .timetopurchase_chart_container .timetopurchase_chart_table{width: 65%;float: left;margin-right: 2%;}
+.advanced_report_wrapper .timetopurchase_chart_container #timetopurchase-advanced-report-table{}
+.advanced_report_wrapper .timetopurchase_chart_container #timetopurchase_chart_div{float: right;width: 30%;clear: none;margin-top: 15px;}
+.shipping-tax-options{}
+.shipping-tax-options ul{
+}
+.shipping-tax-options ul li{float: left;}
+.shipping-tax-options ul li span.spantxt{line-height: 29px;padding-right: 10px;font-weight: bold;color: #058dc7;font-size: 13px;}
+.shipping-tax-options ul li a{display: block;text-decoration: none;background: #fefefe;  background: -moz-linear-gradient(top, #fefefe 0%, #f3f3f3 100%);  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fefefe), color-stop(100%,#f3f3f3));  background: -webkit-linear-gradient(top, #fefefe 0%,#f3f3f3 100%);  background: -o-linear-gradient(top, #fefefe 0%,#f3f3f3 100%);  background: -ms-linear-gradient(top, #fefefe 0%,#f3f3f3 100%);  background: linear-gradient(to bottom, #fefefe 0%,#f3f3f3 100%);    overflow: hidden;  border: 1px solid #cbcbcb;padding: 5px 10px;color: #222;font-size: 12px;font-weight: bold;}
+.shipping-tax-options ul li a:hover{box-shadow: inset 0px 1px 2px rgba(0,0,0,.2);}
+.shipping-tax-options ul li a.first_child{border-right: 0;}
+.shipping-tax-options ul li.active{}
+.shipping-tax-options ul li.active a{background-color: #dfdfdf;background-image: -webkit-linear-gradient(top,#f0f0f0,#dfdfdf);background-image: -moz-linear-gradient(top,#f0f0f0,#dfdfdf);border-color: #ccc;box-shadow: inset 0px 1px 5px rgba(0,0,0,.3);color: #222;cursor: default; filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#dfdfdf', endColorstr='#dfdfdf',GradientType=0 ) !important;}
+
+.advanced-all-product-container {}
+.advanced-all-product-container .all{text-transform: uppercase; float: left;}
+.advanced-all-product-container .all a{color: #058dc7; text-transform: uppercase;text-decoration: none;margin-right: 5px;}
+.advanced-all-product-container .all span{margin-right: 5px;}
+.advanced-all-product-container .all span span{font-size: 15px;}
+.advanced-all-product-container .advanced-all-product-link{float: left; position: relative;}
+.advanced-all-product-container .advanced-all-product-link p{float: left;}
+.advanced-all-product-container .advanced-all-product-link span{border: 1px solid #ccc;display: block;float: left;margin-left: 5px;line-height: 1.1;}
+.advanced-all-product-container .advanced-all-product-link span span{border-width: 0;background: url(../images/arrow_down.png) center 4px no-repeat;padding: 4px 6px 0 5px;margin: 0;}
+.advanced-all-product-container .advanced-all-product-link ul a{display: block;color: #000;text-decoration: none;}
+.advanced-all-product-container .advanced-all-product-link ul{position: absolute; background-color: #fff;border: 1px solid #ccc;color: black;top: 18px;width: 24em;right: 0;z-index: 99;padding: 0 5px;}
+.advanced-all-product-container .advanced-all-product-link ul li{padding: 5px; overflow: hidden;}
+.advanced-all-product-container .advanced-all-product-link ul li:hover{background-color: #ffffcc;}
+.advanced-all-product-container .advanced-all-product-link ul li span{border-width: 0;margin: 0;padding: 0;}
+.advanced-all-product-container .advanced-all-product-link ul li span.prod{width: 19.5em;margin-right: 0.5em;}
+.advanced-all-product-container .advanced-all-product-link ul li span.qty{float: right;width: 3em;text-align: right;}
+.advanced-all-product-container .advanced-all-product-link #advanced-all-product-list{}
+.advanced-all-product-container .advanced-all-product-link #advanced-all-product-list .title{border-bottom: 1px solid #ccc;font-weight: bold;padding: 5px 0;}
+.advanced-all-product-container .advanced-all-product-link #advanced-all-product-list .title:hover{background-color: transparent;}
+span.tooltip_box{display: none;}
+.tooltip_content{position: relative;}
+.tooltip_content:hover span.tooltip_box{display: block; position: absolute; right: 0; top: 0; background: #fff; padding: 10px; border:1px solid #ccc; width: 240px;-moz-box-shadow:  0 2px 5px #ccc;
+   -webkit-box-shadow:   0 2px 5px #ccc;
+   box-shadow:           0 2px 5px #ccc; font-size: 12px; text-align: center;}
+#report-todate-err-msg,#product-report-todate-err-msg,#transactions-report-todate-err-msg,#timetopurchase-report-todate-err-msg{font-weight: normal;
+font-size: 11px;
+color: red;
+display: block;
+padding: 3px;
+background: #fff;
+border: 1px solid #ccc;
+text-align: center;
+line-height: 18px;margin-top: 5px;}
+
+#product-report-err-msg{font-weight: normal; font-size: 11px;color: #000;display: block;padding: 3px;background: #fff;border: 1px solid #ccc;text-align: center;line-height: 18px;}
+#product-report-err-msg b{color: red;}
+
+
+#transactions-report-err-msg{font-weight: normal; font-size: 11px;color: #000;display: block;padding: 3px;background: #fff;border: 1px solid #ccc;text-align: center;line-height: 18px;}
+#transactions-report-err-msg b{color: red;}
+
+#timetopurchase-report-err-msg{font-weight: normal; font-size: 11px;color: #000;display: block;padding: 3px;background: #fff;border: 1px solid #ccc;text-align: center;line-height: 18px;}
+#timetopurchase-report-err-msg b{color: red;}
+
+#loser-report-disable-click-event, 
+#gainer-report-disable-click-event, 
+#sales-report-disable-click-event, 
+#product-report-disable-click-event, 
+#transactions-report-disable-click-event, 
+#timetopurchase-report-disable-click-event{z-index: 1; position: absolute; height: 25px;background: #f7f7f7;opacity: 0.5;}
+#loser-report-disable-click-event a, 
+#gainer-report-disable-click-event a, 
+#sales-report-disable-click-event a,#product-report-disable-click-event a,#transactions-report-disable-click-event a,#timetopurchase-report-disable-click-event a{visibility: hidden;}
+
+table.advancedreports-asc table.only_end{display: none;}
+table.advancedreports-desc table.only_end{display: table-row;}
+
+table.advancedreports-asc table.only_start{display: table-row;}
+table.advancedreports-desc table.only_start{display: none; border:0; width: 100%;}
+table.only_end{display: none; border:0; width: 100%;}
+table.only_start{border:0; width: 100%;}
+table.both_start_end{border:0; width: 100%;}
+table.both_start_end td,table.only_start td,table.only_end td{border-right:0 !important; width: 350px;}
+.revenue_amt table p{font-size: 0; padding: 11px !important;}
+td.qty_grid p.date_data,td.shipping_grid p.date_data,td.tax_grid p.date_data{font-size: 0; padding: 11px !important;}
+
+.timetopurchase_chart_table th:hover {background-color: #f3f3f3 !important;box-shadow: inset 0px 1px 5px rgba(0,0,0,.2);cursor: default;}
+
+p.advancedreports_switcher {margin-bottom: 10px;border: 1px solid #cddddd;background: #e7efef;padding: 10px;}
+p.advancedreports_switcher select {width: 100%;min-height: 17px;}
+
+#transactions-advanced-report-table td.empty_data{padding:8px;}
+input[type="checkbox"].advancedreports_followupproducts{-webkit-appearance: none;-webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 0 #000;  box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 0 #000;  -webkit-transition: border linear 0.2s,box-shadow linear 0.2s;  -moz-transition: border linear 0.2s,box-shadow linear 0.2s;  -ms-transition: border linear 0.2s,box-shadow linear 0.2s;  -o-transition: border linear 0.2s,box-shadow linear 0.2s;  transition: border linear 0.2s,box-shadow linear 0.2s;border: 1px solid #ccc;background: #fff;height: 1.1em;  width: 1.1em;  -webkit-border-radius: 2px;  -moz-border-radius: 2px;  border-radius: 2px; cursor: pointer;}
+input[type="checkbox"]:checked.advancedreports_followupproducts {background:#fff url(../images/check.png) center center no-repeat;-webkit-background-size: 14px 14px;}
+input:disabled{cursor: default !important;}
+#product-advanced-report-table input[type="checkbox"]{}
+#advancedreports_tabs_followupproducts_section_content input[type="checkbox"]{margin-right: 5px;}
+span.advance_followup {display: block;}
+span.checkbox_tooltip{display: none; }
+span.advance_followup .checkbox_tooltip{  position: absolute; right: 0; top: 35px; background: #fff; padding: 5px 10px; border:1px solid #ccc; -moz-box-shadow:  0 2px 5px #ccc;
+   -webkit-box-shadow:   0 2px 5px #ccc;
+   box-shadow:           0 2px 5px #ccc; font-size: 12px; text-align: center;z-index: 10000;border-radius: 3px;-webkit-border-radius: 3px;-moz-border-radius: 3px;}
+tr.advanced-report-data td{position: relative;}
+span.advance_followup .checkbox_tooltip em{
+    font: normal normal 12px arial;
+    padding-right: 5px;
+}
+.checkbox_tooltip:after,.checkbox_tooltip:before{bottom: 100%;
+	border: solid transparent;
+	content: " ";
+	height: 0;
+	width: 0;
+	position: absolute;
+	pointer-events: none;}
+
+.checkbox_tooltip:after{border-color: rgba(136, 183, 213, 0);
+	border-bottom-color: #fff;
+	border-width: 6px;
+	left: 10%;
+	margin-left: 12px;}
+.checkbox_tooltip:before{border-color: rgba(194, 225, 245, 0);
+	border-bottom-color: #ccc;
+	border-width: 8px;
+	left: 10%;
+	margin-left: 10px;}
+.gainer_chart_table{
+    width: 49%;
+    float: left;
+}
+.gainer_chart_table h4{
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 3px;
+}
+.gainer_chart_table table{table-layout: fixed;}
+.gainer_chart_table span.advancegain{color: green;
+font-size: 11px;
+padding-left: 5px;}
+.loser_chart_table{
+    width: 50%;  
+    float: right;
+}
+
+.loser_chart_table table{table-layout: fixed;}
+.loser_chart_table h4{
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 3px;
+}
+.loser_chart_table span.advancelose{color: red;
+font-size: 11px;
+padding-left: 5px;}
+
+#followupproductsexport{float:right; width: 19%;}
+#followup-advanced-report-table span.folllowpgain{color: green;
+font-size: 11px;
+padding-left:2px;}
+
+#followup-advanced-report-table span.folllowplose{color: red;
+font-size: 11px;
+padding-left: 2px;}
+#followup-advanced-report-table span.emptycell{font-size: 11px; padding-left: 2px;}
+.invalid_api{
+    padding: 10px;
+    background: #FFF0E7;
+    border: 1px solid #FFBF94;
+    width: 50%;
+    margin: 0 auto;
+    text-align: center;
+}
+#followup-advanced-report-table .center_td{text-align: center;}
+.invalid_api span{
+    text-align: center;
+    font: bold 22px arial;
+    color: #eb5e00; 
+   
+    margin-bottom: 9px;
+}
+.invalid_api i{background: url(../images/aler.png) no-repeat; width: 23px; height: 23px; display: inline-block;position: relative;top: 3px;}
+.invalid_api a{
+    font-weight: normal;
+    display: block;
+    color: #eb5e00;
+    text-align: center;
+    padding-bottom: 5px;
+}
+.invalid_api a:hover{text-decoration: none;}
+.invalid_api a span{font-weight: normal;font-size: 12px;}
+
+
+.advanced_report_wrapper .chart-button-options a#followup_report_week_select {
+border: 1px solid #ccc;
+border-width: 0 1px;
+float: left;
+}
