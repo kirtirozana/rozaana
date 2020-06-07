@@ -1,0 +1,184 @@
+<?xml version="1.0"?>
+<!-- 
+/**
+ * Apptha
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the EULA
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://www.apptha.com/LICENSE.txt
+ *
+ * ==============================================================
+ *                 MAGENTO EDITION USAGE NOTICE
+ * ==============================================================
+ * This package designed for Magento COMMUNITY edition
+ * Apptha does not guarantee correct work of this extension
+ * on any other Magento edition except Magento COMMUNITY edition.
+ * Apptha does not provide extension support in case of
+ * incorrect edition usage.
+ * ==============================================================
+ *
+ * @category    Apptha
+ * @package     Apptha_Customer-Follow-Up
+ * @version     1.1
+ * @author      Apptha Team <developers@contus.in>
+ * @copyright   Copyright (c) 2014 Apptha. (http://www.apptha.com)
+ * @license     http://www.apptha.com/LICENSE.txt
+ *
+ * */
+ -->
+<config>
+    <modules>
+        <Apptha_Customerfollowup>
+            <version>0.1.1</version>
+        </Apptha_Customerfollowup>
+    </modules>
+    <frontend>
+        <routers>
+            <customerfollowup>
+                <use>standard</use>
+                <args>
+                    <module>Apptha_Customerfollowup</module>
+                    <frontName>customerfollowup</frontName>
+                </args>
+            </customerfollowup>
+        </routers>
+        <layout>
+            <updates>
+                <customerfollowup>
+                    <file>customerfollowup.xml</file>
+                </customerfollowup>
+            </updates>
+        </layout>
+        <translate>
+			<modules>
+				<Apptha_Customerfollowup>
+					<files>
+						<default>Apptha_Customerfollowup.csv</default>
+					</files>
+				</Apptha_Customerfollowup>
+			</modules>
+		</translate>
+    </frontend>
+    <admin>
+        <routers>
+			<customerfollowup>
+				<use>admin</use>
+				<args>
+					<module>Apptha_Customerfollowup</module>
+					<frontName>customerfollowup</frontName>
+				</args>
+			</customerfollowup>
+        </routers>
+    </admin>
+    <adminhtml>
+		<menu>
+			<customerfollowup module="customerfollowup">
+				<title>Customerfollowup</title>
+				<sort_order>71</sort_order>               
+				<children>
+					<items module="customerfollowup">
+						<title>Manage Follow Up Customers</title>
+						<sort_order>0</sort_order>
+						<action>customerfollowup/adminhtml_customerfollowup</action>
+					</items>
+				</children>
+			</customerfollowup>
+		</menu>
+		<acl>
+			<resources>
+				<all>
+					<title>Allow Everything</title>
+				</all>
+				<admin>
+					<children>
+						<Apptha_Customerfollowup>
+							<title>Customerfollowup Module</title>
+							<sort_order>10</sort_order>
+						</Apptha_Customerfollowup>
+					</children>
+				</admin>
+			</resources>
+		</acl>
+		<layout>
+			<updates>
+				<customerfollowup>
+					<file>customerfollowup.xml</file>
+				</customerfollowup>
+			</updates>
+		</layout>
+    </adminhtml>   
+    <global>
+        <models>
+            <customerfollowup>
+                <class>Apptha_Customerfollowup_Model</class>
+                <resourceModel>customerfollowup_mysql4</resourceModel>
+            </customerfollowup>
+            <customerfollowup_mysql4>
+                <class>Apptha_Customerfollowup_Model_Mysql4</class>
+                <entities>
+                    <customerfollowup>
+                        <table>customerfollowup</table>
+                    </customerfollowup>
+                </entities>
+            </customerfollowup_mysql4>
+        </models>
+        <resources>
+            <customerfollowup_setup>
+                <setup>
+                    <module>Apptha_Customerfollowup</module>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </customerfollowup_setup>
+            <customerfollowup_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </customerfollowup_write>
+            <customerfollowup_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </customerfollowup_read>
+        </resources>
+        <blocks>
+            <customerfollowup>
+                <class>Apptha_Customerfollowup_Block</class>
+            </customerfollowup>
+        </blocks>
+        <helpers>
+            <customerfollowup>
+                <class>Apptha_Customerfollowup_Helper</class>
+            </customerfollowup>
+        </helpers>
+      
+        <template>
+		  <email>
+		    <customerfollowup_general_email_template translate="label" module="customerfollowup">
+			      <label>Customer's Email Template</label>
+			      <file>apptha_customerfollowup/apptha_customer_followup_email.html</file>
+			      <type>html</type>
+		    </customerfollowup_general_email_template>
+
+		  </email>
+		</template>
+                
+
+    </global>
+<crontab>
+        <jobs>
+            <customerfollowup_observer>
+                <schedule>
+                    <cron_expr>*/1 * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>customerfollowup/observer::SendMailtocustomer</model>
+                </run>
+            </customerfollowup_observer>
+        </jobs>
+    </crontab>
+</config>

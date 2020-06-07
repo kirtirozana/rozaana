@@ -1,0 +1,64 @@
+<!--@subject You have abandoned your cart in your store@-->
+<body style="background:#F6F6F6; font-family:Verdana, Arial, Helvetica, sans-serif; font-size:12px; margin:0; padding:0;">
+<div style="background:#F6F6F6; font-family:Verdana, Arial, Helvetica, sans-serif; font-size:12px; margin:0; padding:0;">
+<table cellspacing="0" cellpadding="0" border="0" height="100%" width="100%">
+<tr>
+    <td align="center" valign="top" style="padding:20px 0 20px 0">
+        <!-- [ header starts here] -->
+        <table bgcolor="#FFFFFF" cellspacing="0" cellpadding="10" border="0" width="650" style="border:1px solid #E0E0E0;">
+            <tr>
+                <td valign="top"><a href="{{store url=""}}"><img src="{{skin url="images/logo_email.gif" _area='frontend'}}" alt="{{var store.getFrontendName()}}"  style="margin-bottom:10px;" border="0"/></a></td>
+            </tr>
+            <tr>
+                <td><a href="{{store url="customerfollowup/index/cartpage/"}}" style="color:#1E7EC8;"><b>You have pending orders in your shopping cart since {{var date}}</b></a></td>
+            </tr>
+        <!-- [ middle starts here] -->
+            <tr>
+                <td valign="top">
+                    <h1 style="font-size:22px; font-weight:normal; line-height:22px; margin:0 0 11px 0;"">Dear {{var name}},</h1>
+                    <p style="font-size:12px; line-height:16px; margin:0;">
+                        You are only one step away from getting these exciting products, you have following products pending in your shopping cart <a href="{{store url="customerfollowup/index/cartpage/"}}" style="color:#1E7EC8;"><b>pay now...</b></a>
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <table  WIDTH="100%"  CELLPADDING="0" border="0" CELLSPACING="0" style="border: 1px solid #BEBCB7; border-width: 0;">
+                        <tr border="0">
+                        <td valign="top" style="background:#d8e5ed; border-width: 0; border: 1px solid #CCC; border-right:0; border-bottom: 2px solid #CCC; color: #0A263C; text-align:left; font:bold 13px arial; padding:5px 0 5px 10px;">No</td>
+                        <td valign="top" style="background:#d8e5ed; border-width: 0; border: 1px solid #CCC; border-right:0; border-bottom: 2px solid #CCC; color: #0A263C; text-align:left; font:bold 13px arial; padding:5px 0 5px 10px;">Product</td>
+                        <td valign="top" style="background:#d8e5ed; border-width: 0; border: 1px solid #CCC; border-right:0; border-bottom: 2px solid #CCC; color: #0A263C; text-align:left; font:bold 13px arial; padding:5px 0 5px 10px;">Image</td>
+                        <td valign="top" style="background:#d8e5ed; border-width: 0; border: 1px solid #CCC; border-right:0; border-bottom: 2px solid #CCC; color: #0A263C; text-align:left; font:bold 13px arial; padding:5px 0 5px 10px;">SKU</td>
+                        <td valign="top" style="background:#d8e5ed; border-width: 0; border: 1px solid #CCC; border-right:0; border-bottom: 2px solid #CCC; color: #0A263C; text-align:left; font:bold 13px arial; padding:5px 0 5px 10px;">Unit Price</td>
+                        <td valign="top" style="background:#d8e5ed; border-width: 0; border: 1px solid #CCC; border-right:0; border-bottom: 2px solid #CCC; color: #0A263C; text-align:left; font:bold 13px arial; padding:5px 0 5px 10px;">Qty</td>
+                        <td valign="top" style="background:#d8e5ed; border-width: 0; border: 1px solid #CCC;  color: #0A263C; border-bottom: 2px solid #CCC; font:bold 13px arial; text-align:left; padding:5px 0 5px 10px">Subtotal</td>
+                        </tr>
+                        
+                    {{var product_details}}
+
+                    <tr style="background:#d8e5ed;">
+                                <td valign="top" colspan="6" style="text-align: right; border-width: 0; border: 1px solid #CCC;  border-top:0; color: #0A263C; font:bold 16px arial; padding:5px 10px 5px 0px; border-right: 0;">Subtotal</td>
+                                <td valign="top" style="text-align: left; border-width: 0; border: 1px solid #CCC;  border-top:0; color: #0A263C; font:bold 16px arial; padding:5px 0 5px 10px;">{{var subtotal}}</td>
+                    </tr>
+                        
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <ul>
+                        <li>Our Helpline number:  <span class="nobr">{{config path='general/store_information/phone'}}</span></li>
+                        <li>Our internet feedback option: <a href="mailto:{{config path='trans_email/ident_support/email'}}" style="color:#1E7EC8;">{{config path='trans_email/ident_support/email'}}</a></li>
+                    </ul>
+                </td>
+            </tr>
+            <!-- [ footer starts here] -->
+            <tr>
+                <td bgcolor="#EAEAEA" align="center" style="background:#EAEAEA; text-align:center;"><center><p style="font-size:12px; margin:0;">Thank you for shopping with <a href="{{store url=""}}"><strong>{{var store.getFrontendName()}}</strong></a></p></center></td>
+           </tr>
+        </table>
+    </td>
+</tr>
+</table>
+</div>
+</body>

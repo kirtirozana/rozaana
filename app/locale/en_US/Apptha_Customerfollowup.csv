@@ -1,0 +1,24 @@
+//Admin Menu
+
+"Manage Follow Up Customers","Manage Follow Up Customers"
+
+//Manage Follow Up Customers
+
+"ID","ID"
+"Customer Name","Customer Name"
+"Customer Email","Customer Email"
+"Order Id","Order Id"
+"Cart Id","Cart Id"
+"Amount in cart","Amount in cart"
+"Action","Action"
+"Mail sent successfully","Mail sent successfully"
+
+//Mail template
+
+"No","No"
+"Product","Product"
+"Image","Image"
+"SKU","SKU"
+"Unit Price","Unit Price"
+"Qty","Qty"
+"Subtotal","Subtotal"
