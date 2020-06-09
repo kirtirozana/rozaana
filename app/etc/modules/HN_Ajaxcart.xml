@@ -1,0 +1,8 @@
+<config>
+    <modules>
+        <HN_Ajaxcart>
+            <active>true</active>
+            <codePool>local</codePool>
+        </HN_Ajaxcart>
+    </modules>
+</config> 

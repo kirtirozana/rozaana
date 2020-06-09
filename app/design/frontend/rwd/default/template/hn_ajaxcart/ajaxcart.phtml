@@ -1,0 +1,582 @@
+<?php
+?>
+
+<script type="text/javascript">
+var  step1dialog;
+
+step1dialog = jQuery( "#ajcstep1" ).dialog({
+    autoOpen: false,
+   
+    modal: true,
+});
+function mn_quickview(obj) {
+	var ajax_link = jQuery(obj).data('qvl');
+	
+	if (ajax_link != undefined) {
+		 jQuery.colorbox({
+             href:ajax_link,
+             top : '10%',
+             width: '90%'
+         });
+         return false;
+
+	}
+	
+}
+////////////////
+function isUrl(s) {
+	   var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
+	   return regexp.test(s);
+	}
+function updateCartTop() {
+	var baseurl = '<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK)?>';
+	var carttop = document.getElementsByClassName('top-link-cart')[0];
+	new Ajax.Request(baseurl + 'ajaxcart/index/index', {method:'get',
+		 onSuccess: function(transport) {carttop.innerHTML = transport.responseText;
+	}});
+}
+
+//update cart side bar
+function updateCartSideBar() {
+	var baseurl = '<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK)?>';
+	var sidebarE = document.getElementsByClassName('block block-cart')[0];
+	new Ajax.Request(baseurl + 'ajaxcart/index/sidebar',{
+			method: 'get',
+			onSuccess: function(transport) {
+				var beginn = transport.responseText.indexOf('<div class="block-title">');
+				
+				var end = transport.responseText.indexOf('</ol>');
+				
+				
+				var content = transport.responseText.substr(beginn,end-beginn);
+				
+				sidebarE.innerHTML = content;
+				}
+		});
+}
+/** */
+var ajaxcartresponse;
+function hn_addcart(obj) {
+	
+   
+      	              ajaxurl ="http://127.0.0.1/magentotheme/tech/index.php/ajaxcart/index/config/product/423/";
+	                	  jQuery.ajax({
+	              	        type: 'POST',
+	              	         url: ajaxurl,
+	              	         data: {
+	              	            "action": "giftwrapper_select_action",
+	              	            'name': jQuery(this).attr('data-name'),
+	              	            'manufacturer': jQuery(this).attr('data-manufacturer')
+	              	          
+	              	        },
+	              	        success: function(response){
+	              	        	ajaxcartresponse = response
+	              	        	jQuery.colorbox( {html:"<div>"  + response + "</div>" });
+
+	              	        }
+	              	    });
+     
+    
+      }
+
+
+      /** show the view for configurable, grouped product */
+      
+      function mn_ajc_step1(obj) {
+    		var baseurl = '<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK)?>';
+            var ajaxurl = baseurl;
+    		var $product_type = jQuery(obj).data('producttype');
+    		var $product_type = jQuery(obj).attr('data-producttype');
+    		var $product_id = jQuery(obj).attr('data-productid');
+    		
+    		console.log( $product_id);
+
+    		console.log( jQuery(obj));
+    		if ($product_type == 'configurable') {
+    			 ajaxurl =baseurl + '/ajaxcart/index/config/product/' + jQuery(obj).data('productid');
+        		} else if ($product_type == 'grouped') {
+        			 ajaxurl =baseurl + '/ajaxcart/index/group/product/' + jQuery(obj).data('productid');
+            		}   else if ($product_type == 'downloadable') {
+        			 ajaxurl =baseurl + '/ajaxcart/index/downloadable/product/' + jQuery(obj).data('productid');
+            		} else  {
+           			 ajaxurl = baseurl + '/ajaxcart/index/all/product/' + jQuery(obj).data('productid');
+
+            		}
+    		
+    		console.log(ajaxurl);
+    		var imgsrc='<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS)?>' + 'scriptaculous/spinner.gif';
+        	var htlm = '<div style="margin-left:200px"><img src="'+ imgsrc + '"</div>';
+
+        	//jQuery.colorbox( {html:"<div>"  + htlm + "</div>" });
+        	jQuery('#ajcdialogloading').dialog();
+    		  jQuery.ajax({
+        	        type: 'POST',
+        	         url: ajaxurl,
+        	      
+        	        success: function(response){
+        	        	ajaxcartresponse = response;
+
+        	        	jQuery( "#ajcdialogloading" ).dialog( "close" );
+
+        	        	jQuery('#ajcstep1').hide();
+        	        	jQuery('#ajcstep1').html(response);
+        	        	step1dialog = jQuery( "#ajcstep1" ).dialog({
+        	        	    autoOpen: false,
+        	        	   
+        	        	  
+        	        	});
+        	        	//alert('succuess');
+        	        	step1dialog.dialog('open');
+        	        	jQuery('#ajcstep1').show();
+        	        	console.log('what the hell');
+        	        	//jQuery('#ajcstep1').dialog();
+        	        	//jQuery.colorbox( {html:"<div>"  + response + "</div>" });
+
+        	        }
+        	    });
+    		
+          }
+      
+
+      /** step 2 */
+      
+                function mn_ajaxcart_step2() {
+            	var productAddToCartForm = new VarienForm('product_addtocart_form');
+            	
+                productAddToCartForm.submit = function(button, url) {
+                    if (this.validator.validate()) {
+                        var form = this.form;
+                        var oldUrl = form.action;
+
+                        if (url) {
+                           form.action = url;
+                        }
+                        var e = null;
+                        try {
+                            this.form.submit();
+                        } catch (e) {
+                        }
+                        this.form.action = oldUrl;
+                        if (e) {
+                            throw e;
+                        }
+
+                        if (button && button != 'undefined') {
+                            button.disabled = true;
+                        }
+                    }
+                }.bind(productAddToCartForm);
+
+                productAddToCartForm.submitLight = function(button, url){
+                    if(this.validator) {
+                        var nv = Validation.methods;
+                        delete Validation.methods['required-entry'];
+                        delete Validation.methods['validate-one-required'];
+                        delete Validation.methods['validate-one-required-by-name'];
+                        if (this.validator.validate()) {
+                            if (url) {
+                                this.form.action = url;
+                            }
+                            this.form.submit();
+                        }
+                        Object.extend(Validation.methods, nv);
+                    }
+                }.bind(productAddToCartForm);
+                var send_url = productAddToCartForm.form.action;
+                var parameterss='';
+            	var form_select_Ele = productAddToCartForm.form.getElementsByTagName('select');
+            	if(form_select_Ele != null && form_select_Ele != undefined && form_select_Ele.length > 0) {
+                	
+                	parameterss += '?' + form_select_Ele[0].name + '=';
+                	parameterss += form_select_Ele[0].value;
+            	for (var i = 1; i < form_select_Ele.length; i++ ) {
+                	if(form_select_Ele[i] != undefined) {
+                	parameterss += '&' + form_select_Ele[i].name + '=';
+                	parameterss += form_select_Ele[i].value;
+                	if(form_select_Ele[i].value == undefined || form_select_Ele[i].value =='' || form_select_Ele[i].value == null) {
+                    	var boxcontent = "Please select the require options";
+                    	alert(boxcontent);
+                    	return false;
+                	}
+            	}
+            	}
+            }
+            	var form_input_Ele =  productAddToCartForm.form.getElementsByTagName('input');
+            	if(form_input_Ele != null && form_input_Ele != undefined && form_input_Ele.length > 0 ) {
+            		for (var i = 0; i < form_input_Ele.length; i++ ) {
+                		if(form_input_Ele[i].value !='') {
+                    	parameterss += '&' + form_input_Ele[i].name + '=';
+                    	parameterss += form_input_Ele[i].value;
+                		}
+                    	
+                	}
+            	}
+            	
+            	var form = jQuery("#product_addtocart_form");
+//            	alert ( form.serialize() + "&" + cb_name + "=" + cb_value);
+             var parameterss = form.serialize();
+            	//alert ('hehe');
+            	//alert (send_url);
+            	 var add_kart_url = '<?php echo Mage::getUrl('ajaxcart/kart/add')?>';
+            	
+            	new Ajax.Request(add_kart_url+ parameterss,{ method:'get',parameters:parameterss,
+                	onLoading:function () {
+                    	var imgsrc='<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS)?>' + 'scriptaculous/spinner.gif';
+                    	var htlm = '<div style="margin-left:200px"><img src="'+ imgsrc + '"</div>';
+                    	jQuery( "#ajcstep1" ).dialog('close');
+                    	jQuery('#ajcdialogloading').dialog();
+                    	
+                	},
+                	onSuccess: function (response) {
+                       jsondata = JSON.parse(response.responseText);
+                    	
+                       jQuery('#ajcdialogloading').dialog('close');
+            	    	if (jsondata.result =='success') { 
+                	    	
+	            	    	jQuery('.header-minicart').find('.count').html(jsondata.count);
+	            	    	//update the cart content
+	            	    	jQuery('.header-minicart').find('#header-cart').html(jsondata.cart);
+	            	    	
+	            	    	jQuery('.header-minicart').find('a').eq(0).addClass('skip-active');
+	            	    	jQuery('#header-cart').addClass('skip-active');
+            	    	} else {
+            	    		
+		            	    var htmlboxy = '<div id="hnsuccessmessage" style="">' + jsondata.message + '</div>';
+		            	    jQuery('#ajcstep1').html(htmlboxy);
+	        	        	step1dialog = jQuery( "#ajcstep1" ).dialog({
+	        	        	    autoOpen: false,
+	        	        	   
+	        	        	  
+	        	        	});
+	        	        	//alert('succuess');
+	        	        	step1dialog.dialog('open');
+            	    	}
+                      
+                	}
+                	});
+            }
+
+
+                /**
+                *  ajax cart from catalog page
+                */
+
+                function mnajc_step3(obj) {
+                    jQuery(this).unbind();
+                	var form = jQuery("#product_addtocart_form");
+                    var parameterss = form.serialize();
+
+                    var add_kart_url = '<?php echo Mage::getUrl('ajaxcart/kart/add')?>';
+
+                   // alert(add_kart_url);
+                       /////////////////Ajax request////////////
+
+                     new Ajax.Request(add_kart_url+ parameterss,{ method:'get',parameters:parameterss,
+                	onLoading:function () {
+                    	var imgsrc='<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS)?>' + 'scriptaculous/spinner.gif';
+                    	var htlm = '<div style="margin-left:200px"><img src="'+ imgsrc + '"</div>';
+                    	//jQuery( "#ajcstep1" ).dialog('close');
+                    	jQuery('#ajcdialogloading').dialog();
+                    	
+                	},
+                	onSuccess: function (response) {
+            	    	jsondata = JSON.parse(response.responseText);
+                    	//alert('ajaxcallend');
+            	    	jQuery('#ajcdialogloading').dialog('close');
+            	    	if (jsondata.result =='success') { 
+                	    	
+	            	    	jQuery('.header-minicart').find('.count').html(jsondata.count);
+	            	    	//update the cart content
+	            	    	jQuery('.header-minicart').find('#header-cart').html(jsondata.cart);
+	            	    	
+	            	    	jQuery('.header-minicart').find('a').eq(0).addClass('skip-active');
+	            	    	jQuery('#header-cart').addClass('skip-active');
+            	    	} else {
+            	    		
+		            	    var htmlboxy = '<div id="hnsuccessmessage" style="">' + jsondata.message + '</div>';
+		            	    jQuery('#ajcstep1').html(htmlboxy);
+	        	        	step1dialog = jQuery( "#ajcstep1" ).dialog({
+	        	        	    autoOpen: false,
+	        	        	   
+	        	        	  
+	        	        	});
+	        	        	//alert('succuess');
+	        	        	step1dialog.dialog('open');
+            	    	}
+                		 
+                	}
+                	});
+                      /////////////////End ajax request//////////
+                    }
+
+                /**
+                *ajax cart from category page for simple product
+                */
+
+
+                var enable_fly_to_cart_effect = 1; //default value
+
+                enable_fly_to_cart_effect = <?php $fly = Mage::getStoreConfig('ajaxcart/general/enable_fly_tce')?Mage::getStoreConfig('ajaxcart/general/enable_fly_tce'):1; echo  $fly ?>;
+
+                                function  mn_ajaxcart_addsimple(element) {
+                                      console.log('add simple product');  
+                                       $product_id = jQuery(element).data('productid');
+
+                                      
+                                           var ajaxUrl = '<?php echo  Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK)?>' + '/ajaxcart/kart/add/product/' +  $product_id;
+
+                                       console.log(ajaxUrl);  
+                                       
+                                        if (ajaxUrl != undefined && ajaxUrl.length > 0) {
+                                        	/**
+                                        	*Add to cart fly effect with jQuery. - May 05, 2013
+                                        	*(c) 2013 @ElmahdiMahmoud - fikra-masri.by
+                                        	*license: http://www.opensource.org/licenses/mit-license.php
+                                        	*/  
+                                        if (enable_fly_to_cart_effect == 1) {
+                                            var cart = jQuery('.header-minicart').eq(0);
+
+                                        	var imgtodrag =jQuery(element).closest('li').find("img").eq(0);
+                                            if (imgtodrag != undefined) {
+                                            	console.log(imgtodrag.attr('id'));
+                                            	
+                                            	console.log(jQuery(element).closest('li').attr('class'));
+                                                var imgclone = imgtodrag.clone()
+                                                    .offset({
+                                                    top: imgtodrag.offset().top,
+                                                    left: imgtodrag.offset().left
+                                                })
+                                                    .css({
+                                                    'opacity': '0.5',
+                                                        'position': 'absolute',
+                                                        'height': '150px',
+                                                        'width': '150px',
+                                                        'z-index': '100'
+                                                })
+                                                    .appendTo(jQuery('body'))
+                                                    .animate({
+                                                    'top': cart.offset().top + 10,
+                                                        'left': cart.offset().left + 10,
+                                                        'width': 75,
+                                                        'height': 75
+                                                }, 
+                                                {
+                                                    duration: 1200,
+                                                    easing: "easeInOutExpo",
+                                                    complete: function() {
+                                                    	//alert('complete');
+                                                    	jQuery('html, body').animate({
+                                                            scrollTop:cart.offset().top + 20
+                                                        }, 1200);
+                                                    	}
+                                                }
+                                                
+                                               
+                                                );
+                                                
+                                                setTimeout(function () {
+                                                    cart.effect("shake", {
+                                                        times: 2
+                                                    }, 200);
+                                                }, 1500);
+
+                                                imgclone.animate({
+                                                    'width': 0,
+                                                        'height': 0
+                                                }, function () {
+                                                	jQuery(this).detach()
+                                                });
+                                            }
+                                        }	     
+                                           //////////////////////////////////////////////////////////////////////////
+                                           		new Ajax.Request(ajaxUrl, {
+                								  method: 'get',
+                								  onLoading:function () {
+                									  var imgsrc='<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS)?>' + 'scriptaculous/spinner.gif';
+                				                  	  var htlm = '<div style="margin-left:200px"><img src="'+ imgsrc + '"</div>';
+                				                  	  if (enable_fly_to_cart_effect == 0) {
+                				                  	   jQuery.colorbox( {html:"<div>"  + htlm + "</div>" });
+                				                  	  }
+                				              	},
+                				              	onSuccess: function (response) {
+                				              		
+                				              		jsondata = JSON.parse(response.responseText);
+                				              		
+                				            	    var htmlboxy = '<div id="hnsuccessmessage" style="">' + jsondata.message + '</div>';
+
+                				            	    if (enable_fly_to_cart_effect == 0) {
+                				            	    	
+                				                    	jQuery('#ajcdialogloading').dialog();
+                				            	                    				            	    	
+                				            	    } else {
+                				            	    	
+                				            	    	//update count 
+                				            	    	
+                				            	    	
+                				            	    	jsondata = JSON.parse(response.responseText);
+                                                        
+                				            	    	console.log(jsondata.result);
+                				            	    	if (jsondata.result =='success') { 
+                					            	    	jQuery('.header-minicart').find('.count').html(jsondata.count);
+                					            	    	//update the cart content
+                					            	    	jQuery('.header-minicart').find('#header-cart').html(jsondata.cart);
+                					            	    	
+                					            	    	jQuery('.header-minicart').find('a').eq(0).addClass('skip-active');
+                					            	    	jQuery('#header-cart').addClass('skip-active');
+                				            	    	} else {
+                				            	    		console.log(jsondata.message);
+                						            	    var htmlboxy = '<div id="hnsuccessmessage" style="">' + jsondata.message + '</div>';
+                						            	    jQuery('#ajcstep1').html(htmlboxy);
+                					        	        	step1dialog = jQuery( "#ajcstep1" ).dialog({
+                					        	        	    autoOpen: false,
+                					        	        	   
+                					        	        	  
+                					        	        	});
+                					        	        	//alert('succuess');
+                					        	        	step1dialog.dialog('open');
+                				            	    	}
+                				            	    }
+                				              		  
+                				                  	
+                				              	}
+                								});
+                                           //////////////////////////////////////////////////////////////////////////
+
+                                           }
+                                    }
+                      
+      
+jQuery(document).ready(function() {
+    //add to cart function 
+  	        
+	function replacebut() {
+
+		jQuery('.btn-cart').each(function(index,element) {
+			  var $thisbutton = jQuery( this );
+			  onclickAtt =  jQuery(element).attr('title');
+
+			  onclickAtt =  $thisbutton.attr('onclick');
+
+			  
+              if (onclickAtt != undefined) {
+            	  /** replace button for the Product Detail Page */
+	            
+	              /** End of Product detamil */
+            	  
+	              buyLink = onclickAtt.substr('setLocation'.length + 2)
+	  	          buyLink = buyLink.substr(0, buyLink.length - 2);
+
+	              $metaajaxcart  = jQuery(this).closest('.product-info').find('.magenestajaxcartmeta:first');
+
+	              can_configure = $metaajaxcart.data('canconfigure');
+	              
+	              if ( jQuery(this).closest('#product_addtocart_form').length == 0 ) {
+		              
+	            	  $thisbutton.attr('data-addcartlink' , buyLink);
+	            	  
+	            	  $thisbutton.attr('onclick' , 'mn_ajaxcart_addsimple(this)');
+	            	  
+	              } else {
+		              
+	            	  //$thisbutton.attr('onclick' , 'mn_ajaxcart_step2(this)');
+
+	            	//hide it add and new button
+	            	// $thisbutton.hide();
+                      var addtocartlabel = '<?php echo $this->__('Add to cart') ?>';
+	            	 var newbutton = "<div class='button' onclick='mn_ajc_step1(this)'  ><span> " + addtocartlabel + "</span> </div>";
+
+	            	// $thisbutton.after(newbutton);
+	            	  
+	            	  //$thisbutton.unbind();
+
+	            	 // $thisbutton.off('click');
+	            	 // setTimeout(function() { $thisbutton.off('click');} , 1000);
+
+	            	  
+	            	  
+		              }
+	            
+
+	              /** update the product type and product id */
+
+	              $metaajaxcart  = jQuery(this).closest('.product-info').find('.magenestajaxcartmeta:first');
+
+	              $product_id = jQuery($metaajaxcart).data('productid');
+
+	              if ( $product_id != undefined)  $thisbutton.attr('data-productid' , $product_id); 
+
+	              
+	              $product_type = jQuery($metaajaxcart).data('productype');
+	              if ( $product_type != undefined) { 
+		              
+		               $thisbutton.attr('data-producttype' , $product_type);
+
+		                } else {
+		                	 $thisbutton.attr('data-producttype' , 'simple');
+			                }
+		  	         
+              }
+
+  	          
+           
+			});
+
+
+		 //for configurable product and grouped producct
+         if (jQuery('.actions a.button').length > 0) {
+		 jQuery('.actions a.button').each(function() {
+			    $thisbutton =jQuery(this);
+                hrefAttr =  jQuery(this).attr('href');
+
+                if (hrefAttr != undefined)  {
+                	 jQuery(this).attr('data-addcartlink',hrefAttr );
+
+                	 jQuery(this).attr('onclick' , 'mn_ajc_step1(this)');
+
+                	 jQuery(this).attr('href' , '#');
+
+                	 jQuery(this).html('<?php echo $this->__('Add to cart')  ?>');
+                    }
+
+                /** */
+                  /** update the product type and product id */
+
+	              $metaajaxcart  = jQuery(this).closest('.product-info').find('.magenestajaxcartmeta:first');
+
+	              $product_id = jQuery($metaajaxcart).data('productid');
+
+	              if ( $product_id != undefined)  $thisbutton.attr('data-productid' , $product_id); 
+
+	              
+	              $product_type = jQuery($metaajaxcart).data('productype');
+	              if ( $product_type != undefined) { 
+		              
+		               $thisbutton.attr('data-producttype' , $product_type);
+
+		                } else {
+		                 $thisbutton.attr('data-producttype' , 'simple');
+			            }
+			 }); //end of foreach
+
+
+        } //end if
+		 
+	}
+
+	
+	replacebut();
+
+	jQuery('#ajcdialogloading').hide();
+	  
+});
+</script>
+
+
+<div id="ajcdialogloading" >
+  <p class="ajc-preloading"><img src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS);
+  ?>/hungnam/ajax-loader.gif" /></p>
+</div>
+ 
+<div id="ajcstep1">
+	<div id="ajaxcartdetail"></div>
+</div>

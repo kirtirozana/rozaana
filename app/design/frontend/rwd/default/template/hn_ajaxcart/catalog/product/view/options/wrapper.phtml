@@ -1,0 +1,226 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magentocommerce.com for more information.
+ *
+ * @category    design
+ * @package     base_default
+ * @copyright   Copyright (c) 2011 Magento Inc. (http://www.magentocommerce.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+?>
+<?php $_product = $this->getProduct(); ?>
+<form action="<?php echo $this->getSubmitUrl($_product) ?>" method="post" id="product_addtocart_form"<?php if($_product->getOptions()): ?> enctype="multipart/form-data"<?php endif; ?>>
+        <div class="no-display">
+            <input type="hidden" name="product" value="<?php echo $_product->getId() ?>" />
+            <input type="hidden" name="related_product" id="related-products-field" value="" />
+        </div>
+<div style="margin:0px" class="product-options" id="product-options-wrapper">
+    <?php echo $this->getChildHtml('', true, true);?>
+    <?php if ($this->hasRequiredOptions()):?>
+        <p class="required"><?php echo $this->__('* Required Fields') ?></p>
+    <?php endif;?>
+</div>
+
+</form>
+<script type="text/javascript">decorateGeneric($$('#product-options-wrapper dl'), ['last']);
+
+
+
+
+var productAddToCartForm = new VarienForm('product_addtocart_form');
+productAddToCartForm.submit = function(){
+       
+                this.form.submit();
+       
+}.bind(productAddToCartForm);
+
+function hn_addcart() {
+	var productAddToCartForm = new VarienForm('product_addtocart_form');
+	
+    productAddToCartForm.submit = function(button, url) {
+        if (this.validator.validate()) {
+            var form = this.form;
+            var oldUrl = form.action;
+
+            if (url) {
+               form.action = url;
+            }
+            var e = null;
+            try {
+                this.form.submit();
+            } catch (e) {
+            }
+            this.form.action = oldUrl;
+            if (e) {
+                throw e;
+            }
+
+            if (button && button != 'undefined') {
+                button.disabled = true;
+            }
+        }
+    }.bind(productAddToCartForm);
+
+    productAddToCartForm.submitLight = function(button, url){
+        if(this.validator) {
+            var nv = Validation.methods;
+            delete Validation.methods['required-entry'];
+            delete Validation.methods['validate-one-required'];
+            delete Validation.methods['validate-one-required-by-name'];
+            if (this.validator.validate()) {
+                if (url) {
+                    this.form.action = url;
+                }
+                this.form.submit();
+            }
+            Object.extend(Validation.methods, nv);
+        }
+    }.bind(productAddToCartForm);
+    var send_url = productAddToCartForm.form.action;
+    var parameterss='';
+	var form_select_Ele = productAddToCartForm.form.getElementsByTagName('select');
+	if(form_select_Ele != null && form_select_Ele != undefined && form_select_Ele.length > 0) {
+    	
+    	parameterss += '?' + form_select_Ele[0].name + '=';
+    	parameterss += form_select_Ele[0].value;
+	for (var i = 1; i < form_select_Ele.length; i++ ) {
+    	if(form_select_Ele[i] != undefined) {
+    	parameterss += '&' + form_select_Ele[i].name + '=';
+    	parameterss += form_select_Ele[i].value;
+    	if(form_select_Ele[i].value == undefined || form_select_Ele[i].value =='' || form_select_Ele[i].value == null) {
+        	var boxcontent = "Please select the require options";
+        	alert(boxcontent);
+        	return false;
+    	}
+	}
+	}
+}
+	var form_input_Ele =  productAddToCartForm.form.getElementsByTagName('input');
+	if(form_input_Ele != null && form_input_Ele != undefined && form_input_Ele.length > 0 ) {
+		for (var i = 0; i < form_input_Ele.length; i++ ) {
+    		if(form_input_Ele[i].value !='') {
+        	parameterss += '&' + form_input_Ele[i].name + '=';
+        	parameterss += form_input_Ele[i].value;
+    		}
+        	
+    	}
+	}
+	//alert ('hehe');
+	//alert (send_url);
+	new Ajax.Request(send_url+ parameterss,{ method:'get',parameters:parameterss,
+    	onLoading:function () {
+        	var imgsrc='<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS)?>' + 'scriptaculous/spinner.gif';
+        	var htlm = '<div style="margin-left:200px"><img src="'+ imgsrc + '"</div>';
+        	//alert(htlm);
+        	//Modalbox.show(htlm);
+        	if ( Boxy.get(jQuery('#product_addtocart_form')) != null) Boxy.get(jQuery('#product_addtocart_form')).hide();
+        
+        	if (Boxy.get(jQuery('#aaloading')) != null) {
+        		Boxy.get(jQuery('#aaloading')).show();
+        	} else {
+        		 var imgsrc='<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS)?>' + 'scriptaculous/spinner.gif';
+  	             var htlm = '<div id="aaloading"  style="margin-left:5px"><img src="'+ imgsrc + '"</div>';
+                   new Boxy(htlm, {title: "Loading", draggable: true});
+        	
+        	}
+    	},
+    	onSuccess: function () {
+    		if (Boxy.get(jQuery('#aaloading')) != null) {
+        		Boxy.get(jQuery('#aaloading')).hide();
+        	}
+    	var htmlboxy = '<div id="hnsuccessmessage" style=""> <strong>Item add to cart sucessfully </strong> </div>';
+    		if (Boxy.get(jQuery('#hnsuccessmessage')) != null) {
+    			Boxy.get(jQuery('#hnsuccessmessage')).show();
+    			console.log('show success messages');
+    		} else {
+    			new Boxy(htmlboxy, {title: "Item add to cart sucessfully", draggable: true});
+        		console.log('create new success messages');
+    		}
+    		updateCartTop();
+    		updateCartSideBar();
+    		var tbodyElement = document.getElementById('shopping-cart-table').getElementsByTagName('tbody')[0];
+      		if (tbodyElement != null && tbodyElement !=undefined) { 
+      		updateTbody();
+      		}
+      		if(window.updateTotalPrice) {
+    			updateTotalPrice();
+          		}  
+    	}
+    	});
+}
+
+
+//display the cart when hover on the top link cart
+//  jQuery('a.top-link-cart').mouseover(function() {
+  // 
+ // showCartContent();
+ // }).mouseout(function(){
+	//  Boxy.get(jQuery('.cart')).hide();
+ // });
+
+
+function showCartContent() {
+   Boxy.get(jQuery('#aaloading')).hide();
+   var baseurl = '<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK)?>';
+   var send_url = baseurl + "ajaxcart/cart/index";
+	new Ajax.Request(send_url,{ method:'get',
+    	onLoading:function () {
+			if (Boxy.get(jQuery('#aaloading')) != null) {
+        		Boxy.get(jQuery('#aaloading')).show();
+        	} else {
+        		 var imgsrc='<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS)?>' + 'scriptaculous/spinner.gif';
+  	             var htlm = '<div id="aaloading"  style="margin-left:5px"><img src="'+ imgsrc + '"</div>';
+                 new Boxy(htlm, {title: "Loading", draggable: true});
+        	
+        	}
+	  } , onSuccess: function(transport) {
+		   new Boxy(transport.responseText, {title: "Hungnam store", draggable: true} );
+	  }
+	});
+}
+
+
+
+function updateCartTop() {
+	var baseurl = '<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK)?>';
+	var carttop = document.getElementsByClassName('top-link-cart')[0];
+	new Ajax.Request(baseurl + 'ajaxcart/index/index', {method:'get',
+		 onSuccess: function(transport) {carttop.innerHTML = transport.responseText;
+	}});
+}
+
+//update cart side bar
+function updateCartSideBar() {
+	var baseurl = '<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK)?>';
+	var sidebarE = document.getElementsByClassName('block block-cart')[0];
+	new Ajax.Request(baseurl + 'ajaxcart/index/sidebar',{
+			method: 'get',
+			onSuccess: function(transport) {
+				var beginn = transport.responseText.indexOf('<div class="block-title">');
+				
+				var end = transport.responseText.indexOf('</ol>');
+				
+				
+				var content = transport.responseText.substr(beginn,end-beginn);
+				
+				sidebarE.innerHTML = content;
+				}
+		});
+}
+</script>
