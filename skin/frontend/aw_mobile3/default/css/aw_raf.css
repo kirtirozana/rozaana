@@ -1,0 +1,95 @@
+.cart-awraf{
+    margin-top: 40px;
+}
+#raf_broadcastlink{
+    height: 75px;
+}
+.awraf-send-form{
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+    height: 100%;
+    padding: 15px;
+}
+.button span.white{
+    background-color: #1c57ff;
+    background-image: url("../images/arrow-right-white.svg");
+    background-position: 100% 50%;
+    background-repeat: no-repeat;
+    background-size: 14px 14px;
+    display: block;
+}
+.input-comment {
+    font-size: 9px;
+    width:100%;
+    display:block;
+}
+#referred-friends-table{
+    width: 100%;
+    margin-bottom: 15px;
+}
+#referred-friends-table tr.last {
+    border-bottom: 1px solid #b2b2b2;
+    margin-bottom: 10px;
+}
+#referred-friends-table tr.last td{
+    padding-bottom: 10px;
+}
+.awraf-social-share {
+    height:40px;
+}
+.awraf-social-share a {
+    display:block;
+    width:40px;
+    height:40px;
+    float:left;
+    border:none;
+}
+.raf-twitter-share {
+    background: url('../images/aw_raf/Twitter.png') no-repeat;
+    background-size:40px;
+}
+.raf-facebook-share {
+    background: url('../images/aw_raf/Facebook.png') no-repeat;
+    background-size:40px;
+    margin-left:12px;
+    margin-right:12px;
+}
+/**.raf-delicious-share {
+    background: url('../images/aw_raf/share.jpg') no-repeat;
+}**/
+.raf-myspace-share {
+    background:url('../images/aw_raf/Myspace.png') no-repeat;
+    background-size:40px;
+}
+.raf-section__title, #referred-friends-table .title {
+    display:inline-block;
+    text-transform: uppercase;
+    font-size:9px;
+    font-weight:400;
+}
+.raf-section__title .title, #referred-friends-table .title{
+    font-size:12px;
+}
+.raf-section__title .total,#referred-friends-table .total {
+    float:right;
+    font-size:12px;
+}
+.aw-raf-statistics h3{
+    line-height: 25px;
+    width:100%;
+}
+.aw-raf-statistics{
+    padding:15px;
+}
+.aw-raf-statistics .button {
+    margin-bottom:12px;
+    margin-top:12px;
+}
+p.raf-section__title {
+    font-size:9px;
+    text-transform: none;
+    line-height: 25px;
+}
+#referafriend-form textarea{
+    height: 100px;
+}

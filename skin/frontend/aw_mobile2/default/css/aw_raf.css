@@ -1,0 +1,67 @@
+#raf-invite {
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+    height: 100%;
+    padding: 15px;
+
+}
+.input-comment {
+    font-size: 8px;
+    width:100%;
+    display:block;
+}
+.awraf-social-share {
+    height:40px;
+}
+.awraf-social-share a {
+    display:block;
+    width:40px;
+    height:40px;
+    float:left;
+    border:none;
+}
+.raf-twitter-share {
+    background: url('../images/aw_raf/Twitter.png') no-repeat;
+    background-size:40px;
+}
+.raf-facebook-share {
+    background: url('../images/aw_raf/Facebook.png') no-repeat;
+    background-size:40px;
+    margin-left:12px;
+    margin-right:12px;
+}
+/**.raf-delicious-share {
+    background: url('../images/aw_raf/share.jpg') no-repeat;
+}**/
+.raf-myspace-share {
+    background:url('../images/aw_raf/Myspace.png') no-repeat;
+    background-size:40px;
+}
+.raf-section__title {
+    display:inline-block;
+    text-transform: uppercase;
+    font-size:9px;
+    font-weight:400;
+}
+.raf-section__title .title{
+    float:left;
+}
+.raf-section__title .total{
+    float:right;
+}
+.aw-raf-statistics h3{
+    line-height: 25px;
+    width:100%;
+}
+.aw-raf-statistics{
+    padding:15px;
+}
+.aw-raf-statistics .continue {
+    margin-bottom:12px;
+    margin-top:12px;
+}
+p.raf-section__title {
+    font-size:9px;
+    text-transform: none;
+    line-height: 25px;
+}

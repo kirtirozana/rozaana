@@ -1,0 +1,75 @@
+<?php
+/**
+ * aheadWorks Co.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the EULA
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://ecommerce.aheadworks.com/AW-LICENSE.txt
+ *
+ * =================================================================
+ *                 MAGENTO EDITION USAGE NOTICE
+ * =================================================================
+ * This software is designed to work with Magento community edition and
+ * its use on an edition other than specified is prohibited. aheadWorks does not
+ * provide extension support in case of incorrect edition use.
+ * =================================================================
+ *
+ * @category   AW
+ * @package    AW_Raf
+ * @version    2.2.0
+ * @copyright  Copyright (c) 2010-2012 aheadWorks Co. (http://www.aheadworks.com)
+ * @license    http://ecommerce.aheadworks.com/AW-LICENSE.txt
+ */
+?><div class="raf-invite panel panel--from-bottom">
+    <div class="panel__inner">
+        <div class="panel__header">
+            <button class="panel__back panel__action"><svg class="panel__action-icon panel__action-icon panel__action-icon--back svg-icon"><use xlink:href="#icon-arrow-back" /></svg><span class="hide"><?php echo $this->__("Back") ?></span></button>
+            <h2 class="panel__title"><span class="panel__title-text"><?php echo $this->__('Refer a Friend') ?></span></h2>
+            <button class="panel__close panel__action"><svg class="panel__action-icon panel__action-icon--close svg-icon"><use xlink:href="#icon-close" /></svg><span class="hide"><?php echo $this->__("Close") ?></span></button>
+        </div><!-- .panel__header -->
+
+        <div class="panel__content">
+            <div class="awraf-send-form">
+                <div class="group-select">
+                    <form id="referafriend-form" method="post" action="<?php echo $this->getFormUrlNonAjax() ?>">
+                        <p class="form__field form__field--required">
+                            <label for="invite:email" class="form__label form__label--required"><?php echo $this->__('Friend\'s email') ?></label>
+                            <input type="text" class="form__textfield textfield required-entry" name="invite[email]" id="invite:email" value="<?php echo $this->htmlEscape($this->getEmail()) ?>" title="<?php echo $this->__('Email') ?>">
+                            <span class="input-comment">
+                                <?php echo $this->__('Separate multiple emails by semicolons'); ?>
+                            </span>
+                            <span class="input-comment">
+                                <?php echo $this->__('Maximum number of emails per launch is %d', AW_Raf_Helper_Config::MAX_EMAILS_PER_LAUNCH); ?>
+                            </span>
+                        </p><!-- .form__field -->
+                        <p class="form__field form__field--required">
+                            <label for="invite:subject" class="form__label form__label--required"><?php echo $this->__('Message subject') ?></label>
+                            <input name="invite[subject]" id="invite:subject" title="<?php echo $this->__('Subject') ?>" value="<?php echo $this->htmlEscape($this->getSubject()) ?>" class="form__textfield textfield required-entry" type="text" />
+                        </p>
+                        <p class="form__field form__field--required">
+                            <label for="nvite:message" class="form__label form__label--required"><?php echo $this->__('Message text') ?></label>
+                            <textarea name="invite[message]" id="invite:message" title="<?php echo $this->__('Message') ?>" class="form__textfield textfield required-entry" cols="5" rows="3"><?php echo $this->htmlEscape($this->getMessage()) ?></textarea>
+                            <span class="input-comment">
+                                <?php echo $this->__("You shouldn't insert any links in the text - they will be added automatically."); ?>
+                            </span>
+                        </p>
+                        <p class="form__submit-wrapper">
+                            <p class="form__required-hint">
+                                <?php echo $this->__('Required Fields') ?>
+                            </p>
+                            <button class="button" type="submit"><?php echo  $this->__('Submit') ?></button>
+                        </p><!-- .form__submit-wrapper -->
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            //<![CDATA[
+            var referafriendForm = new VarienForm('referafriend-form', true);
+            //]]>
+        </script>
+    </div>
+</div>

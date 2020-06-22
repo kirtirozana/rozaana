@@ -1,0 +1,37 @@
+<?php
+/**
+ * aheadWorks Co.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the EULA
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://ecommerce.aheadworks.com/AW-LICENSE.txt
+ *
+ * =================================================================
+ *                 MAGENTO EDITION USAGE NOTICE
+ * =================================================================
+ * This software is designed to work with Magento community edition and
+ * its use on an edition other than specified is prohibited. aheadWorks does not
+ * provide extension support in case of incorrect edition use.
+ * =================================================================
+ *
+ * @category   AW
+ * @package    AW_Raf
+ * @version    2.2.0
+ * @copyright  Copyright (c) 2010-2012 aheadWorks Co. (http://www.aheadworks.com)
+ * @license    http://ecommerce.aheadworks.com/AW-LICENSE.txt
+ */
+?><div class="aw-raf-statistics">
+    <div class="raf-balance">
+        <?php echo $this->getMessagesBlock()->getGroupedHtml() ?>
+        <h3 class="raf-section__title"><span class="title"><?php echo $this->__('Active Balance'); ?></span><span class="total"><?php echo $this->getActiveBalance(); ?></span></h3>
+        <h3 class="raf-section__title"><span class="title"><?php echo $this->__('Active Discount'); ?></span><span class="total"><?php echo (float) $this->getActiveDiscount(); ?>%</span></h3>
+    </div>
+    <?php if ($this->isInviteAllowed()): ?>
+        <?php echo $this->getChildHtml('awraf.invite_button'); ?>
+    <?php endif; ?>
+    <p class="raf-section__title"><?php echo $this->__('Share broadcast link'); ?></p>
+    <?php echo $this->getChildHtml('awraf.broad.cast.link'); ?>
+</div>
