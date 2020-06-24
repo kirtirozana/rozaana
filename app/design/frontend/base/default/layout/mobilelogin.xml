@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <default>
+        <reference name="head">
+            <action method="addCss">
+                <stylesheet>mobilelogin/css/mobilelogin.css</stylesheet>
+            </action>
+            <action method="addItem"><type>skin_js</type><name>mobilelogin/js/mobilelogin.js</name></action>
+        </reference>
+    </default>
+    <customer_account_create>
+        <reference name="customer_form_register">
+            <action  method="setTemplate" ifconfig="mobilelogin/otpsend/registerenabled"><template>mobilelogin/customer/register.phtml</template></action>
+        </reference>
+    </customer_account_create>
+    <customer_account_login>
+        <reference name="customer_form_login">
+            <action method="setTemplate" ifconfig="mobilelogin/general/enabled"><template>mobilelogin/customer/form/login.phtml</template></action>
+        </reference>
+    </customer_account_login>
+    <customer_account_forgotpassword>
+        <reference name="forgotPassword">
+            <action method="setTemplate" ifconfig="mobilelogin/otpsend/forgotenabled"><template>mobilelogin/customer/form/forgotpassword.phtml</template></action>
+        </reference>
+    </customer_account_forgotpassword>
+    <customer_account>
+        <reference name="customer_account_navigation">
+            <action method="addLink" translate="label" module="mobilelogin" ifconfig="mobilelogin/otpsend/updateenabled">
+                <name>mobilelogin</name>
+                <path>mobilelogin/customer/view</path>
+                <label>Mobile Number</label>
+            </action>
+        </reference>
+    </customer_account>
+    <mobilelogin_customer_view>
+        <update handle="customer_account"/>
+        <reference name="content">
+            <block type="mobilelogin/customer" name="view.mobilelogin" template="mobilelogin/customer/view.phtml"/>
+        </reference>
+    </mobilelogin_customer_view>
+
+    <checkout_onepage_index>
+        <reference name="checkout.onepage.login">
+            <action  method="setTemplate"><template>mobilelogin/checkout/login.phtml</template></action>
+        </reference>
+        <reference name="checkout.onepage.billing">
+            <action  method="setTemplate"><template>mobilelogin/checkout/billing.phtml</template></action>
+        </reference>
+        <reference name="checkout.onepage.shipping">
+            <action method="setTemplate"><template>mobilelogin/checkout/shipping.phtml</template></action>
+        </reference>
+    </checkout_onepage_index>
+
+</layout>

@@ -1,0 +1,264 @@
+<?xml version="1.0"?>
+<config>
+    <tabs>
+        <meetanshi translate="label">
+            <label>
+                <![CDATA[<img src="https://meetanshi.com/media/logo.png" alt="Meetanshi" height="20" style="vertical-align:middle;"/>]]>
+            </label>
+            <sort_order>100</sort_order>
+        </meetanshi>
+    </tabs>
+    <sections>
+        <mobilelogin translate="label" module="adminhtml">
+            <label>Mobile Login</label>
+            <tab>meetanshi</tab>
+            <sort_order>10</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <general translate="label comment">
+                    <label>Configuration</label>
+                    <sort_order>1</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <enabled translate="label comment">
+                            <label>Mobile Login</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>1</sort_order>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </enabled>
+
+                        <otptype>
+                            <label>OTP Type</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>15</sort_order>
+                            <source_model>mobilelogin/otptype</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </otptype>
+                        <otplength translate="label">
+                            <label>OTP Length</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <validate>required-entry</validate>
+                            <validate>validate-number</validate>
+                        </otplength>
+                    </fields>
+                </general>
+            </groups>
+            <groups>
+                <apiconfig translate="label comment">
+                    <label>API Settings</label>
+                    <sort_order>2</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <apiprovider>
+                            <label>Select APi</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>5</sort_order>
+                            <source_model>mobilelogin/apitype</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </apiprovider>
+                        <sendername translate="label comment">
+                            <label>Sender ID</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <apiprovider separator=",">msg91,textlocal</apiprovider>
+                            </depends>
+                        </sendername>
+                        <msgtype translate="label comment">
+                            <label>Message Type</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>mobilelogin/msgtype</source_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <apiprovider separator=",">msg91</apiprovider>
+                            </depends>
+                        </msgtype>
+
+                        <authkey>
+                            <label>Authorization Key</label>
+                            <frontend_type>password</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <validate>required-entry</validate>
+                            <depends>
+                                <apiprovider separator=",">msg91,textlocal</apiprovider>
+                            </depends>
+                        </authkey>
+                        <apiurl>
+                            <label>API URL</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <validate>required-entry</validate>
+                            <validate>validate-url</validate>
+                            <depends>
+                                <apiprovider separator=",">msg91,textlocal</apiprovider>
+                            </depends>
+                        </apiurl>
+                        <sid>
+                            <label>SID</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>35</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <validate>required-entry</validate>
+                            <depends><apiprovider>twilio</apiprovider></depends>
+                        </sid>
+                        <token>
+                            <label>Token</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <validate>required-entry</validate>
+                            <depends><apiprovider>twilio</apiprovider></depends>
+                        </token>
+                        <frommobile>
+                            <label>From Mobile</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <validate>required-entry</validate>
+                            <depends><apiprovider>twilio</apiprovider></depends>
+                        </frommobile>
+                        <countrycode>
+                            <label>Country Code</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <validate>required-entry</validate>
+                            <depends><apiprovider>twilio</apiprovider></depends>
+                            <comment>
+                                <![CDATA[Country Code Example : +91(India)]]></comment>
+                        </countrycode>
+                    </fields>
+                </apiconfig>
+            </groups>
+            <groups>
+                <otpsend translate="label">
+                    <label>OTP Custom SMS Settings</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>10</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <loginenabled translate="label comment">
+                            <label>Login With OTP</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>1</sort_order>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </loginenabled>
+                        <loginotppmessage translate="label">
+                            <label>Login OTP SMS Text</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>
+                                <![CDATA[You can make use of {{shop_name}},{{shop_url}},{{otp_code}} variables in your SMS notification text]]></comment>
+                        </loginotppmessage>
+                        <registerenabled translate="label comment">
+                            <label>Registration With OTP</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>8</sort_order>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </registerenabled>
+
+                        <registrationmessage translate="label">
+                            <label>Registration OTP SMS Text</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>
+                                <![CDATA[You can make use of {{shop_name}},{{shop_url}},{{otp_code}} variables in your SMS notification text]]></comment>
+                        </registrationmessage>
+                        <forgotenabled translate="label comment">
+                            <label>Forgot Password With OTP</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>18</sort_order>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </forgotenabled>
+                        <forgototpmessage translate="label">
+                            <label>Forgot Password OTP SMS Text</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>
+                                <![CDATA[You can make use of {{shop_name}},{{shop_url}},{{otp_code}} variables in your SMS notification text]]></comment>
+                        </forgototpmessage>
+                        <updateenabled translate="label comment">
+                            <label>Update Mobile Number With OTP</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>30</sort_order>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+							<comment>
+                                <![CDATA[Allows customers to update their mobile number from their My Account section.]]></comment>
+							
+                        </updateenabled>
+                        <updateotpmessage translate="label">
+                            <label>Update Mobile Number OTP SMS Text</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>32</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>
+                                <![CDATA[You can make use of {{shop_name}},{{shop_url}},{{otp_code}} variables in your SMS notification text]]></comment>
+                        </updateotpmessage>
+                    </fields>
+                </otpsend>
+            </groups>
+        </mobilelogin>
+    </sections>
+</config>

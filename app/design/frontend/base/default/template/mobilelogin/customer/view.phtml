@@ -1,0 +1,92 @@
+<?php
+$helper = Mage::helper('mobilelogin');
+?>
+<div class="acc-edit">
+    <div>
+
+        <?php if($helper->getCurrentMobile()){ ?>
+            <label for="mobilenumber" class="required"><em>*</em><?php echo $this->__('Your Mobile Number') ?></label>
+            <div class="input-box">
+            <input type="text" name="old_mobilenumber" id="old_mobilenumber" value="<?php echo $this->getMobile(); ?>" title=""
+                   class="input-text required-entry validate-number"/>
+                <input type="hidden" value="update" name="otptype" id="otptype" />
+            </div>
+            <input type="button" name="update_mobile" id="update_mobile" class="button update-mobile" value="Update Mobile Number" />
+            <?php }
+            else{
+                ?>
+        <div class="input-box">
+            <input type="hidden" value="update" name="otptype" id="otptype" />
+        </div>
+        <input type="button" name="update_mobile" id="update_mobile" class="button update-mobile" value="Add Mobile Number" />
+        <?php }?>
+
+    </div>
+</div>
+
+
+<div class="mobilenumber-update">
+    <div id="mobilemodal" class="mobilemodal">
+        <!-- Modal content -->
+        <div class="mobilemodal-content">
+            <div class="mobilepopup-header">
+                <input type="hidden" name="otptype" id="otptype" value="update" />
+                <span class="mobilelogin-close">&times;</span>
+                <h1 class="mobilepopup-title"><?php echo $this->__('Update Mobile') ?></h1>
+                <span id="mobilelogin-popup-message"></span>
+            </div>
+            <div class="mobilelogin-otpsend">
+                <div class="mobilepopup-content">
+                    <li class="mobilenumber-container">
+                        <label for="mobilenumber"
+                               class="required"><em>*</em><?php echo $this->__('New Mobile Number (Without Country Code)') ?>
+                        </label>
+                        <div class="input-box">
+                            <input type="text" class="mobile-input" name="mobilenumber" id="mobilenumber"
+                                   title="<?php echo Mage::helper('core')->quoteEscape($this->__('Mobile Number')) ?>"
+                                   class="input-text validate-email required-entry"/>
+                            <span class="mobilelogin-error"><?php echo $this->__('Enter Valid Mobile') ?></span>
+
+                        </div>
+                    </li>
+                </div>
+                <div class="mobilepopup-footer footerlinks">
+                    <input type="button" class="button sendotp" name="sendotp" id="sendotp"
+                           value="<?php echo $this->__('Send Otp') ?>" />
+                </div>
+            </div>
+            <div class="mobile-otpverify">
+                <div class="mobilenumber-container">
+                    <label for="otpverify" class="required"><em>*</em><?php echo $this->__('Mobile Number Verification') ?>
+                    </label>
+                    <div class="input-box">
+                        <input type="text" class="mobile-input" name="inputotpverify" id="inputotpverify"
+                               class="input-text" />
+                    </div>
+                    <div class="mobilepopup-footer">
+                        <input type="button" class="button" name="btnverifyotp" id="btnverifyotp"
+                               value="<?php echo $this->__("Verify Otp"); ?>" />
+                        <input type="button" class="button sendotp" name="resendotp" id="resendotp"
+                               value="<?php echo $this->__("Resend Otp"); ?>" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<?php $loaderPath = $this->getSkinUrl('images/ajax-loader.gif', array('_secure' => true)) ?>
+<div class="mobileloader">
+    <div class="wait">
+        <img src='<?php echo $loaderPath; ?>' width="64" height="64"/><br>Loading..
+    </div>
+</div>
+<?php
+$storeurl=Mage::getBaseUrl();
+?>
+<script>
+    function  getBaseUrl() {
+        return '<?php echo $storeurl; ?>';
+    }
+</script>
+
