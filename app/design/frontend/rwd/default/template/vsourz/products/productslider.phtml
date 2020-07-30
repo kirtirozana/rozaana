@@ -55,7 +55,8 @@ $saleproduct = trim($helper->getSaleProductText());
 						if(!empty($specialFrmDate) && strtotime($specialFrmDate) <= strtotime('now') && ( $specialToDate == '' || (!empty($specialToDate) && strtotime($specialToDate) >= strtotime('now'))) && !empty($specialPrice)) { ?>
 						
 						<?php if($saleproduct!=""): ?>
-							<div class="new-box saleproduct"><?php echo $saleproduct; ?></div>
+							<div class="new-box saleproduct"><?php echo "Rs." ;echo $_product->getPrice()-$specialPrice;echo "off"; ?></div>
+							<!--<div class="new-box saleproduct"><?php echo round(($_product->getPrice()-$specialPrice)/($_product->getPrice())*100);echo "% off"; ?></div>-->
 						<?php endif; ?>
 						
                     	<?php } ?>					

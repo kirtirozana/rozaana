@@ -36,6 +36,15 @@
         <span class="product-image"><img src="<?php echo $this->getProductThumbnail()->resize(50, 50)->setWatermarkSize('30x10'); ?>" width="50" height="50" alt="<?php echo $this->escapeHtml($this->getProductName()) ?>" /></span>
     <?php endif; ?>
     <div class="product-details">
+            <?php if (!$this->isOnCheckoutPage()): ?>
+                <a style="float:right" href="<?php echo $this->getAjaxDeleteUrl() ?>" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Remove This Item')) ?>"
+                   data-confirm="<?php echo $this->__('Are you sure you would like to remove this item from the shopping cart?') ?>"
+                   class="remove">
+                    <?php echo $this->__('x') ?>
+                </a>
+            <?php else: ?>
+                <span><?php echo $this->__('Remove Item') ?></span>
+            <?php endif; ?>
         <p class="product-name"><?php if ($this->hasProductUrl()): ?><a href="<?php echo $this->getProductUrl() ?>"><?php endif; ?><?php echo $this->escapeHtml($this->getProductName()) ?><?php if ($this->hasProductUrl()): ?></a><?php endif; ?></p>
 
         <table class="info-wrapper">
@@ -150,19 +159,10 @@
         </table>
 
         <?php if ($isVisibleProduct): ?>
-        <a href="<?php echo $this->getConfigureUrl() ?>" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Edit item')) ?>" class="btn-edit">
+<!--        <a href="<?php echo $this->getConfigureUrl() ?>" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Edit item')) ?>" class="btn-edit">
             <?php echo $this->__('Edit item')?>
         </a>
-            |
-            <?php if (!$this->isOnCheckoutPage()): ?>
-                <a href="<?php echo $this->getAjaxDeleteUrl() ?>" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Remove This Item')) ?>"
-                   data-confirm="<?php echo $this->__('Are you sure you would like to remove this item from the shopping cart?') ?>"
-                   class="remove">
-                    <?php echo $this->__('Remove Item') ?>
-                </a>
-            <?php else: ?>
-                <span><?php echo $this->__('Remove Item') ?></span>
-            <?php endif; ?>
+            |-->
         <?php endif ?>
 
 

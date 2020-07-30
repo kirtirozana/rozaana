@@ -79,6 +79,11 @@
                         <div class="std"><?php echo $_helper->productAttribute($_product, nl2br($_product->getShortDescription()), 'short_description') ?></div>
                     </div>
                 <?php endif;?>
+                <?php if ($_product->getShelfLife()):?>
+                    <div class="short-description">
+                        <div class="std">Shelf Life : <?php echo $_helper->productAttribute($_product, nl2br($_product->getShelfLife()), 'shelf_life') ?></div>
+                    </div>
+                <?php endif;?>
 
 
 

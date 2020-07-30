@@ -102,7 +102,7 @@ Category default layout
                     <action method="addColumnCountLayoutDepend"><layout>three_columns</layout><count>3</count></action>
                     <action method="setToolbarBlockName"><name>product_list_toolbar</name></action>
                     <!-- Since the addColumnCountLayoutDepend does not work, we are manually setting the max columns -->
-                    <action method="setColumnCount"><count>4</count></action>
+                    <action method="setColumnCount"><count>5</count></action>
                 </block>
             </block>
         </reference>
@@ -149,7 +149,7 @@ Category layered navigation layout
                     <action method="addColumnCountLayoutDepend"><layout>three_columns</layout><count>3</count></action>
                     <action method="setToolbarBlockName"><name>product_list_toolbar</name></action>
                     <!-- Since the addColumnCountLayoutDepend does not work, we are manually setting the max columns -->
-                    <action method="setColumnCount"><count>4</count></action>
+                    <action method="setColumnCount"><count>5</count></action>
                 </block>
             </block>
         </reference>
@@ -191,6 +191,11 @@ Product view
         <!-- Mage_Catalog -->
         <reference name="root">
             <action method="setTemplate"><template>page/1column.phtml</template></action>
+        </reference>
+        <reference name="left">
+            <block type="core/template" name="product.left.sidebar" template="catalog/layer/product-left.phtml">
+	    </block>
+		
         </reference>
         <reference name="head">
             <action method="addJs"><script>varien/product.js</script></action>
@@ -294,7 +299,7 @@ Additional block dependant on product type
                     <label>Product Extra Info</label>
                 </block>
             </block>
-            <block type="catalog/product_view_type_simple" name="product.info.availability" as="product_type_availability" template="catalog/product/view/type/availability/default.phtml" />
+            <!--<block type="catalog/product_view_type_simple" name="product.info.availability" as="product_type_availability" template="catalog/product/view/type/availability/default.phtml" />-->
         </reference>
     </PRODUCT_TYPE_simple>
     <PRODUCT_TYPE_configurable translate="label" module="catalog">

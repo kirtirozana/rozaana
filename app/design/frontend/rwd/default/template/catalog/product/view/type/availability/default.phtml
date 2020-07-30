@@ -26,7 +26,7 @@
 $_product = $this->getProduct(); ?>
 <?php if ($this->displayProductStockStatus()): ?>
     <?php if ($_product->isAvailable()): ?>
-        <p class="availability in-stock">
+        <p class="availability in-stock" style="display:none">
             <span class="label"><?php echo $this->helper('catalog')->__('Availability:') ?></span>
             <span class="value"><?php echo $this->helper('catalog')->__('In stock') ?></span>
         </p>

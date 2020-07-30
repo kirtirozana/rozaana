@@ -150,12 +150,12 @@ class Apptha_Productfilters_Helper_Data extends Mage_Core_Helper_Data
 
             $html .= '<li><div class="ajaxloader product_categories_list">';
                           if( (!empty($subhtml))){
-                              $html .= '<span class="accor"></span>';
+                              $html .= '<span class="accor">&#9660</span>';
                           }else{
                               $html .= '<span class="no-accor"></span>';
                           }
 
-                          if (count($_testproductCollection) <= 0)
+                          if (count($_testproductCollection) <= -1)
                           {
                               $html.='<span class="product_block_count_zero">';
                               $html.= $category->getName().'<span>('.count($_testproductCollection).')</span>';

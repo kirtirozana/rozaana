@@ -31,6 +31,113 @@
  * @see Mage_Catalog_Block_Layer_View
  */
 ?>
+<?php
+$currentUrl=  $this->getUrl('*/*/*', array('_use_rewrite' => true, '_forced_secure' => true));
+$logoSrc = Mage::getStoreConfig('design/header/logo_src');
+$logoAlt = Mage::getStoreConfig('design/header/logo_alt');
+$logo = $this->getSkinUrl($logoSrc);
+?>
+<div class="show-on-scroll" style="display:none;">
+<div><img src="<?php echo $logo;?>"/></div>
+<div class="sort-by sort-by2" style="display:none;">
+	<span class="sort-by-text" onclick="location.href='<?php echo $currentUrl;?>?dir=asc&order=price';">Price &#8613;</span>
+	<span class="sort-by-text" onclick="location.href='<?php echo $currentUrl;?>?dir=desc&order=price';">Price &#8615;</span>
+	<span class="sort-by-text" onclick="location.href='<?php echo $currentUrl;?>?dir=desc&order=position';">Reset</span>
+</div>
+</div>
+<div class="sort-by sort-by1">
+	<span class="sort-by-text" onclick="location.href='<?php echo $currentUrl;?>?dir=asc&order=price';">Price &#8613;</span>
+	<span class="sort-by-text" onclick="location.href='<?php echo $currentUrl;?>?dir=desc&order=price';">Price &#8615;</span>
+	<span class="sort-by-text" onclick="location.href='<?php echo $currentUrl;?>?dir=desc&order=position';">Reset</span>
+</div>
+<?php
+////
+?>
+<?php
+$_helper = Mage::helper('catalog/category');
+$_categories = $_helper->getStoreCategories();
+$currentCategory = Mage::registry('current_category');
+?>
+<div class="block block-list block-categorys">
+    <div class="block-title">
+        <!--<strong><span>Category</span></strong>-->
+    </div>
+    <div class="block-content">
+        <ul class="category_sub">
+            <?php
+                if (count($_categories) > 0){
+
+                    global $index;
+                    global $data;
+
+                    foreach($_categories as $_category){
+
+                        $check_child_class = check_child_par($_category->getId());
+                        $collaps = ($check_child_class)? "<span class='show-cat accor'>+</span>" : "";
+                        echo "<li class='".$check_child_class."'>";
+                        echo $collaps."<a href='".$_helper->getCategoryUrl($_category)."'>".$_category->getName();
+                        //echo " (".product_count($_category->getId()).")";
+                        echo "</a>";
+                        echo check_child($_category->getId());
+                        echo "</li>";
+
+                    }
+                }
+            ?>
+        </ul>
+    </div>
+</div>
+<?php
+    function check_child($cid){
+        $_helper = Mage::helper('catalog/category');
+        $_subcategory = Mage::getModel('catalog/category')->load($cid);
+        $_subsubcategories = $_subcategory->getChildrenCategories();
+
+        if (count($_subsubcategories) > 0){
+            echo "<ul>";
+            foreach($_subsubcategories as $_subcate){
+
+                $check_child_class = check_child_par($_subcate->getId());
+                $collaps = ($check_child_class)? "<span class='show-cat accor'>+</span>" : "";
+
+                echo "<li class='".$check_child_class."'>";
+                echo $collaps."<a href='".$_helper->getCategoryUrl($_subcate)."'>".$_subcate->getName();
+                //echo " (".product_count($_subcate->getId()).")";
+                echo "</a>";
+                echo check_child($_subcate->getId());
+                echo "</li>";
+            }
+            echo "</ul>";
+        }else{
+            return "";
+        }
+    }
+
+   function check_child_par($cid){
+
+        $_subcat = Mage::getModel('catalog/category')->load($cid);
+        $_subsubcats = $_subcat->getChildrenCategories();
+
+        if (count($_subsubcats) > 0){
+            return "parent";
+        }else{
+            return "";
+        }
+    }
+
+    function product_count($cid){
+        $products_count = Mage::getModel('catalog/category')->load($cid)->getProductCount();
+        return $products_count;
+    }
+
+?>
+
+
+<?php
+////
+?>
+
+
 
 
 <?php if($this->canShowBlock()): ?>
@@ -64,44 +171,43 @@
 </div>
 <?php endif; ?>
 <?php
-  $helper = Mage::helper('productfilters');
-  $paramCatagory = $this->getRequest()->getParam('cat');
-  /* $parent_id = $helper->getCatagoryParentId($paramCatagory);
-  if(!empty($parent_id) && !empty($paramCatagory)){
-        $paramCatagory = $parent_id;
-  } */
-  if(!empty($paramCatagory)) {
-                $catlistHtml = $helper->getTreeCategories($paramCatagory,$this->getLayer()->getProductCollection(), false);
-  } else if(Mage::registry('current_category')) {
-                $currentCategoryId = Mage::registry('current_category')->getEntityId();
-                $catlistHtml = $helper->getTreeCategories($currentCategoryId,$this->getLayer()->getProductCollection(), false);
-  }
-
 ?>
-    <div class="block-title">
-        <strong><span><a href="<?php echo Mage::registry('current_registry')?>"><?php echo Mage::registry('current_category')->getName(); ?></a></span></strong>
-    </div>
-<div class="catagory_list">
-        <?php  echo $catlistHtml; ?>
-</div>
 
-<Script>
- /*       jQuery(document).ready(function($){
-                $(".product_categories_list .accor").on("click",function(event){
-                        $(this).toggleClass('minus');
-                        $(this).parent().children('ul.sub-cat-list').toggle();
-                });
-   });*/
-jQuery(".product_categories_list .accor").on("click",function(event){
-			if(jQuery(this).html()=="▼"){jQuery(this).html("▲")}
-			else if(jQuery(this).html()=="▲"){jQuery(this).html("▼")}
-			jQuery(".sub-cat-list").each(function() {
-   				jQuery(this).css('display','none');
-			});
-			jQuery(this).parent().children('ul.sub-cat-list').toggle();
+<script>
+jQuery('.accor').click(function(){
+	if(jQuery(this).html()=="+")
+	{
+		jQuery(this).html("-");
+		jQuery(this).next().next().css('display','block');
+	}
+	else if(jQuery(this).html()=="-")
+	{
+		jQuery(this).html("+");
+		jQuery(this).next().next().find(".parent ul").css('display','none');
+		jQuery(this).next().next().find(".accor").html("+");
+		jQuery(this).next().next().css('display','none');
+	}
+	
+});
 
-    });
-</Script>
+jQuery(document).scroll(function() {
+  var y = jQuery(this).scrollTop();
+  if (y > jQuery('.main-container').offset().top) {
+    jQuery('.show-on-scroll').fadeIn();
+    //jQuery('.sort-by1').fadeOut();
+  } else {
+    jQuery('.show-on-scroll').css('display','none');
+    //jQuery('.sort-by1').fadeIn();
+  }
+});
+
+</script>
 <style>
-.sub-cat-list{display:none;margin-left:20px;}
+.category_sub li ul{display:none;margin-left:20px;}
+.category_sub li ul li ul{display:none;margin-left:40px;}
+.show-on-scroll{
+position: fixed;
+    top: 55px;
+    width: 20%;
+}
 </style>

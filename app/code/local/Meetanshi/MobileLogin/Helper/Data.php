@@ -166,6 +166,7 @@ class Meetanshi_MobileLogin_Helper_Data extends Mage_Core_Helper_Abstract
         $otpcode = $this->generateOtpCode();
         $return['succeess'] = "";
         $return['errormsg'] = "";
+        $return['otp'] = $otpcode;
         $sendMsg = false;
         try {
             if ($otptype == "register") {
@@ -332,9 +333,10 @@ class Meetanshi_MobileLogin_Helper_Data extends Mage_Core_Helper_Abstract
                     $apikey = Mage::getStoreConfig(self::SMS_APIKEY);
                     $senderid = Mage::getStoreConfig(self::SMS_SENDERID);
                     $url = Mage::getStoreConfig(self::SMS_APIURL);
-                    $msgtype = Mage::getStoreConfig(self::SMS_MSGTYPE);
+                    #$msgtype = Mage::getStoreConfig(self::SMS_MSGTYPE);
+			$msgtype=2;
 
-                    $postUrl = $url . "?sender=" . $senderid . "&route=" . $msgtype . "&mobiles=" . $mobilenumber . "&authkey=" . $apikey . "&message=" . $msg . "";
+                    $postUrl = $url . "?senderid=" . $senderid . "&channel=" . $msgtype . "&number=91" . $mobilenumber . "&APIKey=" . $apikey . "&text=" . $msg . "&DCS=0&flashsms=0&route=11";
                     $curl = curl_init();
                     curl_setopt_array(
                         $curl, array(
@@ -354,8 +356,9 @@ class Meetanshi_MobileLogin_Helper_Data extends Mage_Core_Helper_Abstract
                     $err = curl_error($curl);
 
                     curl_close($curl);
-
+			$err=0;
                     if ($err) {
+                        return true;
                         return "cURL Error #:" . $err;
                     } else {
                         return true;

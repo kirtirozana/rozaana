@@ -1,0 +1,169 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magento.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magento.com for more information.
+ *
+ * @category    design
+ * @package     rwd_default
+ * @copyright   Copyright (c) 2006-2019 Magento, Inc. (http://www.magento.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+?>
+<?php
+/**
+ * Category layered navigation
+ *
+ * @see Mage_Catalog_Block_Layer_View
+ */
+?>
+<?php
+$currentUrl=  $this->getUrl('*/*/*', array('_use_rewrite' => true, '_forced_secure' => true));
+$logoSrc = Mage::getStoreConfig('design/header/logo_src');
+$logoAlt = Mage::getStoreConfig('design/header/logo_alt');
+$logo = $this->getSkinUrl($logoSrc);
+?>
+<div class="show-on-scroll" style="display:none;">
+<div><img src="<?php echo $logo;?>"/></div>
+</div>
+<?php
+////
+?>
+<?php
+$_helper = Mage::helper('catalog/category');
+$_categories = $_helper->getStoreCategories();
+$currentCategory = Mage::registry('current_category');
+?>
+<div class="block block-list block-categorys">
+    <div class="block-title">
+        <!--<strong><span>Category</span></strong>-->
+    </div>
+    <div class="block-content">
+        <ul class="category_sub">
+            <?php
+                if (count($_categories) > 0){
+
+                    global $index;
+                    global $data;
+
+                    foreach($_categories as $_category){
+
+                        $check_child_class = check_child_par($_category->getId());
+                        $collaps = ($check_child_class)? "<span class='show-cat accor'>+</span>" : "";
+                        echo "<li class='".$check_child_class."'>";
+                        echo $collaps."<a href='".$_helper->getCategoryUrl($_category)."'>".$_category->getName();
+                        //echo " (".product_count($_category->getId()).")";
+                        echo "</a>";
+                        echo check_child($_category->getId());
+                        echo "</li>";
+
+                    }
+                }
+            ?>
+        </ul>
+    </div>
+</div>
+<?php
+    function check_child($cid){
+        $_helper = Mage::helper('catalog/category');
+        $_subcategory = Mage::getModel('catalog/category')->load($cid);
+        $_subsubcategories = $_subcategory->getChildrenCategories();
+
+        if (count($_subsubcategories) > 0){
+            echo "<ul>";
+            foreach($_subsubcategories as $_subcate){
+
+                $check_child_class = check_child_par($_subcate->getId());
+                $collaps = ($check_child_class)? "<span class='show-cat accor'>+</span>" : "";
+
+                echo "<li class='".$check_child_class."'>";
+                echo $collaps."<a href='".$_helper->getCategoryUrl($_subcate)."'>".$_subcate->getName();
+                //echo " (".product_count($_subcate->getId()).")";
+                echo "</a>";
+                echo check_child($_subcate->getId());
+                echo "</li>";
+            }
+            echo "</ul>";
+        }else{
+            return "";
+        }
+    }
+
+   function check_child_par($cid){
+
+        $_subcat = Mage::getModel('catalog/category')->load($cid);
+        $_subsubcats = $_subcat->getChildrenCategories();
+
+        if (count($_subsubcats) > 0){
+            return "parent";
+        }else{
+            return "";
+        }
+    }
+
+    function product_count($cid){
+        $products_count = Mage::getModel('catalog/category')->load($cid)->getProductCount();
+        return $products_count;
+    }
+
+?>
+
+
+<?php
+////
+?>
+
+
+
+
+
+<script>
+jQuery('.accor').click(function(){
+	if(jQuery(this).html()=="+")
+	{
+		jQuery(this).html("-");
+		jQuery(this).next().next().css('display','block');
+	}
+	else if(jQuery(this).html()=="-")
+	{
+		jQuery(this).html("+");
+		jQuery(this).next().next().find(".parent ul").css('display','none');
+		jQuery(this).next().next().find(".accor").html("+");
+		jQuery(this).next().next().css('display','none');
+	}
+	
+});
+
+jQuery(document).scroll(function() {
+  var y = jQuery(this).scrollTop();
+  if (y > jQuery('.main-container').offset().top) {
+    jQuery('.show-on-scroll').fadeIn();
+  } else {
+    jQuery('.show-on-scroll').css('display','none');
+  }
+});
+
+</script>
+<style>
+.category_sub li ul{display:none;margin-left:20px;}
+.category_sub li ul li ul{display:none;margin-left:40px;}
+.show-on-scroll{
+position: fixed;
+    top: 55px;
+    width: 20%;
+}
+</style>

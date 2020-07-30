@@ -48,6 +48,15 @@
     <ol class="products-list" id="products-list">
     <?php foreach ($_productCollection as $_product): ?>
         <li class="item<?php if( ++$_iterator == sizeof($_productCollection) ): ?> last<?php endif; ?>">
+		<?php //sale tag calculations
+			$specialFrmDate = $_product->getSpecialFromDate();
+                        $specialToDate = $_product->getSpecialToDate();
+                        $specialPrice = $_product->getSpecialPrice();
+			$normalPrice=$_product->getResource()->getAttribute('price')->getFrontend()->getValue($_product);
+			if(!empty($specialFrmDate) && strtotime($specialFrmDate) <= strtotime('now') && ( $specialToDate == '' || (!empty($specialToDate) && strtotime($specialToDate) >= strtotime('now'))) && !empty($specialPrice)):
+		?>
+			<div class="new-box saleproduct"><?php echo $normalPrice-$specialPrice;echo "/- off"; ?></div>
+		<?php endif;?>
             <?php // Product Image ?>
             <a href="<?php echo $_product->getProductUrl() ?>" title="<?php echo $this->stripTags($this->getImageLabel($_product, 'small_image'), null, true) ?>" class="product-image">
                 <?php /* Based on the native RWD styling, product images are displayed at a max of ~400px wide when viewed on a
@@ -129,7 +138,7 @@
                             <?php endif; ?>
                         </ul>
                     </div>
-                    <div class="desc std">
+                    <div class="desc std" style="display:none">
                         <?php echo $_helper->productAttribute($_product, $_product->getShortDescription(), 'short_description') ?>
                         <a href="<?php echo $_product->getProductUrl() ?>" title="<?php echo $_productNameStripped ?>" class="link-learn"><?php echo $this->__('Learn More') ?></a>
                     </div>
@@ -146,11 +155,20 @@
 
     <?php $_collectionSize = $_productCollection->count() ?>
     <?php $_columnCount = $this->getColumnCount(); ?>
-    <ul class="products-grid products-grid--max-<?php echo $_columnCount; ?>-col">
+    <ul class="products-grid sulabh products-grid--max-<?php echo $_columnCount; ?>-col">
         <?php $i=0; foreach ($_productCollection as $_product): ?>
             <?php /*if ($i++%$_columnCount==0): ?>
             <?php endif*/ ?>
             <li class="item<?php if(($i-1)%$_columnCount==0): ?> first<?php elseif($i%$_columnCount==0): ?> last<?php endif; ?>">
+		<?php //sale tag calculations
+			$specialFrmDate = $_product->getSpecialFromDate();
+                        $specialToDate = $_product->getSpecialToDate();
+                        $specialPrice = $_product->getSpecialPrice();
+			$normalPrice=$_product->getResource()->getAttribute('price')->getFrontend()->getValue($_product);
+			if(!empty($specialFrmDate) && strtotime($specialFrmDate) <= strtotime('now') && ( $specialToDate == '' || (!empty($specialToDate) && strtotime($specialToDate) >= strtotime('now'))) && !empty($specialPrice)):
+		?>
+			<div class="new-box saleproduct"><?php echo $normalPrice-$specialPrice;echo "/- off"; ?></div>
+		<?php endif;?>
                 <a href="<?php echo $_product->getProductUrl() ?>" title="<?php echo $this->stripTags($this->getImageLabel($_product, 'small_image'), null, true) ?>" class="product-image">
                     <?php $_imgSize = 210; ?>
                     <img id="product-collection-image-<?php echo $_product->getId(); ?>"

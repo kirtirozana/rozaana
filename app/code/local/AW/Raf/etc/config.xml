@@ -157,7 +157,7 @@
                     </awraf_customer_delete_observer>
                 </observers>
             </customer_delete_before>
-            <sales_order_place_after>
+            <!--<sales_order_place_after>
                 <observers>
                     <awraf_order_palce_after>
                         <type>singleton</type>
@@ -165,7 +165,7 @@
                         <method>orderPlaceAfter</method>
                     </awraf_order_palce_after>
                 </observers>
-            </sales_order_place_after>
+            </sales_order_place_after>-->
             <sales_order_invoice_load_after>
                 <observers>
                     <awraf_add_on_order_invoice_load>

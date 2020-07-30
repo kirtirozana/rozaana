@@ -10,7 +10,7 @@ class Vsourz_Catproduct_Model_Productslider extends Mage_Catalog_Model_Product{
 			->setStoreId(Mage::app()->getStore()->getId())
 			->addAttributeToFilter('visibility', $visibility)
 			->addAttributeToFilter('status', Mage_Catalog_Model_Product_Status::STATUS_ENABLED)
-			->setOrder('position','ASC')
+			->setOrder('position','DESC')
 			->setPageSize($products);
 		
 		Mage::getSingleton('cataloginventory/stock')->addInStockFilterToCollection($collection);

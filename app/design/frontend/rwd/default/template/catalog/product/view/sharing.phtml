@@ -27,7 +27,7 @@
 
 <?php $_product = $this->getProduct(); ?>
 <?php $_wishlistSubmitUrl = $this->helper('wishlist')->getAddUrlWithCustomParams($_product, array(), false); ?>
-
+<!--
 <ul class="sharing-links">
     <?php if ($this->canEmailToFriend()): ?>
         <li><a href="<?php echo $this->helper('catalog/product')->getEmailToFriendUrl($_product) ?>" class="link-email-friend" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Email to a Friend')) ?>"><?php echo $this->__('Email to a Friend') ?></a></li>
@@ -47,4 +47,4 @@
         <a href="<?php echo 'http://twitter.com/home?status=' . $_productName . '+' . $_productUrl; ?>" target="_blank" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Share on Twitter')) ?>" class="link-twitter"><?php echo $this->__('Share on Twitter') ?></a>
     </li>
 </ul>
-
+-->
