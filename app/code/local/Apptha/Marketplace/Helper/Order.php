@@ -69,7 +69,7 @@ class Apptha_Marketplace_Helper_Order extends Mage_Core_Helper_Abstract{
          * and customer email id.
          */
         $emailTemplate->setSenderName ( $customerFirstname );
-        $emailTemplate->setSenderEmail ( $customerEmail );
+        $emailTemplate->setSenderEmail ( "support@rozaanaonline.com" );
         $emailTemplateVariablesValueDatas = (array (
                 'ownername' => $toName,
                 'order_id' => $orderIncrementId,

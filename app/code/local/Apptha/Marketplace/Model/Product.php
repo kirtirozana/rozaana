@@ -584,7 +584,7 @@ $product->setStockEndDate ( '' );
         $product->setSku ( $sku );
         $product->setDelivery($productData['delivery']);
         if(isset($productData ['status'])){
-        $product->setStatus( $productData ['status'] );
+        //$product->setStatus( $productData ['status'] );
         }
         $product->setSellerShippingOption ( $shippingOption );
         $product->setNationalShippingPrice ( $nationalShippingPrice );

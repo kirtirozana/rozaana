@@ -349,6 +349,7 @@ class Apptha_Marketplace_ProductController extends Mage_Core_Controller_Front_Ac
                 foreach ($allStores as $_eachStoreId => $val){
                     $_storeId[] = Mage::app()->getStore($_eachStoreId)->getId();
                 }
+		/*
                 for($i=0;$i<count($_storeId);$i++){
                     $storeId = $_storeId [$i];
 
@@ -357,7 +358,7 @@ class Apptha_Marketplace_ProductController extends Mage_Core_Controller_Front_Ac
                     } else {
                         Mage::getModel ( 'catalog/product_status' )->updateProductStatus ( $product->getId (), $storeId, Mage_Catalog_Model_Product_Status::STATUS_DISABLED );
                     }
-                }
+                }*/
                 Mage::getModel ( 'marketplace/product' )->deleteProductImagesForEdit($deleteImages, $productId, $baseImage );
                 /**
                  * Set product images

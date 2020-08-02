@@ -71,14 +71,14 @@ $filterProductType =  $this->getRequest()->getParam('filter_product_type');
     </div>
     <div class="clear"></div>
     <button onclick="window.location='<?php echo Mage::helper('marketplace/url')->getCreateProductUrl(); ?>';" title="<?php
-     echo $this->__('Add New Product'); ?>" class="button right mp_addnew_pdt"> <span><span><?php
+     echo $this->__('Add New Product'); ?>" class="button right mp_addnew_pdt" style="display:none"> <span><span><?php
      /**
       * Display add new product option
       */
      echo $this->__('Add New Product'); ?> </span></span></button>
 
     <form name="multiple_select" id="multiple_select" class="multiple_select" method="post" action="<?php echo $this->getmultiselectUrl(); ?>">
-    <div class="mp_action"><b><?php echo $this->__('Action'); ?> </b>
+    <div class="mp_action" style="display:none"><b><?php echo $this->__('Action'); ?> </b>
     <select name="multi">
         <option name="" value="Select an option"><?php echo $this->__('Select an option'); ?></option>
         <?php
@@ -93,8 +93,16 @@ $filterProductType =  $this->getRequest()->getParam('filter_product_type');
     <span><span><?php echo $this->__('Submit') ?></span></span></button> 
     </div>
     <div style="clear: both;"></div>       
+	<?php 
+		if(Mage::getSingleton('customer/session')->isLoggedIn()) {
+     $customerData = Mage::getSingleton('customer/session')->getCustomer();
+      $sellerid= $customerData->getId();
+	$sellerid=$sellerid."-";
+ }
+
+	?>
 <?php echo $this->getMessagesBlock()->getGroupedHtml(); 
-$_products = $this->getCollection(); 
+$_products = $this->getCollection();//->addAttributeToFilter('sku',array('like','24-%'));
 /**
  * Set sno in collection
  */
@@ -211,9 +219,10 @@ echo $this->__('Disabled'); ?></option>
     <tbody>
         <?php if($_products->getSize()): 
         foreach ($_products as $_product): ?>
-        <tr>            
+        <tr>           
+	<?php /*var_dump($_product->getData());die;*/?>
             <td><input type="checkbox" name="id[]" id="id" value="<?php echo $_product->getId(); ?>"/></td>
-            <td class="mtext_left"><em><?php echo $_product->getId(); ?></em></td>
+            <td class="mtext_left"><em><?php echo $_product->getSku();?></em></td>
            <td class="img_td">
                <?php 
                /**
@@ -305,7 +314,7 @@ echo $this->__('Disabled'); ?></option>
                  * Display edit Option
                  */
                 echo $this->__('Edit') ?>"/></a>               
-               <a href="<?php echo Mage::getUrl('marketplace/product/delete/',array('id' => $_product->getId())); ?>" onclick="return confirm('<?php
+               <a style="display:none" href="<?php echo Mage::getUrl('marketplace/product/delete/',array('id' => $_product->getId())); ?>" onclick="return confirm('<?php
                /**
                 * confirming message before delete
                 */

@@ -139,9 +139,19 @@ class Apptha_Marketplace_Block_Product_Manage extends Mage_Core_Block_Template {
    */
   $products = Mage::getModel ( 'catalog/product' )->getCollection ();
   $products->addAttributeToSelect ( '*' );
-  $products->addAttributeToFilter ( 'seller_id', array (
-    'eq' => $customerId 
-  ) );  
+	//var_dump($products->getSize());
+  //$products->addAttributeToFilter ( 'seller_id', array (
+  //  'eq' => $customerId 
+  //) ); 
+  $products->addAttributeToFilter ( 'sku', array (
+    'like' => $customerId.'-%' 
+  ) );
+/*foreach($products as $product)
+{
+var_dump($product->getData());
+break;
+}
+echo "afa";echo $customerId;echo "aaa"; die;*/
   $products = Mage::helper('marketplace/product')->productFilterByAttribute('name',$filterName,$products);
   $products = Mage::helper('marketplace/product')->productFilterByAttribute('entity_id',$filterId,$products); 
   $products = Mage::helper('marketplace/product')->productFilterByAttribute('price',$filterPrice,$products);

@@ -28,7 +28,7 @@
                 <tr>
                     <td class="email-heading">
                         <h1>Thank you for your order from {{var store.getFrontendName()}}.</h1>
-                        <p>Once your package ships we will send an email with a link to track your order. Your order summary is below. Thank you again for your business.</p>
+                        <p>Your order summary is below. Thank you again for your business.</p>
                     </td>
                     <td class="store-info">
                         <h4>Order Questions?</h4>
@@ -65,7 +65,7 @@
             </table>
             {{/if}}
             {{layout handle="sales_email_order_items" order=$order}}
-            <table cellpadding="0" cellspacing="0" border="0">
+            <!--<table cellpadding="0" cellspacing="0" border="0">
                 <tr>
                     <td class="address-details">
                         <h6>Bill to:</h6>
@@ -90,7 +90,7 @@
                         {{var payment_html}}
                     </td>
                 </tr>
-            </table>
+            </table>-->
         </td>
     </tr>
 </table>

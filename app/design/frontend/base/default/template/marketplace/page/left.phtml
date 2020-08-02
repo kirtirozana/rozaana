@@ -48,6 +48,13 @@ $customer = Mage::getSingleton("customer/session")->getCustomer();
     <div class="block-content">
         <?php      
         if ($groupId == $getGroupId && $loginId && $customerStatus != 2 && $customerStatus != 0) { ?>
+	<style>
+		.col-left-first
+		{
+			display:none;
+		}
+		
+	</style>
             <ul>
                 <?php 
                 /*              

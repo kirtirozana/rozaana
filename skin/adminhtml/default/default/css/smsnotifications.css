@@ -1,0 +1,132 @@
+body .open-popop {
+    display: block !important;
+    width: 100%;
+    position: fixed;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 9999;    background: rgba(0, 0, 0, 0.3);
+}
+.open-popop .popop-model-inner-wrap {
+    width: 1050px;
+    background: white;
+    height: 630px;
+    margin: auto;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    overscroll-behavior: auto;
+    overscroll-behavior: contain;
+    overscroll-behavior: none;
+    top: 16%;
+    position: relative;
+    box-shadow: 1px 1px 1px 1px grey;
+    padding: 30px;
+}
+.close-popop {
+cursor: pointer;
+cursor: pointer;
+width: 26px;
+margin-right: 0;
+margin-left: auto;
+background: #eb5e00;
+color: white;
+text-align: center;
+height: 26px;
+line-height: 26px;
+position: absolute;
+right: 0px;
+top: 0;
+z-index: 9;
+font-size: 26px;
+}
+.close-popop span {
+transform: rotate(45deg);
+display: block;
+}
+ul#pagination-demo {
+margin-top: 21px;
+}
+.click-me {
+    cursor: pointer;
+    text-decoration: underline;
+}
+input#smsnotifications_log_history_log_deatils {
+    display: none;
+}
+/*Admin Fonts css */
+.content-header h3 {
+font-size: 15px;
+}
+.form-list td.scope-label {
+   font-size: 11px;
+}
+
+.entry-edit label,.click-me {
+font-size: 12px;
+}
+.entry-edit p {
+font-size: 12px;
+padding-top: 6px;
+}
+
+.wrappers{
+  margin: 7px auto;
+  text-align: center;
+}
+#pagination-demo{
+  display: inline-block;
+  margin-bottom: 1.75em;
+}
+#pagination-demo li{
+  display: inline-block;
+}
+
+.page-content{
+  background: #eee;
+  display: inline-block;
+  padding: 10px;
+  width: 100%;
+  max-width: 660px;
+}
+.default_order {
+    font-size: 12px;
+}
+
+
+.pagination-sm .page-link {
+    padding: 9px 14px;
+    font-size: 12px;
+    text-decoration: none;
+}
+
+
+table#page-content th {
+padding: 9px;
+text-align: center;
+}
+table#page-content td {
+padding: 8px;
+font-size: 14px;
+}
+
+
+.popop-model-inner-wrap input {
+background: #0275d8;
+border: 0;
+color: white;
+padding: 7px 27px;
+text-transform: uppercase;
+margin-left: 15px;
+margin-top: 6px;
+}
+
+.popop-model-inner-wrap .table-bordered td, .popop-model-inner-wrap .table-bordered th {
+    font-size: 13px;
+    padding: 10px;
+}
+
+
+.popop-model-inner-wrap  form {
+    display: block;
+    text-align: center;
+}

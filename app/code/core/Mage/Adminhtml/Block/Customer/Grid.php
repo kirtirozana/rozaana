@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Adminhtml
- * @copyright  Copyright (c) 2006-2019 Magento, Inc. (http://www.magento.com)
+ * @copyright  Copyright (c) 2006-2016 X.commerce, Inc. and affiliates (http://www.magento.com)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -189,7 +189,12 @@ class Mage_Adminhtml_Block_Customer_Grid extends Mage_Adminhtml_Block_Widget_Gri
              'url'      => $this->getUrl('*/*/massUnsubscribe')
         ));
 
-        $groups = $this->helper('customer')->getGroups()->toOptionArray();
+        $this->getMassactionBlock()->addItem('coupon_generate', array(
+             'label'    => Mage::helper('smsnotifications/data')->__('Send sms for coupon generation'),
+             'url'      =>Mage::getUrl('*/*/massCoupon')
+        )); 
+
+     $groups = $this->helper('customer')->getGroups()->toOptionArray();
 
         array_unshift($groups, array('label'=> '', 'value'=> ''));
         $this->getMassactionBlock()->addItem('assign_group', array(

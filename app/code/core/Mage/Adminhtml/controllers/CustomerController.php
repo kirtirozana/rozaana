@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Adminhtml
- * @copyright  Copyright (c) 2006-2019 Magento, Inc. (http://www.magento.com)
+ * @copyright  Copyright (c) 2006-2016 X.commerce, Inc. and affiliates (http://www.magento.com)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -33,16 +33,6 @@
  */
 class Mage_Adminhtml_CustomerController extends Mage_Adminhtml_Controller_Action
 {
-    /**
-     * Controller predispatch method
-     *
-     * @return Mage_Adminhtml_Controller_Action
-     */
-    public function preDispatch()
-    {
-        $this->_setForcedFormKeyActions(array('delete', 'massDelete'));
-        return parent::preDispatch();
-    }
 
     protected function _initCustomer($idFieldName = 'id')
     {
@@ -333,7 +323,6 @@ class Mage_Adminhtml_CustomerController extends Mage_Adminhtml_Controller_Action
                 // Force new customer confirmation
                 if ($isNewCustomer) {
                     $customer->setPassword($data['account']['password']);
-                    $customer->setPasswordCreatedAt(time());
                     $customer->setForceConfirmed(true);
                     if ($customer->getPassword() == 'auto') {
                         $sendPassToEmail = true;
@@ -360,15 +349,9 @@ class Mage_Adminhtml_CustomerController extends Mage_Adminhtml_Controller_Action
                 }
 
                 if (!empty($data['account']['new_password'])) {
-                    $newPassword = trim($data['account']['new_password']);
+                    $newPassword = $data['account']['new_password'];
                     if ($newPassword == 'auto') {
                         $newPassword = $customer->generatePassword();
-                    } else {
-                        $minPasswordLength = Mage::getModel('customer/customer')->getMinPasswordLength();
-                        if (Mage::helper('core/string')->strlen($newPassword) < $minPasswordLength) {
-                            Mage::throwException(Mage::helper('customer')
-                                ->__('The minimum password length is %s', $minPasswordLength));
-                        }
                     }
                     $customer->changePassword($newPassword);
                     $customer->sendPasswordReminderEmail();
@@ -760,7 +743,38 @@ class Mage_Adminhtml_CustomerController extends Mage_Adminhtml_Controller_Action
         $this->_redirect('*/*/index');
     }
 
-    public function massAssignGroupAction()
+      public function massCouponAction()
+    {
+         $settings = Mage::helper('smsnotifications/data')->getSettings();
+         $text = Mage::getStoreConfig('smsnotifications/customer_notification/coupon_generation');
+          $customersIds = $this->getRequest()->getParam('customer');
+         if(!is_array($customersIds)) {
+             Mage::getSingleton('adminhtml/session')->addError(Mage::helper('adminhtml')->__('Please select customer(s).'));
+          } else {
+            $recipients = array();
+            foreach ($customersIds as $customerId) {
+                $customer = Mage::getModel('customer/customer')->load($customerId);
+                 $address= $customer->getAddresses();
+             $recipients[] = $telephone= $customer->getAddressesCollection()->getFirstitem()->getTelephone();
+      }
+         if (in_array($telephone, $recipients)) {
+            $text = Mage::getStoreConfig('smsnotifications/customer_notification/coupon_generation');
+                }
+
+         $result = Mage::helper('smsnotifications/data')->sendSms($text, $recipients);
+          
+          if ($result) {
+             $recipients_string = implode(',', $recipients);
+             Mage::getSingleton('adminhtml/session')->addSuccess(sprintf('The order notification has been sent via SMS to: %s', $recipients_string));
+ 
+            }else {
+                Mage::getSingleton('adminhtml/session')->addError('There has been an error sending the order notification SMS.');
+            }
+          }
+            $this->_redirect('*/*/index');
+  }
+
+   public function massAssignGroupAction()
     {
         $customersIds = $this->getRequest()->getParam('customer');
         if(!is_array($customersIds)) {
@@ -831,7 +845,6 @@ class Mage_Adminhtml_CustomerController extends Mage_Adminhtml_Controller_Action
             $ioFile->streamOpen($fileName, 'r');
             $contentLength = $ioFile->streamStat('size');
             $contentModify = $ioFile->streamStat('mtime');
-
             $this->getResponse()
                 ->setHttpResponseCode(200)
                 ->setHeader('Pragma', 'public', true)
@@ -842,7 +855,6 @@ class Mage_Adminhtml_CustomerController extends Mage_Adminhtml_Controller_Action
             $this->getResponse()->sendHeaders();
 
             while (false !== ($buffer = $ioFile->streamRead())) {
-                echo $buffer;
             }
         } else {
             $name = pathinfo($fileName, PATHINFO_BASENAME);
@@ -851,8 +863,6 @@ class Mage_Adminhtml_CustomerController extends Mage_Adminhtml_Controller_Action
                 'value' => $fileName
             ));
         }
-
-        exit();
     }
 
     protected function _isAllowed()

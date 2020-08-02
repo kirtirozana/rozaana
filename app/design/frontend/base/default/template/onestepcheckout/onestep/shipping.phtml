@@ -31,7 +31,7 @@
 
 
 <ul class="form-list">
-    <li class="control" id="shipping:same_as_billing_hide">
+    <li class="control" id="shipping:same_as_billing_hide" style="display:none">
         <input type="checkbox" name="billing[use_for_shipping]" id="shipping:same_as_billing" value="1"<?php if (!$this->isCustomerLoggedIn()): ?> checked="checked"<?php endif; ?> title="<?php echo $this->__('Use Billing Address') ?>" onclick="shipping.setSameAsBilling(this.checked)" class="checkbox" /><label for="shipping:same_as_billing"><?php echo $this->__('Ship to same Address') ?></label>
     </li>
         <!-- start of Default Shipping Address -->

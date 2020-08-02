@@ -1,0 +1,488 @@
+<?xml version="1.0"?>
+<config>
+    <sections>
+        <smsnotifications module="smsnotifications">
+            <tab>service</tab>
+            <label>SMS Notifications</label>
+            <sort_order>9001</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>0</show_in_website>
+            <show_in_store>0</show_in_store>
+            <groups>
+                <sms_api_credentials module="smsnotifications">
+                    <label>API Credentials</label>
+                    <expanded>1</expanded>
+                    <sort_order>1</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <comment><![CDATA[
+                    ]]></comment>
+                    <fields>
+                        <gateway_url>
+                            <label> SMS gateway url</label>
+                            <validate>required-entry</validate>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>1</sort_order>
+                            <show_in_default>0</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment></comment>
+                        </gateway_url>
+                        <auth_token>
+                            <label>Api Key</label>
+                            <validate>required-entry</validate>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        <comment><![CDATA[<a href='https://control.textlocal.in/settings/apikeys/' target="_blank">Click Here</a> to create/manage your API Keys]]></comment>
+                        </auth_token>
+                        <sender_name>
+                            <label> Sender ID</label>
+                             <frontend_type>select</frontend_type>
+                         <source_model>smsnotifications/system_config_source_senderid</source_model>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                           <comment><![CDATA[ ]]></comment>
+                        </sender_name>
+                    </fields>
+                </sms_api_credentials>
+
+                 <log_history module="smsnotifications">
+                    <label>Log History</label>
+                    <expanded>1</expanded>
+                    <sort_order>2</sort_order>
+                    <show_in_default>1</show_in_default>
+                   <!--  <show_in_website>0</show_in_website> -->
+                    <show_in_store>0</show_in_store>
+                    <comment><![CDATA[
+                        <p> </p>
+                    ]]></comment>
+                    <fields>
+                        <log_deatils>
+                            <label>Show your Log History</label>
+                            <expanded>1</expanded>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>1</show_in_store>
+                           <comment><![CDATA[<div class="click-me">Click Me for log history</div>
+                           <div  style="display:none;">
+                           
+                            <div class="popop-model-inner-wrap">  <div class="close-popop">X</div>
+                            </div>
+                              </div>]]></comment>
+                              <source_model>smsnotifications/system_config_source_logdetails</source_model> 
+                            <sort_order>97</sort_order>
+                        </log_deatils>
+                    </fields>
+                </log_history>
+
+                
+                <order_notification module="smsnotifications">
+                    <label>Order Notification Settings</label>
+                    <expanded>1</expanded>
+                    <sort_order>3</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <comment><![CDATA[
+                        <p> </p>
+                    ]]></comment>
+                    <fields>
+                        <recipients>
+                            <label>Primary Admin Number.You can specify multiple numbers seperated by comma</label>
+                            <expanded>1</expanded>
+                            <frontend_type>text</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[
+                
+                            ]]></comment>
+                            <sort_order>97</sort_order>
+                        </recipients>
+                        <order_status>
+                            <label>Notification Order placed Status</label>
+                            <expanded>1</expanded>
+                            <frontend_type>textarea</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>1</show_in_store>
+                          
+                            <comment><![CDATA[
+                            <p>
+                            To send an automatic notification by SMS once an order has been held with your store,
+                            enter a hold message below. 
+                            </p>
+                                <p> Variable parameters <b> :  {{name}},{{amount}},{{order}} </b> </p>
+                            ]]></comment>
+                            <sort_order>98</sort_order>
+                        </order_status>
+                        <order_hold_status>
+                            <label>Notification Order hold Status</label>
+                            <expanded>1</expanded>
+                            <frontend_type>textarea</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <tooltip>Maximum length: 150 characters</tooltip>
+                            <validate>validate-length maximum-length-150</validate>
+                            <comment><![CDATA[
+                            <p>
+                            To send an automatic notification by SMS once an order has been unheld with your store
+                            , enter a unhold message below. 
+                            </p>
+                                <p> Variable parameters <b> :  {{name}},{{amount}},{{order}} </b> </p>
+                            ]]></comment>
+                            <sort_order>99</sort_order>
+                        </order_hold_status>
+                        <order_unhold_status>
+                            <label>Notification Order Unhold Status</label>
+                            <expanded>1</expanded>
+                            <frontend_type>textarea</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[
+                            <p>
+                            To send an automatic notification by SMS once an order has been complete with your store,
+                            enter a complete message below. 
+                            </p>
+                            <p> Variable parameters <b> : {{name}},{{amount}},{{order}}</b> </p>
+                               
+                            ]]></comment>
+                            <sort_order>100</sort_order>
+                        </order_unhold_status>
+                        <order_complete_status>
+                            <label>Notification Order complete Status</label>
+                            <expanded>1</expanded>
+                            <frontend_type>textarea</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <tooltip>Maximum length: 150 characters</tooltip>
+                            <validate>validate-length maximum-length-150</validate>
+                            <comment><![CDATA[
+                            <p>
+                            To send an automatic notification by SMS once an order has been canceled with your store,
+                            enter a canceled message below. 
+                            </p>
+                                <p> Variable parameters <b> :  {{name}},{{amount}},{{order}} </b> </p>
+                               
+                            ]]></comment>
+                            <sort_order>101</sort_order>
+                        </order_complete_status>
+                        <order_canceled_status>
+                            <label>Notification Order cancelled Status</label>
+                            <expanded>1</expanded>
+                            <frontend_type>textarea</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[
+                            <p>
+                            To send an automatic notification by SMS once an order has been closed with your store
+                            , enter a closed message below. 
+                            </p>
+                                <p> Variable parameters <b> : {{name}},{{amount}},{{order}} </b></p>
+                            ]]></comment>
+                            <sort_order>102</sort_order>
+                        </order_canceled_status>
+
+                    <order_suspected_fraud>
+                            <label>Notification Order Suspected Fraud</label>
+                            <expanded>1</expanded>
+                            <frontend_type>textarea</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[
+                            <p>
+                            To send an automatic notification by SMS once an order has been closed with your store
+                            , enter a closed message below. 
+                            </p>
+                                <p> Variable parameters <b> : {{name}},{{amount}},{{order}} </b></p>
+                            ]]></comment>
+                            <sort_order>103</sort_order>
+                    </order_suspected_fraud>
+
+                         <order_paypal_reversed>
+                            <label>Notification Order Paypal Reversed</label>
+                            <expanded>1</expanded>
+                            <frontend_type>textarea</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[
+                            <p>
+                            To send an automatic notification by SMS once an order has been closed with your store
+                            , enter a closed message below. 
+                            </p>
+                                <p> Variable parameters <b> : {{name}},{{amount}},{{order}} </b></p>
+                            ]]></comment>
+                            <sort_order>104</sort_order>
+                    </order_paypal_reversed>
+
+                    <order_pending_payment>
+                            <label>Notification Order Pending Payment</label>
+                            <expanded>1</expanded>
+                            <frontend_type>textarea</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[
+                            <p>
+                            To send an automatic notification by SMS once an order has been closed with your store
+                            , enter a closed message below. 
+                            </p>
+                                <p> Variable parameters <b> : {{name}},{{amount}},{{order}} </b></p>
+                            ]]></comment>
+                            <sort_order>105</sort_order>
+                     </order_pending_payment>
+
+                         <order_pending_paypal>
+                            <label>Notification Order Pending Paypal</label>
+                            <expanded>1</expanded>
+                            <frontend_type>textarea</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[
+                            <p>
+                            To send an automatic notification by SMS once an order has been closed with your store
+                            , enter a closed message below. 
+                            </p>
+                                <p> Variable parameters <b> : {{name}},{{amount}},{{order}} </b></p>
+                            ]]></comment>
+                            <sort_order>106</sort_order>
+                     </order_pending_paypal>
+
+                         <order_paypal_canceled>
+                            <label>Notification Order PayPal Canceled Reversal</label>
+                            <expanded>1</expanded>
+                            <frontend_type>textarea</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[
+                            <p>
+                            To send an automatic notification by SMS once an order has been closed with your store
+                            , enter a closed message below. 
+                            </p>
+                                <p> Variable parameters <b> : {{name}},{{amount}},{{order}} </b></p>
+                            ]]></comment>
+                            <sort_order>107</sort_order>
+                     </order_paypal_canceled>
+                     
+                      <order_Payment_reivew>
+                            <label>Notification Order Payment Review</label>
+                            <expanded>1</expanded>
+                            <frontend_type>textarea</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[
+                            <p>
+                            To send an automatic notification by SMS once an order has been closed with your store
+                            , enter a closed message below. 
+                            </p>
+                                <p> Variable parameters <b> : {{name}},{{amount}},{{order}} </b></p>
+                            ]]></comment>
+                            <sort_order>108</sort_order>
+                     </order_Payment_reivew>
+               
+
+            </fields>
+                </order_notification>
+                <invoice_notification module="smsnotifications">
+                    <label>Invoice Notification Settings</label>
+                    <expanded>1</expanded>
+                    <sort_order>4</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <comment><![CDATA[
+                            <p> Variable parameters <b> : {{name}},{{amount}},{{order}},{{invoiceno}}</b> </p>
+                            <p>
+                            To send an invoice notification to your customers once their invoice has been created, enter a invoice message below.
+                        </p>
+                       
+                    ]]></comment>
+                    <fields>
+                        <message>
+                            <label>Invoice Notification Message</label>
+                            <frontend_type>textarea</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[
+                               
+                            ]]></comment>
+                            <sort_order>109</sort_order>
+                        </message>
+                    </fields>
+                </invoice_notification>
+                <shipment_notification module="smsnotifications">
+                    <label>Shipment Notification Settings</label>
+                    <expanded>1</expanded>
+                    <sort_order>5</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <comment><![CDATA[
+                         <p> Variable parameters <b> : {{name}},{{amount}},{{order}},{{shipmentno}}</b> </p>
+                        <p>
+                            To send an shipment notification to your customers once their shipment has been created, enter a shipment message below.
+                        </p>
+                    ]]></comment>
+                    <fields>
+                        <message>
+                            <label>Shipment Notification Message</label>
+                            <frontend_type>textarea</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[
+
+                            ]]></comment>
+                            <sort_order>110</sort_order>
+                        </message>
+                    </fields>
+                </shipment_notification>
+
+                <customer_notification module="smsnotifications">
+                    <label>Customer Settings</label>
+                    <expanded>1</expanded>
+                    <sort_order>7</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <comment></comment>
+                    <fields>
+                        <message>
+                            <label>Registration Status</label>
+                            <expanded>1</expanded>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[
+                            <p> Variable parameters <b> : {{firstname}},{{lastname}},{{emailid}}</b> </p>
+                            <p>
+                            To send a Register notification to your customer. 
+                             </p>
+                       
+                             ]]></comment>
+                            <sort_order>112</sort_order>
+                        </message>
+                        <password_status>
+                            <label>Forgot password Status</label>
+                            <expanded>1</expanded>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[
+                            <p> Variable parameters <b> : {{firstname}},{{lastname}},{{emailid}}</b> </p>
+                            <p>
+                            To send a Forgot password notification to your customer. 
+                             </p>
+                       
+                             ]]></comment>
+                            <sort_order>113</sort_order>
+                        </password_status>
+                        <newslettre_sub>
+                            <label>Newsletter Subscription Status</label>
+                            <expanded>1</expanded>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>1</show_in_store>
+                          <comment><![CDATA[
+                            <p> Variable parameters <b> : {{firstname}},{{lastname}},{{emailid}}</b> </p>
+                            <p>
+                            To send a Newsletter subscription notification to your customer. 
+                           </p>
+                       
+                             ]]></comment>
+                            <sort_order>114</sort_order>
+                        </newslettre_sub>
+                        
+                        <customer_review>
+                            <label>Customer Review For Product</label>
+                            <expanded>1</expanded>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>1</show_in_store>
+                           <comment><![CDATA[
+                            <p> Variable parameters <b> : {{firstname}},{{lastname}},{{emailid}}</b> </p>
+                            <p>
+                            To send a Customer review notification to your customer. 
+                            </p>
+                       
+                            ]]></comment>
+                            <sort_order>115</sort_order>
+                        </customer_review>
+                        <product_tag>
+                            <label>Product tag Status</label>
+                            <expanded>1</expanded>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[
+                            <p> Variable parameters <b> : {{firstname}},{{lastname}},{{emailid}}</b> </p>
+                            <p>
+                            To send  Product tag notification to your customer. 
+                             </p>
+                       
+                              ]]></comment>
+                            <sort_order>116</sort_order>
+                        </product_tag>
+                        <coupon_generation>
+                            <label>Coupon Generation Status</label>
+                            <expanded>1</expanded>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment></comment>
+                            <sort_order>117</sort_order>
+                        </coupon_generation>
+
+                          <order_allstatus>
+                              <label>Order Status</label>
+                              <frontend_type>multiselect</frontend_type>
+                              <source_model>smsnotifications/system_config_source_view</source_model>
+                             
+                              <show_in_default>1</show_in_default>
+                               <sort_order>118</sort_order>
+                          </order_allstatus>
+
+                           <order_newstatus>
+                              <label>Default Order Status</label>
+                              <frontend_type>multiselect</frontend_type>
+                              <source_model>adminhtml/system_config_source_order_status_new</source_model>
+                              <comment><![CDATA[<div class="default_order">You can create your own default order status like Payment Review, PayPal Canceled Reversal,PayPal Reversed,Pending Payment,Pending PayPal,Suspected Fraud For new order,You can create default order On System->Order status, It will automatically In Drop down</div>  
+                               ]]></comment>
+                                <show_in_default>1</show_in_default>
+                               <sort_order>120</sort_order>
+                          </order_newstatus>
+
+                           <!--  <export_cvs>
+                              <label>Default Order Status</label>
+                              <frontend_type>button</frontend_type>
+                              <frontend_model>Textlocal_SMSNotifications_Block_Button</frontend_model>
+                               <comment><![CDATA[
+                               ]]></comment>
+                                <show_in_default>1</show_in_default>
+                               <sort_order>125</sort_order>
+                          </export_cvs> -->
+            
+
+            </fields>
+                </customer_notification>
+            </groups>
+        </smsnotifications>
+    </sections>
+
+</config>

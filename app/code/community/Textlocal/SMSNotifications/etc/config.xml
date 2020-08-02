@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <modules>
+        <Textlocal_SMSNotifications>
+            <version>0.1.5</version>
+        </Textlocal_SMSNotifications>
+    </modules>
+    <global>
+         <models>
+            <smsnotifications>
+                <class>Textlocal_SMSNotifications_Model</class>
+            </smsnotifications>
+        </models>
+            <helpers>
+                    <smsnotifications>
+                        <class>Textlocal_SMSNotifications_Helper</class>
+                    </smsnotifications>
+            </helpers>
+             <blocks>
+                    <smsnotifications>
+                          <class>Textlocal_SMSNotifications_Block</class>
+                    </smsnotifications>                         
+             </blocks>
+      </global>
+
+
+<!-- add custom js and css  in admin  -->
+ 	  <adminhtml>
+         <layout>
+            <updates>
+                <smsnotifications>
+                    <file>smsnotifications.xml</file>
+            	</smsnotifications>
+        	</updates>
+         </layout>
+ 	 </adminhtml>
+
+<!-- end custom js and css in admin  -->
+
+    <adminhtml>
+        <events>
+            <admin_system_config_changed_section_smsnotifications>
+                <observers>
+                    <smsnotifications>
+                        <type>singleton</type>
+                        <class>smsnotifications/observer</class>
+                        <method>configSaveAfter</method>
+                    </smsnotifications>
+                </observers>
+            </admin_system_config_changed_section_smsnotifications>
+        </events>
+    </adminhtml>
+    <global>
+        <events>
+                <sales_order_shipment_save_after>
+                        <observers>
+                        <smsnotifications>
+                            <type>singleton</type>
+                            <class>smsnotifications/observer</class>
+                            <method>salesOrderShipmentSaveAfter</method>
+                        </smsnotifications>
+                        </observers>
+                </sales_order_shipment_save_after>
+                <sales_order_invoice_save_after>
+                        <observers>
+                        <smsnotifications>
+                            <type>singleton</type>
+                            <class>smsnotifications/observer</class>
+                            <method>salesOrderInvoiceSaveAfter</method>
+                        </smsnotifications>
+                        </observers>
+                </sales_order_invoice_save_after>
+
+                <checkout_onepage_controller_success_action>
+                     <observers>
+                        <smsnotifications>
+                            <type>singleton</type>
+                            <class>smsnotifications/observer</class>
+                            <method>NewOrderPlace</method>
+                        </smsnotifications>
+                        </observers>
+                </checkout_onepage_controller_success_action>
+
+
+              <sales_order_save_after>
+                        <observers>
+                        <smsnotifications>
+                            <type>singleton</type>
+                            <class>smsnotifications/observer</class>
+                            <method>salesOrderSaveAfter</method>
+                        </smsnotifications>
+                        </observers>
+                </sales_order_save_after> 
+
+               
+                <customer_register_success>
+                        <observers>
+                        <smsnotifications>
+                                <type>singleton</type>
+                                <class>smsnotifications/observer</class>
+                                <method>customerRegisterSuccess</method>
+                        </smsnotifications>
+                        </observers>
+                  </customer_register_success>
+
+              <controller_action_postdispatch_customer_account_forgotpasswordpost>
+                        <observers>
+                        <smsnotifications>
+                                <type>singleton</type>
+                                <class>smsnotifications/observer</class>
+                                <method>customerForgotpassword</method>
+                        </smsnotifications>
+                        </observers>
+              </controller_action_postdispatch_customer_account_forgotpasswordpost>
+
+                <review_save_before>
+                        <observers>
+                        <smsnotifications>
+                                <type>singleton</type>
+                                <class>smsnotifications/observer</class>
+                                <method>customerProductReview</method>
+                         </smsnotifications>
+                        </observers>
+               </review_save_before >
+
+               
+
+               <prepare_catalog_product_index_select>
+                        <observers>
+                        <smsnotifications>
+                                <type>singleton</type>
+                                <class>smsnotifications/observer</class>
+                                <method>customerProductTag</method>
+                        </smsnotifications>
+                        </observers>
+             </prepare_catalog_product_index_select> 
+
+             <newsletter_subscriber_save_after >
+                        <observers>
+                        <smsnotifications>
+                                <type>singleton</type>
+                                <class>smsnotifications/observer</class>
+                                <method>newsletterSubscription</method>
+                        </smsnotifications>
+                        </observers>
+             </newsletter_subscriber_save_after>
+             <adminhtml_manage_customer_grid_prepare_massaction>
+                 <observers>
+                        <smsnotifications>
+                                <type>singleton</type>
+                                <class>smsnotifications/observer</class>
+                                <method>coupongeneration</method>
+                        </smsnotifications>
+                        </observers>
+             </adminhtml_manage_customer_grid_prepare_massaction>
+
+         <!--      <catalog_product_save_after>
+                    <observers>
+                        <sms>
+                            <type>singleton</type>
+                            <class>sms/observer</class>
+                            <method>sendSmsNotifyMe</method>
+                        </sms>
+                    </observers>
+                </catalog_product_save_after> -->
+
+             <customr_log_history>
+                        <observers>
+                        <smsnotifications>
+                           <type>singleton</type>
+                           <class>modulename/observer</class>
+                           <method>customLogDetails</method>
+                       </smsnotifications>
+                       </observers>
+              </customr_log_history>
+            
+
+</events>
+   
+    </global>
+ </config>

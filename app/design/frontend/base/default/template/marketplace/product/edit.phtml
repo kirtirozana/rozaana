@@ -294,7 +294,7 @@ echo $this->__('Product Categories'); ?></h2>
 <div class="field">
 <label for="name" class="required"> <em>*</em> <?php echo $this->__('Name'); ?></label>
 <div class="input-box">
-<input id="name" name="product[name]"
+<input id="name" disabled name="product[name]"
 value="<?php
 /**
  * Check the product name is not equal to empty
@@ -318,7 +318,7 @@ echo $this->__('Description'); ?> </label>
 <div class="input-box">
 <textarea id="description" name="product[description]"
 class="required-entry textarea" rows="7" cols="75"
-style="width: 710px;"><?php
+style="width: 710px;" disabled><?php
 /**
  * Check the product description is not equal to empty
  * if so display product description
@@ -339,7 +339,7 @@ style="width: 710px;"><?php
 echo $this->__('Short Description'); ?> </label>
 <div class="input-box">
 <textarea id="short_description"
-name="product[short_description]"
+name="product[short_description]" disabled
 class="required-entry textarea" rows="7" cols="75"
 style="width: 710px;"><?php
 /**
@@ -367,7 +367,7 @@ style="width: 710px;"><?php
     ?>>
 <label for="weight" class="required"> <em>*</em><?php echo $this->__('Weight'); ?> </label>
 <div class="input-box">
-<input id="weight" name="product[weight]"
+<input id="weight" name="product[weight]" disabled
 value="<?php
 /**
  * Check the product weight is set
@@ -402,7 +402,7 @@ type="text"
 echo $this->__('SKU'); ?> </label>
 <div class="input-box">
 <input id="sku_for_avail" name="sku_for_avail" type="hidden" value="<?php echo $productSku; ?>" />
-<input id="sku" onblur="validateSkuForAddProduct();" name="product[sku]"
+<input disabled id="sku" onblur="validateSkuForAddProduct();" name="product[sku]"
 value="<?php echo $productSku; ?>"
 class="input-text required-entry" type="text" />
 <div id="category-loading" style="display: none">
@@ -521,7 +521,7 @@ title="<?php
  * and type is not equal to virtual
  */
 if($type != 'downloadable' && $type != 'virtual' ){ ?>
-<div class="fieldset marketplace-shipping">
+<div class="fieldset marketplace-shipping" style="display:none">
 <h4 class="legend"><?php echo $this->__('Shipping'); ?></h4>
 <ul class="form-list">
 <li class="fields"><label for="default_country" class="required"><em>*</em><?php echo $this->__('Select Default Country'); ?></label>
@@ -585,7 +585,7 @@ type="text">
 </div>
     <?php } ?>
 <!-- Marketplace product image information container -->
-<div class="fieldset marketplace-image">
+<div class="fieldset marketplace-image" style="display:none">
 <h2 class="legend"><?php echo $this->__('Images'); ?></h2>
 <div class="clear"></div>
 <?php 
@@ -666,7 +666,7 @@ for="<?php
 <div class="clear"></div>
 </div>
 <!-- Marketplace product meta information container -->
-<div class="fieldset marketplace-meta-information">
+<div class="fieldset marketplace-meta-information" style="display:none">
 <h2 class="legend"><?php 
 /**
  * Display meta information

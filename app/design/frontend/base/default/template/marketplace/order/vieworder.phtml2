@@ -115,14 +115,14 @@ $created_date = date('M j, Y', strtotime($orderDetails['created_at']));
 <?php 
 if($invoiceStatus == 1 && $orderStatusFlag == 1){
 ?>
-<span class="separator">|</span>
+<span class="separator" style="display:none">|</span>
 <a style="display:none" href="<?php echo Mage::getUrl('sales/order/printInvoice').'invoice_id/'.$invoiceId; ?>" onclick="this.target='_blank'" class="link-print"><?php echo $this->__('Print Invoice'); ?></a>
 <?php } ?>        
 <?php 
 if($shipmentStatus == 1 && $orderStatusFlag == 1){
 ?>
 <span class="separator">|</span>
-<a style="display:none" href="<?php echo Mage::getUrl('sales/order/printShipment').'shipment_id/'.$shipmentId; ?>" onclick="this.target='_blank'" class="link-print"><?php echo $this->__('Print Shipment'); ?></a>
+<a href="<?php echo Mage::getUrl('sales/order/printShipment').'shipment_id/'.$shipmentId; ?>" onclick="this.target='_blank'" class="link-print"><?php echo $this->__('Print Shipment'); ?></a>
 <?php } ?> 
 
 </h1>
@@ -133,7 +133,7 @@ if($shipmentStatus == 1 && $orderStatusFlag == 1){
  * Display shipping address
  */
 ?>
-<div style="display:none" class="col2-set order-info-box">
+<div class="col2-set order-info-box" style="display:none">
     <div class="col-1">
         <div class="box">
             <div class="box-title">
@@ -183,7 +183,7 @@ if($shipmentStatus == 1 && $orderStatusFlag == 1){
  * Display Billing Address
  */
 ?>
-<div style="display:none" class="col2-set order-info-box">
+<div class="col2-set order-info-box" style="display:none">
     <div class="col-1">
         <div class="box">
             <div class="box-title">
@@ -447,7 +447,7 @@ if($flagForUpdateInvoice == 1 && $orderStatusFlag == 1){ ?>
 	
 	</div>
 
-		<div id="shipping_tracking" style="display:none;">	
+		<div id="shipping_tracking">	
 		<?php echo $this->getChildHtml('marketplace_shipping_tracking'); ?>
 		<input id="send_email" name="shipment[send_email]" value="1" type="hidden">
 		<input id="notify_customer" name="shipment[comment_customer_notify]" value="1" type="hidden" >				
