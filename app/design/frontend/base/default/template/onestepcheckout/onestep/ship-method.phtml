@@ -39,9 +39,9 @@ $_shippingRateGroups = $this->getShippingRates();
 <?php else: ?>
 <dl class="shipment-methods">
         <?php foreach ($_shippingRateGroups as $code => $_rates): ?>
-                    <dd><?php echo $this->getCarrierName($code) ?></dd>
+                    <dd style="display:none"><?php echo $this->getCarrierName($code) ?></dd>
                 <?php foreach ($_rates as $_rate): ?>
-                    <dt  >
+                    <dt style="display:none">
 
                        <?php if ($_rate->getErrorMessage()): ?>
                         <ul class="messages"><li class="error-msg"><ul><li><?php echo $_rate->getErrorMessage() ?></li></ul></li></ul>
@@ -65,14 +65,18 @@ $_shippingRateGroups = $this->getShippingRates();
          <?php
          /**
           * Get delivery schedule module enabled status
-          */
-        $deliveryscheduleEnable = (int) Mage::helper('onestepcheckout')->getModuleInstalledStatus('Apptha_Deliveryschedule');
+	  */
+$deliveryscheduleEnable = (int) Mage::helper('onestepcheckout')->getModuleInstalledStatus('Apptha_Deliveryschedule');
+	
+
         /**
          * Check delivery schedule module enabled or not
          */
-        if ($deliveryscheduleEnable == 1) {
-            echo Apptha_Deliveryschedule_Block_Deliveryschedule::getLayout()->createBlock("core/template")->setTemplate('deliveryschedule/js/calendar.phtml')->toHtml();
-            echo Apptha_Deliveryschedule_Block_Deliveryschedule::getLayout()->createBlock("core/template")->setTemplate('deliveryschedule/deliveryschedule.phtml')->toHtml();
+if ($deliveryscheduleEnable == 1) {
+            //echo Apptha_Deliveryschedule_Block_Deliveryschedule::getLayout()->createBlock("core/template")->setTemplate('deliveryschedule/js/calendar.phtml')->toHtml();
+            echo $this->getLayout()->createBlock("core/template")->setTemplate('deliveryschedule/js/calendar.phtml')->toHtml();
+            //echo Apptha_Deliveryschedule_Block_Deliveryschedule::getLayout()->createBlock("core/template")->setTemplate('deliveryschedule/deliveryschedule.phtml')->toHtml();
+            echo $this->getLayout()->createBlock("core/template")->setTemplate('deliveryschedule/deliveryschedule.phtml')->toHtml();
         } ?>
     </dl>
 
@@ -96,7 +100,7 @@ $_shippingRateGroups = $this->getShippingRates();
                        ?>
                        $$('.delivery_schedule_dates_select').invoke('observe', 'click', function() {
                        if(!select_shipping_method){
-                            alert("please select shipping method");return false;
+                            //alert("please select shipping method");return false;
                            }
                        shipping.reloadReviewBlock();
                        var payment_methods = $('ajax-payment-methods');
@@ -115,3 +119,9 @@ $_shippingRateGroups = $this->getShippingRates();
     </div>
   <!---End of Gift Message  -->
   <!---End of Gift Message  -->
+<style>
+.onepage-page-title
+{
+display:none;
+}
+</style>

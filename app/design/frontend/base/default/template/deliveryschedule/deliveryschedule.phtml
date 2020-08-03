@@ -71,8 +71,8 @@ $currentDay =  Mage::getModel('core/date')->date('D');
 </li>
 </ul>
  <?php if(!empty($typesDropDown))  { ?>
-        <label for="" class="time-slot-label"><?php echo $this->__('SCHEDULE TYPES:');?></label>
-        <select name="delivery_schedule_types" class="clearfix shipping-delivery-select" onchange="selectScheduleType(this.value);">
+        <label for="" class="time-slot-label"><?php echo $this->__('Select Delivery Slot');?></label>
+        <select name="delivery_schedule_types" style="display:none" class="clearfix shipping-delivery-select" onchange="selectScheduleType(this.value);">
          <?php   echo $typesDropDown; 
          }?>
         </select>
