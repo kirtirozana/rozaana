@@ -111,7 +111,7 @@ public function salesOrderSaveAfter($observer)
         $order_amount = $order->getBaseCurrencyCode();
         $order_amount  .= ' '.$order->getBaseGrandTotal();
         $order_id        = $order->getIncrementId();
-        $telephoneNumber = trim($shippingAdress->getTelephone());
+        $telephoneNumber = trim($billingAdress->getTelephone());
 
         $ordermethod = ($order->getRemoteIp()) ?  1 : 0;
        //if (in_array("placeorder", $final_array))

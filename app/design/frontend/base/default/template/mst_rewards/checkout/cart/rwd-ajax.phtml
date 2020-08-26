@@ -1,0 +1,46 @@
+<script>
+    function enableRewardsBlock()
+    {
+        var currentElement = document.getElementById('points_amount');
+        if(currentElement.disabled == true) {
+            currentElement.disabled = false;
+        }
+
+        var currentElement = document.getElementById('points_all');
+        if(currentElement.disabled == true) {
+            currentElement.disabled = false;
+        }
+
+        var currentElement = document.getElementById('mstApplyPoints');
+        if(currentElement.disabled == true) {
+            currentElement.disabled = false;
+        }
+
+        var currentElement = document.getElementById('mstCancelPoints');
+        if(currentElement != null) {
+            if(currentElement.disabled == true) {
+                currentElement.disabled = false;
+            }
+        }
+    }
+
+
+    window.addEventListener("load", function (event) {
+        var element = document.getElementById('checkout-step-payment');
+        var isChrome = /chrome/.test( navigator.userAgent.toLowerCase());
+
+        if(isChrome) {
+            document.getElementById('checkout-payment-method-load').addEventListener("DOMSubtreeModified", function (attrEvent) {
+                if(attrEvent.target.id.indexOf('p_method') >= 0) {
+                    enableRewardsBlock();
+                }
+            }, false);
+        } else {
+            element.addEventListener("DOMAttrModified", function (attrEvent) {
+                if(attrEvent.target.id.indexOf('p_method') >= 0) {
+                    enableRewardsBlock();
+                }
+            }, false);
+        }
+    }, false);
+</script>

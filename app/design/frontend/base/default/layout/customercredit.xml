@@ -25,7 +25,7 @@
         <!-- update layout for all frontend page -->
         <reference name="top.links">
             <block type="customercredit/toplink" name="customercredit">
-                <action method="addTopLinkStores"/>
+		    <!--<action method="addTopLinkStores"/>-->
             </block>
         </reference>
         <reference name="head">
@@ -94,14 +94,14 @@
                 <action method="addLink" translate="label" module="customercredit" ifconfig='customercredit/general/enable_send_credit'>
                     <name>sharecredit</name>
                     <path>customercredit/index/share</path>
-                    <label>Send Credit</label>
+		    <label>Send Money</label>
                     <disabled helper="customercredit/account/accountNotLogin" />
                     <order>30</order>
                 </action>
                 <action method="addLink" translate="label" module="customercredit">
                     <name>redeem</name>
                     <path>customercredit/index/redeem</path>
-                    <label>Redeem Credit</label>
+                    <label>Redeem Gift Code</label>
                     <disabled helper="customercredit/account/accountNotLogin" />
                     <order>40</order>
                 </action>
@@ -147,7 +147,7 @@
                 <block>customercredit/product_price</block>
                 <template>customercredit/product/price_view.phtml</template>
             </action>
-        </reference>
+    </reference>
     </catalog_product_view>
     
    <catalogsearch_result_index>

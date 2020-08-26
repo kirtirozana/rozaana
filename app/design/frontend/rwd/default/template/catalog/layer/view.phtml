@@ -38,7 +38,7 @@ $logoAlt = Mage::getStoreConfig('design/header/logo_alt');
 $logo = $this->getSkinUrl($logoSrc);
 ?>
 <div class="show-on-scroll" style="display:none;">
-<div><img src="<?php echo $logo;?>"/></div>
+<div><a href="<?php echo $this->getBaseUrl();?>"><img src="<?php echo $logo;?>"/></a></div>
 <div class="sort-by sort-by2" style="display:none;">
 	<span class="sort-by-text" onclick="location.href='<?php echo $currentUrl;?>?dir=asc&order=price';">Price &#8613;</span>
 	<span class="sort-by-text" onclick="location.href='<?php echo $currentUrl;?>?dir=desc&order=price';">Price &#8615;</span>
@@ -207,7 +207,8 @@ jQuery(document).scroll(function() {
 .category_sub li ul li ul{display:none;margin-left:40px;}
 .show-on-scroll{
 position: fixed;
-    top: 55px;
+    top: 30px;
     width: 20%;
+padding-left:30px;
 }
 </style>

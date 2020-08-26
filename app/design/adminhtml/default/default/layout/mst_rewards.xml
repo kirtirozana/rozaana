@@ -1,0 +1,76 @@
+<layout version="0.1.0">
+    <default>
+        <reference name="head">
+            <action method="addJs"><script>mirasvit/code/rewards/rewards.js</script></action>
+        </reference>
+    </default>
+
+    <adminhtml_rewards_earning_rule_add>
+        <update handle="editor"/>
+    </adminhtml_rewards_earning_rule_add>
+    <adminhtml_rewards_earning_rule_edit>
+        <update handle="editor"/>
+    </adminhtml_rewards_earning_rule_edit>
+
+    <adminhtml_rewards_spending_rule_add>
+        <update handle="editor"/>
+    </adminhtml_rewards_spending_rule_add>
+    <adminhtml_rewards_spending_rule_edit>
+        <update handle="editor"/>
+    </adminhtml_rewards_spending_rule_edit>
+
+    <adminhtml_rewards_notification_rule_add>
+        <update handle="editor"/>
+    </adminhtml_rewards_notification_rule_add>
+    <adminhtml_rewards_notification_rule_edit>
+        <update handle="editor"/>
+    </adminhtml_rewards_notification_rule_edit>
+
+    <adminhtml_rewards_transaction_add>
+        <update handle="editor"/>
+    </adminhtml_rewards_transaction_add>
+    <adminhtml_rewards_transaction_edit>
+        <update handle="editor"/>
+    </adminhtml_rewards_transaction_edit>
+
+    <adminhtml_sales_order_view>
+        <reference name="order_totals">
+<!--             <block type="adminhtml/sales_order_totals_item" name="reward_points" template="mst_rewards/sales/order/total.phtml">
+            </block> -->
+<!--             <block type="adminhtml/sales_order_totals_item" name="reward.points.refunded" template="mst_rewards/sales/order/refunded.phtml">
+                <action method="setDisplayArea"><area>footer</area></action>
+                <action method="setAfterCondition"><condition>last</condition></action>
+            </block> -->
+        </reference>
+    </adminhtml_sales_order_view>
+
+
+    <adminhtml_sales_order_create_load_block_billing_method>
+        <reference name="billing_method">
+            <block type="rewards/adminhtml_sales_order_spend" template="mst_rewards/order/create/spend.phtml" name="spend_points" before="-" />
+        </reference>
+    </adminhtml_sales_order_create_load_block_billing_method>
+
+    <adminhtml_sales_order_create_load_block_data>
+        <reference name="billing_method">
+            <block type="rewards/adminhtml_sales_order_spend" template="mst_rewards/order/create/spend.phtml" name="spend_points" before="-" />
+        </reference>
+    </adminhtml_sales_order_create_load_block_data>
+
+    <adminhtml_sales_order_create_index>
+        <reference name="billing_method">
+            <block type="rewards/adminhtml_sales_order_spend" template="mst_rewards/order/create/spend.phtml" name="spend_points" before="-" />
+        </reference>
+    </adminhtml_sales_order_create_index>
+
+
+    <adminhtml_customer_edit>
+        <reference name="customer_edit_tabs">
+            <!--<block type="rewards/adminhtml_customer_edit_tabs_rewards" name="rewards"/>-->
+            <action method="addTab">
+                <name>rewards_rewards</name>
+                <block>rewards/adminhtml_customer_edit_tabs_rewards</block>
+            </action>
+        </reference>
+    </adminhtml_customer_edit>
+</layout>

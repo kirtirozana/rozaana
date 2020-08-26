@@ -1,0 +1,65 @@
+<style>
+    .rewards-input-box {
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+
+    .backend-use-points {
+        display: none;
+        margin-left: 20px;
+    }
+
+    .backend-buttons-pane {
+        margin-top: 5px;
+    }
+</style>
+
+<div style="margin-bottom: 3px">
+    <input id="p_method_use_pointst" value="1" name="use_points" <?php if ($this->getSpentPoints()): ?>checked<?php endif;?> type="checkbox" title="<?php echo $this->__('Use Points') ?>" onclick="showUsePoints(this)" />
+    <label for="p_method_use_points">
+        <?php echo $this->__('Use Points (<b>%s</b> available)', Mage::helper('rewards')->formatPoints($this->getBalance())) ?>
+    </label>
+    <div class="backend-use-points" <?php if ($this->getSpentPoints()): ?>style="display: block;"<?php endif;?>>
+        <div class="input-box rewards-input-box">
+            <input class="input-text" id="points_amount" name="points_amount" value="<?php echo $this->getSpentPoints() ? $this->htmlEscape($this->getSpentPoints()) : '' ?>" />
+        </div>
+        <?php echo $this->__('Maximum points for this order: <b>%s</b>', Mage::helper('rewards')->formatPoints($this->getMaxUsePoints())) ?>
+
+        <div class="backend-buttons-pane">
+            <button type="button" title="<?php echo $this->__('Apply Points') ?>" class="button" onclick="applyPoints(false)" value="<?php echo $this->__('Apply Points') ?>">
+                <span><span><?php echo $this->__('Apply Points') ?></span></span>
+            </button>
+
+            <?php if ($this->getSpentPoints()): ?>
+                &nbsp; <button type="button" title="<?php echo $this->__('Cancel Points') ?>" class="button" onclick="applyPoints(true)" value="<?php echo $this->__('Cancel Points') ?>">
+                    <span><span><?php echo $this->__('Cancel Points') ?></span></span>
+                </button>
+            <?php endif;?>
+        </div>
+    </div>
+</div>
+
+<script language="JavaScript">
+    function showUsePoints(trigger)
+    {
+        var backendUsePane = document.getElementsByClassName('backend-use-points')[0];
+        if(trigger.checked && (backendUsePane.style.display == 'none' || backendUsePane.style.display == '')) {
+            backendUsePane.style.display = 'block';
+        } else {
+            backendUsePane.style.display = 'none';
+        }
+    }
+
+    function applyPoints(cancelTrigger)
+    {
+        var data = {};
+        if(cancelTrigger == true) {
+            document.getElementById('points_amount').value = 0;
+            data['points_amount'] = 0;
+        } else {
+            data['points_amount'] = document.getElementById('points_amount').value;
+        }
+
+        order.loadArea(['totals', 'billing_method'], true, data);
+    }
+</script>

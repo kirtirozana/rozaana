@@ -1255,7 +1255,8 @@
                         <name/>
                         <status/>
                         <visibility/>
-                        <price/>
+			<price/>
+			<unit/>
                         <weight/>
                         <url_path/>
                         <url_key/>

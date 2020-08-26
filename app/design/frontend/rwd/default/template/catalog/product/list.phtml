@@ -54,8 +54,10 @@
                         $specialPrice = $_product->getSpecialPrice();
 			$normalPrice=$_product->getResource()->getAttribute('price')->getFrontend()->getValue($_product);
 			if(!empty($specialFrmDate) && strtotime($specialFrmDate) <= strtotime('now') && ( $specialToDate == '' || (!empty($specialToDate) && strtotime($specialToDate) >= strtotime('now'))) && !empty($specialPrice)):
-		?>
-			<div class="new-box saleproduct"><?php echo $normalPrice-$specialPrice;echo "/- off"; ?></div>
+?>
+			<?php if($normalPrice-$specialPrice>0):?>
+			<div class="new-box saleproduct"><?php echo "₹"; echo $normalPrice-$specialPrice;echo " off"; ?></div>
+			<?php endif;?>
 		<?php endif;?>
             <?php // Product Image ?>
             <a href="<?php echo $_product->getProductUrl() ?>" title="<?php echo $this->stripTags($this->getImageLabel($_product, 'small_image'), null, true) ?>" class="product-image">
@@ -167,7 +169,7 @@
 			$normalPrice=$_product->getResource()->getAttribute('price')->getFrontend()->getValue($_product);
 			if(!empty($specialFrmDate) && strtotime($specialFrmDate) <= strtotime('now') && ( $specialToDate == '' || (!empty($specialToDate) && strtotime($specialToDate) >= strtotime('now'))) && !empty($specialPrice)):
 		?>
-			<div class="new-box saleproduct"><?php echo $normalPrice-$specialPrice;echo "/- off"; ?></div>
+			<div class="new-box saleproduct"><?php echo "₹"; echo $normalPrice-$specialPrice;echo " off"; ?></div>
 		<?php endif;?>
                 <a href="<?php echo $_product->getProductUrl() ?>" title="<?php echo $this->stripTags($this->getImageLabel($_product, 'small_image'), null, true) ?>" class="product-image">
                     <?php $_imgSize = 210; ?>

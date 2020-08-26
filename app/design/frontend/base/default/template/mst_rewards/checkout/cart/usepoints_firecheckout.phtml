@@ -1,0 +1,224 @@
+<?php
+if (!$this->getMaxPointsNumberToSpent() || !$this->getIsSpendAllowed()) {
+    return;
+}
+$secure = Mage::app()->getFrontController()->getRequest()->isSecure();
+$config = Mage::getSingleton('rewards/config');
+?>
+<div id="coupon-discount" class="firecheckout-section mst-rewards">
+    <div class="block-title"><span><?php echo $this->__('Use Reward Points') ?></span></div>
+    <div class="discount-form" id="discount-code">
+        <?php
+        echo $this->getMessagesBlock()->getGroupedHtml();
+        $this->getMessagesBlock()->getMessageCollection()->clear();
+        ?>
+        <label for="points_amount"><?php echo $this->__('You have <b>%s</b> available.', Mage::helper('rewards')->formatPoints($this->getBalancePoints())) ?><br>
+            <?php echo $this->__('Enter amount of points to spend:'); ?>
+        </label>
+        <input type="hidden" name="remove-points" id="remove-points" value="0" />
+        <div class="input-box">
+            <input class="input-text" id="points_amount" name="points_amount" value="<?php echo $this->getPointsAmount() ? $this->htmlEscape($this->getPointsAmount()) : '' ?>" style="width: 90%;"/>
+        </div>
+        <div class="input-box">
+            <input type='checkbox' id="points_all" name="points_all"
+                <?php echo $this->getPointsAmount() == $this->getMaxPointsNumberToSpent() ? 'checked' : ''?> />
+            <label for="points_all"><?php echo $this->__('Use maximum %s', Mage::helper('rewards')->formatPoints($this->getMaxPointsNumberToSpent()))?></label>
+        </div>
+        <div class="button-box">
+            <button type="button" title="<?php echo $this->__('Apply Points') ?>"  id="apply_points" class="button" value="<?php echo $this->__('Apply Points') ?>"><span><span><?php echo $this->__('Apply Points') ?></span></span></button>
+
+            &nbsp; <button type="button" <?php if (!$this->getPointsAmount()): ?>style="display: none;"<?php endif?> title="<?php echo $this->__('Cancel Points') ?>"  id="cancel_points"  class="button" value="<?php echo $this->__('Cancel Points') ?>"><span><span><?php echo $this->__('Cancel Points') ?></span></span></button>
+
+        </div>
+    </div>
+    <script type="text/javascript">
+        //<![CDATA[
+
+        Event.observe($('points_all'), 'click', function(){
+            if ($('points_amount').value == <?php echo $this->getMaxPointsNumberToSpent() ?>) {
+                $('points_amount').value = '';
+            } else {
+                $('points_amount').value = <?php echo $this->getMaxPointsNumberToSpent() ?>;
+            }
+        });
+        Event.observe($('points_amount'), 'keyup', function(){
+            var val = parseInt($('points_amount').value);
+            if (isNaN(val) || val < <?php echo $this->getMaxPointsNumberToSpent() ?>) {
+                $('points_all').checked = false;
+            } else {
+                $('points_all').checked = true;
+                $('points_amount').value = <?php echo $this->getMaxPointsNumberToSpent() ?>;
+            }
+        });
+
+        $('apply_points') && $('apply_points').observe('click', function(e) {
+            checkout.update('<?php echo $this->getUrl('rewards/checkout_firecheckout/applyPoints', array('_secure' => $secure)) ?>', {
+                'review': 1
+            });
+            $('cancel_points').show();
+        });
+        $('cancel_points') && $('cancel_points').observe('click', function(e) {
+            $('points_amount').value = '';
+            $('points_all').checked = false;
+            checkout.update('<?php echo $this->getUrl('rewards/checkout_firecheckout/applyPoints', array('_secure' => $secure)) ?>', {
+                'review': 1
+            });
+            $('cancel_points').hide();
+        });
+
+        <?php if ($config->getGeneralIsAllowRewardsAndCoupons() ==
+                        Mirasvit_Rewards_Model_Config::COUPONS_DISABLED_HIDDEN): ?>
+
+        function hideCouponsAndRewards()
+        {
+            var coupon = document.getElementById('coupon-code');
+            var rewards = document.getElementById('points_amount');
+
+            var rewardsBlock = document.getElementsByClassName('mst-rewards')[0];
+            var discountBlock = document.getElementsByClassName('discount-block')[0];
+
+            if(rewards.value == '' && coupon.value == '') {
+                rewardsBlock.style = 'display: block;';
+                discountBlock.style = 'display: block;';
+            }
+
+            if(rewards.value != '') {
+                rewardsBlock.style = 'display: block;';
+                discountBlock.style = 'display: none;';
+            }
+
+            if(coupon.value != '') {
+                rewardsBlock.style = 'display: none;';
+                discountBlock.style = 'display: block;';
+            }
+        }
+
+        window.onload = function() {
+            hideCouponsAndRewards();
+
+            document.addEventListener("DOMNodeInserted", function (event) {
+                if(event.target.id == 'checkout-review-table-wrapper') {
+                    hideCouponsAndRewards();
+                }
+            }, false);
+        }
+        <?php endif; ?>
+
+        <?php if ($config->getGeneralIsAllowRewardsAndCoupons() ==
+                        Mirasvit_Rewards_Model_Config::COUPONS_DISABLED_WARNED): ?>
+
+        function createWarning(text) {
+
+            var colourText = document.createElement('font');
+            colourText.setAttribute('color', 'red');
+            var warn = document.createTextNode(text);
+            colourText.appendChild(warn);
+            var boldText = document.createElement('b');
+            boldText.appendChild(colourText);
+
+            return boldText;
+        }
+
+        function warnCouponsAndRewards()
+        {
+            var coupon = document.getElementById('coupon-code');
+            var rewards = document.getElementById('points_amount');
+
+            var rewardsBlock = document.getElementsByClassName('mst-rewards')[0];
+            var discountBlock = document.getElementsByClassName('discount-block')[0];
+
+            // Remove warnings, if there were any
+            var rewardsWarn = document.getElementById("mst-coupon-warning");
+            if(rewardsWarn) {
+                rewardsWarn.parentNode.removeChild(rewardsWarn);
+            }
+
+            var couponWarn = document.getElementById("mst-rewards-warning");
+            if(couponWarn) {
+                couponWarn.parentNode.removeChild(couponWarn);
+            }
+
+            if(rewards.value == '' && coupon.value == '') {
+                coupon.readOnly = false;
+                rewards.readOnly = false;
+
+                coupon.disabled = false;
+                rewards.disabled = false;
+            }
+
+            if(rewards.value != '') {
+                coupon.readOnly = true;
+                rewards.readOnly = false;
+
+                coupon.disabled = true;
+                rewards.disabled = false;
+
+                var container = document.createElement('div');
+                container.setAttribute("id", "mst-coupon-warning");
+                container.appendChild(createWarning("You can not use coupon with points spent."));
+                discountBlock.insertBefore(container, discountBlock.childNodes[0]);
+            }
+
+            if(coupon.value != '') {
+                coupon.readOnly = false;
+                rewards.readOnly = true;
+
+                coupon.disabled = false;
+                rewards.disabled = true;
+
+                var container = document.createElement('div');
+                container.setAttribute("id", "mst-rewards-warning");
+                container.appendChild(createWarning("You can not use rewards with coupon used."));
+                rewardsBlock.insertBefore(container, rewardsBlock.childNodes[0]);
+            }
+
+        }
+
+        window.onload = function() {
+            warnCouponsAndRewards();
+
+            document.addEventListener("DOMNodeInserted", function (event) {
+                if(event.target.id == 'checkout-review-table-wrapper') {
+                    warnCouponsAndRewards();
+                }
+            }, false);
+        }
+        <?php endif; ?>
+        //]]>
+    </script>
+</div>
+<style>
+    #firecheckout-form #coupon-discount {
+        padding: 15px;
+    }
+    #firecheckout-form #coupon-discount label {
+        display: block;
+    }
+    #firecheckout-form #coupon-discount .button-box {
+        margin-top: 5px;
+    }
+    #firecheckout-form #coupon-discount .input-box {
+        margin-top: 3px;
+        margin-bottom: 3px;
+    }
+    .firecheckout-section.mst-rewards > .block-title {
+        padding: 0;
+        padding-bottom: 15px;
+    }
+    .firecheckout-section.mst-rewards > .block-title::before {
+        counter-increment: firecheckout-section-number;
+        content: counter(firecheckout-section-number);
+        font-family: Verdana, sans-serif;
+        font-size: 12px;
+        margin: 0 7px 0 0;
+        background: #000;
+        color: #fff;
+        font-weight: normal;
+        vertical-align: top;
+        display: inline-block;
+        width: 22px;
+        height: 22px;
+        text-align: center;
+        line-height: 22px;
+    }
+</style>

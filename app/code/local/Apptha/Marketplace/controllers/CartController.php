@@ -41,7 +41,9 @@ class Apptha_Marketplace_CartController extends Mage_Checkout_CartController{
      */
     protected function _goBack()
     {
-        $returnUrl = $this->getRequest()->getParam('return_url');
+	    $buy_now = $this->getRequest()->getParam('buy_now');
+
+	    $returnUrl = $this->getRequest()->getParam('return_url');
         if ($returnUrl) {
 
             if (!$this->_isUrlInternal($returnUrl)) {
@@ -49,7 +51,8 @@ class Apptha_Marketplace_CartController extends Mage_Checkout_CartController{
             }
 
             $this->_getSession()->getMessages(true);
-            $this->getResponse()->setRedirect($returnUrl);
+	    $this->getResponse()->setRedirect($returnUrl);
+
         } elseif (!Mage::getStoreConfig('checkout/cart/redirect_to_cart')
             && !$this->getRequest()->getParam('in_cart')
             && $backUrl = $this->_getRefererUrl()
@@ -59,7 +62,12 @@ class Apptha_Marketplace_CartController extends Mage_Checkout_CartController{
         $backUrl = Mage::getSingleton('core/session')->getCustomRefererUrl();
         Mage::getSingleton('core/session')->unsCustomRefererUrl();
         }
-        $this->getResponse()->setRedirect($backUrl);
+        //$this->getResponse()->setRedirect($backUrl);
+	    if (!empty($buy_now)) {
+		    $this->_redirect('onestepcheckout'); // If you are using onepagecheckout or use this $this->_redirect('checkout/onepage/')
+	    }else{
+		    $this->getResponse()->setRedirect($backUrl);
+	    }
         } else {
             if ((strtolower($this->getRequest()->getActionName()) == 'add') && !$this->getRequest()->getParam('in_cart')) {
                 $this->_getSession()->setContinueShoppingUrl($this->_getRefererUrl());

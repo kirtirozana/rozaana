@@ -125,7 +125,7 @@ class Magespacex_Customercredit_Helper_Data extends Mage_Core_Helper_Data
         if (Mage::getVersion() < '1.9.0.0') {
             return '<img src="' . Mage::getDesign()->getSkinUrl('images/customercredit/point.png') . '" />';
         } else {
-            return '<img style="display:inline;float:left;margin-right:3px;" src="' . Mage::getDesign()->getSkinUrl('images/customercredit/point.png') . '" />';
+		return '<img style="display:inline;float:none;margin-top:7px;width:26px;" src="' . Mage::getDesign()->getSkinUrl('images/customercredit/point.png') . '" />';
         }
     }
 
@@ -348,7 +348,7 @@ class Magespacex_Customercredit_Helper_Data extends Mage_Core_Helper_Data
         $customercredit = Mage::getModel('customer/customer')->load($customer->getId());
         $balance = $customercredit->getCreditValue();
         $moneyText = Mage::helper('core')->currency($balance);
-        return $this->__('My Credit  %s %s', $moneyText, $icon);
+        return $this->__('%s %s', $moneyText, $icon);
     }
 
     /**

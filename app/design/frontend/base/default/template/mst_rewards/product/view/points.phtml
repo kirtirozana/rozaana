@@ -1,0 +1,7 @@
+<?php if ($points = $this->getProductPoints()):?>
+    <?php if ($this->getProduct()->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_BUNDLE):?>
+        <b><?php echo $this->__("You'll earn up to %s for this item",Mage::helper('rewards')->formatPoints($points))?></b>
+    <?php else: ?>
+        <b><?php echo $this->__("You'll earn %s for this item",Mage::helper('rewards')->formatPoints($points))?></b>
+    <?php endif;?>
+<?php endif;?>

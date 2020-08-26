@@ -93,6 +93,7 @@ $totalsales = ($operation == '+' ? ($productData->getTotalSales () + 1) : ($prod
 /**
  * Set total sales
  */
-$productData->setTotalSales ( $totalsales )->save ();
+//TEMP OFF
+//$productData->setTotalSales ( $totalsales )->save ();
 }
 }

@@ -64,6 +64,7 @@
         </tbody>
     </table>
 </div>
+<p class="tail" >You will earn <?php $p= Mage::getModel("rewards/checkout_earn")->getEarnPoints(Mage::getSingleton('checkout/session')->getQuote()->getBillingAddress());echo $p;?> R-Coins after this order</p>
 <?php echo $this->getChildHtml('items_after'); ?>
 <script type="text/javascript">
 //<![CDATA[

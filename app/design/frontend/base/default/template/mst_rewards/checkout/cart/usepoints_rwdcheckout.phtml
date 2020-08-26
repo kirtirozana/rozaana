@@ -1,0 +1,133 @@
+<?php
+if (!$this->getMaxPointsNumberToSpent() || !$this->getIsSpendAllowed()) {
+    return;
+}
+?>
+<ul class="messages" id="rwd-rewards-messages" style="display: none;">
+    <li class="success-msg">
+        <ul>
+                <li id="rwd-rewards-message"></li>
+        </ul>
+    </li>
+</ul>
+
+<div class="discount" style="background-color: #f4f4f4; padding: 10px;">
+    <h2 <?php if ($this->getIsIntensoTheme()): ?>onclick="overrideIntenso();"<?php endif; ?>><?php echo $this->__('Use Reward Points') ?></h2>
+    <div class="discount-form">
+        <label for="points_amount"><?php echo $this->__('You have <b>%s</b> available.', Mage::helper('rewards')->formatPoints($this->getBalancePoints())) ?><br>
+            <?php echo($this->getIsSpendBlocked()) ? '<font color="red">'.$this->__('You can not spend points while using coupon.').'</font>' : $this->__('Enter amount of points to spend:'); ?>
+        </label>
+        <input type="hidden" name="remove-points" id="remove-points" value="0" />
+        <div class="input-box">
+            <input <?php echo($this->getIsSpendBlocked()) ? 'disabled style="background: #d9d9d9;"' : '' ?> class="input-text" id="points_amount" name="points_amount" value="<?php echo $this->getPointsAmount() ? $this->htmlEscape($this->getPointsAmount()) : '' ?>" />
+        </div>
+        <div class="input-box">
+            <input type='checkbox' <?php echo($this->getIsSpendBlocked()) ? 'disabled' : '' ?> id="points_all" name="points_all"
+                <?php echo $this->getPointsAmount() == $this->getMaxPointsNumberToSpent() ? 'checked' : ''?> />
+            <label for="points_all"><?php echo $this->__('Use maximum %s', Mage::helper('rewards')->formatPoints($this->getMaxPointsNumberToSpent()))?></label>
+        </div>
+        <div class="buttons-set">
+            <button type="button" id="mstApplyPoints" title="<?php echo $this->__('Apply Points') ?>" class="button" value="<?php echo $this->__('Apply Points') ?>"><span><span><?php echo $this->__('Apply Points') ?></span></span></button>
+            &nbsp; <button type="button" style="display: <?php echo ($this->getPointsAmount()) ? 'block;' : 'none;' ?>" id="mstCancelPoints" title="<?php echo $this->__('Cancel Points') ?>" class="button" value="<?php echo $this->__('Cancel Points') ?>"><span><span><?php echo $this->__('Cancel Points') ?></span></span></button>
+        </div>
+    </div>
+</div>
+
+<!-- additional CSS to gray coupon box -->
+<?php if ($this->getIsCouponBlocked()): ?>
+    <style>
+        input#coupon_code.input-text {
+            background: #d9d9d9;
+            pointer-events: none;
+        }
+    </style>
+<?php endif ?>
+
+<script type="text/javascript">
+    //<![CDATA[
+    Event.observe($('points_all'), 'click', function(){
+        if ($('points_amount').value == <?php echo $this->getMaxPointsNumberToSpent() ?>) {
+            $('points_amount').value = '';
+        } else {
+            $('points_amount').value = <?php echo $this->getMaxPointsNumberToSpent() ?>;
+        }
+    });
+    Event.observe($('points_amount'), 'keyup', function(){
+        var val = parseInt($('points_amount').value);
+        if (isNaN(val) || val < <?php echo $this->getMaxPointsNumberToSpent() ?>) {
+            $('points_all').checked = false;
+        } else {
+            $('points_all').checked = true;
+            $('points_amount').value = <?php echo $this->getMaxPointsNumberToSpent() ?>;
+        }
+    });
+
+    function displayMessage(text)
+    {
+        var rwdMsg = document.getElementById('rwd-rewards-message');
+        rwdMsg.textContent = text;
+        var container = document.getElementById('rwd-rewards-messages');
+        container.style.display = "block";
+    }
+
+    function submitPointsForm(isRemove)
+    {
+        var url = '<?php echo $this->getUrl('rewards/checkout/applyPointsGoMageLightcheckout', array('_secure' => true)) ?>';
+        var unitName = "<?php echo Mage::getSingleton('rewards/config')->getGeneralPointUnitName(Mage::app()->getStore()) ?>";
+        if(isRemove) {
+            $('points_amount').value = '';
+        }
+        var parameters = {points_amount: $('points_amount').value};
+        document.getElementById('payment-please-wait').style.display = 'block';
+
+        // Disable button while we applying points
+        var buttonPane = document.getElementById('payment-buttons-container');
+        var continueButton = buttonPane.getElementsByTagName('button')[0];
+        continueButton.classList.add('disabled');
+
+        new Ajax.Request(url, {
+            method: 'post',
+            parameters: parameters,
+            onSuccess: function(transport) {
+                if(transport.status == 200) {
+
+                    var response = transport.responseText.evalJSON();
+
+                    if(response.success) {
+                        if($('points_amount').value != '') {
+                            displayMessage($('points_amount').value + " " + unitName + " applied");
+                            document.getElementById('mstCancelPoints').style.display = 'block';
+                        } else {
+                            displayMessage(unitName + " were cancelled");
+                            $('points_all').checked = false;
+                            document.getElementById('mstCancelPoints').style.display = 'none';
+                        }
+                    }
+                    document.getElementById('payment-please-wait').style.display = 'none';
+                    continueButton.classList.remove('disabled');
+                }
+            }
+        });
+    }
+
+    Event.observe($('mstApplyPoints'), 'click', function(){
+        submitPointsForm(false);
+    });
+
+    Event.observe($('mstCancelPoints'), 'click', function(){
+        submitPointsForm(true);
+    });
+
+    <?php if ($this->getIsIntensoTheme()): ?>
+    function overrideIntenso()
+    {
+        var block = $('reward-points-form').getElementsByClassName('discount')[0].getElementsByClassName('discount-form')[0];
+        if(block.style.display == 'none') {
+            block.style.display = 'block';
+        } else {
+            block.style.display = 'none';
+        }
+    }
+    <?php endif; ?>
+    //]]>
+</script>

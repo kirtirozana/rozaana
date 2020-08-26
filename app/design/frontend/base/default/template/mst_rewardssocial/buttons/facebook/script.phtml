@@ -1,0 +1,68 @@
+<?php
+    $localeCode = Mage::app()->getLocale()->getLocaleCode();
+    if (Mage::app()->getRequest()->isSecure()) {
+        $facebookConnect = 'https://connect.facebook.net/' . $localeCode . '/all.js';
+    } else {
+        $facebookConnect = 'http://connect.facebook.net/' . $localeCode . '/all.js';
+    }
+?>
+
+<div id="fb-root"></div>
+<script>
+    window.fbAsyncInit = function() {
+        FB.init({
+            appId      : '<?php echo $this->getAppId(); ?>',
+            version: '<?php echo $this->getAppVersion(); ?>',
+            status     : true,
+            xfbml      : true
+        });
+
+        FB.Event.subscribe('xfbml.render', function(b){
+            FB.Event.subscribe('edge.create',function(a) {
+                new Ajax.Request('<?php echo $this->getLikeUrl() ?>?url=<?php echo $this->getCurrentEncodedUrl()?>',
+                    {
+                        onSuccess: function(response) {
+                            $('status-message').update(response.responseText);
+                            $('facebook-message').update('');
+                        }
+                    });
+            });
+            FB.Event.subscribe('edge.remove',function(a){
+                new Ajax.Request('<?php echo $this->getUnlikeUrl() ?>?url=<?php echo $this->getCurrentEncodedUrl()?>',{
+                    onSuccess: function(response) {
+                        $('status-message').update(response.responseText);
+                        $('facebook-message').update('');
+                    }
+                });
+            });
+        });
+
+    };
+
+    (function(d, s, id){
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {return;}
+        js = d.createElement(s); js.id = id;
+        js.src = "<?php echo $facebookConnect; ?>";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+
+    function facebookShare() {
+        FB.ui({
+                method: 'share',
+                title: '<?php echo addslashes($this->getLayout()->getBlock('head')->getTitle()); ?>',
+                description: `<?php echo substr(strip_tags($this->getLayout()->getBlock('head')->getDescription()), 0, 100) . '...' ;?>`,
+                href: '<?php echo $this->getCurrentUrl()?>',
+            },
+            function(response) {
+                if (response && !response.error_code) {
+                    new Ajax.Request('<?php echo $this->getFbShareUrl() ?>?url=<?php echo $this->getCurrentEncodedUrl()?>',{
+                        onSuccess: function(response) {
+                            $('status-message').update(response.responseText);
+                            $('facebook-message').update('');
+                        }
+                    });
+                }
+            });
+    }
+</script>

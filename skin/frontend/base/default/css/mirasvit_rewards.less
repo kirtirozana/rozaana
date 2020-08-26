@@ -1,0 +1,324 @@
+.rewardssocial-buttons {
+    font-size: 11px;
+    height: 20px;
+    line-height: 20px;
+    margin-bottom: 10px;
+  /*z-index: 190;*/ /* fix for refer friends popup z-index for ultimo theme */
+    position: relative;
+
+    #facebook-message, #twitter-message, #referral-message, #googleplus-message, #pinterest-message {
+        display: none;
+        position: absolute;
+        background: #333;
+        padding: 2px 5px;
+        color: #fff;
+        margin-top: -25px;
+    }
+
+    .buttons-facebook-like {
+        &:hover {
+            #facebook-message {
+                display: block;
+            }
+        }
+    }
+
+    .buttons-googleplus-one {
+        &:hover {
+            #googleplus-message {
+                display: block;
+            }
+        }
+    }
+
+    .buttons-pinterest-pin {
+        &:hover {
+            #pinterest-message {
+                display: block;
+            }
+        }
+    }
+
+    .buttons-twitter-like {
+        &:hover {
+            #twitter-message {
+                display: block;
+            }
+        }
+    }
+
+    .buttons-referral-like {
+        > a {
+            text-decoration: none;
+            line-height: 18px;
+            border-radius: 2px;
+            padding: 0px 3px;
+            font-weight: bold;
+            color: #333;
+            font-size: 11px;
+            border: 1px solid #ccc;
+            background: #ffffff;
+            background: -moz-linear-gradient(top, #ffffff 0%, #eaeaea 100%);
+            background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#eaeaea));
+            background: -webkit-linear-gradient(top, #ffffff 0%,#eaeaea 100%);
+            background: -o-linear-gradient(top, #ffffff 0%,#eaeaea 100%);
+            background: -ms-linear-gradient(top, #ffffff 0%,#eaeaea 100%);
+            background: linear-gradient(to bottom, #ffffff 0%,#eaeaea 100%);
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#eaeaea',GradientType=0 );
+        }
+        &:hover {
+            #referral-message {
+                display: block;
+            }
+        }
+    }
+
+    .fb_iframe_widget {
+        margin-right: 10px;
+        display: block;
+        float: left;
+    }
+
+    .mst-rewardssocial-tweet {
+        margin-right: 10px;
+        display: block;
+        float: left;
+    }
+
+    .referral {
+        display: block;
+        float: left;
+    }
+
+    .status-message {
+        float: left;
+        margin-left: 10px;
+        color: #666;
+    }
+
+    .buttons-pinterest-pin {
+        >a {
+            margin-right: 10px;
+            float: left;
+        }
+    }
+
+    .buttons-googleplus-one {
+        >div {
+            float: left !important;
+            margin-right: 10px !important;
+        }
+    }
+}
+
+.rewards-notification-message {
+    border-style: solid !important;
+    border-width: 1px !important;
+    min-height: 24px !important;
+    padding: 8px 8px 6px 32px !important;
+    color: #3d6611;
+    border-color: #446423;
+    background-color: #eff5ea;
+    margin-bottom: 10px;
+}
+.rewards-notification-message li {
+    margin-top: 2px;
+}
+
+div.rewardssocial-buttons div.buttons-referral-like button.referral {
+  background: rgba(0, 0, 0, 0) linear-gradient(to bottom, #ffffff 0%, #eaeaea 100%) repeat scroll 0 0;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  color: #333;
+  font-size: 11px;
+  font-weight: bold;
+  line-height: 18px;
+  padding: 0 3px;
+  text-decoration: none;
+}
+
+div.rewardssocial-buttons div.buttons-referral-like div.referral-popup {
+  background: #fff none repeat scroll 0 0;
+  border: 1px solid #cccccc;
+  left: 50%;
+  margin-left: -215px;
+  padding: 20px;
+  position: fixed;
+  top: 100px;
+  width: 630px;
+  z-index: 2001; /* ultimo theme menu has 2000 */
+}
+
+div.rewardssocial-buttons div.buttons-referral-like div#referral-popup.referral-popup form#rma-confirmation-form-validate h2#refer-friends {
+  color: #50a4cf;
+  font-family: "Raleway","Helvetica Neue",Verdana,Arial,sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+div.rewardssocial-buttons div.buttons-referral-like div#referral-popup.referral-popup div.close {
+  color: #636363;
+  cursor: pointer;
+  display: block;
+  float: right;
+  font-family: "Raleway","Helvetica Neue",Verdana,Arial,sans-serif;
+  font-size: 30px;
+  font-weight: normal;
+  position: absolute;
+  right: -14px;
+  top: -2px;
+  text-decoration: none;
+  width: 40px;
+}
+
+div.rewardssocial-buttons div.buttons-referral-like div#referral-popup.referral-popup form#rma-confirmation-form-validate ul.form-list li div.input-box input#comment.input-text {
+  width: 100%;
+}
+
+.rewards-social-buttons {
+  display: inline-block;
+  float: left;
+
+  > .fb {
+    position: relative;
+    display: inline-block;
+    margin-top: 0px;
+  }
+  > .tw {
+    position: relative;
+    display: inline-block;
+    padding-top:15px;
+  }
+  > .gp {
+    position: relative;
+    display: inline-block;
+    margin-top: 5px;
+  }
+}
+
+.box-account div.fieldset p {
+  margin-bottom: 0px;
+}
+.box-account div.fieldset div.rewards-social-buttons {
+  height: 20px;
+}
+.box-account div.fieldset div.rewards-social-buttons div.tw {
+  padding-top: 0px;
+  position: relative;
+  top: -2px;
+}
+.box-account div.fieldset div.rewards-social-buttons div.fb {
+  position: relative;
+  top: -8px;
+}
+
+div.rewardssocial-buttons div.buttons-twitter-like {
+  float: left;
+  margin-right: 10px;
+}
+div.rewardssocial-buttons div.buttons-googleplus-one {
+  float: left;
+  margin-right: 10px;
+}
+/*Gomagecheckout Begin*/
+form#gcheckout-onepage-form div#coupon-discount.glc-step.rewards {
+  width: 34%;
+  float: left;
+  position: absolute;
+  top: 440px;
+}
+form#gcheckout-onepage-form div#coupon-discount.glc-step.rewards div#discount-code.discount-form {
+  border: 1px solid #eaeaea;
+  border-radius: 0 0 4px 4px;
+  color: #5f5f5f;
+  background-color: #ffffff;
+}
+form#gcheckout-onepage-form div#coupon-discount.glc-step.rewards div#discount-code.discount-form label {
+  margin-left: 15px;
+  margin-top: 10px;
+  color: #5f5f5f;
+}
+form#gcheckout-onepage-form div#coupon-discount.glc-step.rewards div#discount-code.discount-form div.input-box input#points_amount.input-text {
+  margin-left: 15px;
+  width: 93% !important;
+}
+form#gcheckout-onepage-form div#coupon-discount.glc-step.rewards div#discount-code.discount-form div.input-box input#points_all {
+  margin-left: 15px;
+}
+form#gcheckout-onepage-form div#coupon-discount.glc-step.rewards div#discount-code.discount-form div.input-box label {
+  margin-top: 5px;
+}
+form#gcheckout-onepage-form div#coupon-discount.glc-step.rewards div#discount-code.discount-form div button#apply_points.button {
+  float: right;
+  margin-bottom: 10px;
+  margin-right: 15px;
+}
+div.glc.gcheckout-onepage-wrap.not_deliverydate_mode form#gcheckout-onepage-form div#gcheckout-onepage-review.glc-step.review {
+  padding-bottom: 150px;
+}
+form#gcheckout-onepage-form div#coupon-discount.glc-step.rewards div#discount-code.discount-form div button#cancel_points.button {
+  float: right;
+  margin-right: 10px;
+}
+
+/*Gomagecheckout End*/
+
+/* Invite popup styles */
+
+div.rewardssocial-buttons div.buttons-referral-like div#referral-popup.referral-popup form#referralForm ul.form-list li div.input-box {
+  width: 80%;
+}
+
+div.rewardssocial-buttons div.buttons-referral-like div#referral-popup.referral-popup form#referralForm ul.form-list li div.input-box input.input-text {
+  width: 100%;
+}
+
+/* firecheckout */
+
+.firecheckout-section.mst-rewards #coupon-discount label {
+  display: inline;
+}
+
+/* New version of Magestore Onestepcheckout */
+
+form#one-step-checkout-form div.onestepcheckout-shipping-payment-review div.order-review-section ol div.onestepcheckout-rewards div.discount h3#shipping_method_step_header.onestepcheckout-numbers.step_2 {
+  background: rgba(0, 0, 0, 0) url("/skin/frontend/base/default/images/onestepcheckout/flatnew/payment_title.png") no-repeat scroll left center;
+}
+form#one-step-checkout-form div.onestepcheckout-shipping-payment-review div.order-review-section ol div.onestepcheckout-rewards div.discount div.discount-form label {
+  width: 100%;
+  margin: 15px 15px 20px;
+}
+form#one-step-checkout-form div.onestepcheckout-shipping-payment-review div.order-review-section ol div.onestepcheckout-rewards div.discount div.discount-form div.input-box input#points_amount.input-text {
+  width: 92% !important;
+  margin-left: 15px;
+}
+form#one-step-checkout-form div.onestepcheckout-shipping-payment-review div.order-review-section ol div.onestepcheckout-rewards div.discount div.discount-form div.input-box input#points_all {
+  margin-left: 15px;
+  margin-top: 10px;
+  float: left;
+}
+form#one-step-checkout-form div.onestepcheckout-shipping-payment-review div.order-review-section ol div.onestepcheckout-rewards div.discount div.discount-form div.input-box label {
+  float: left;
+  margin-top: 10px;
+  width: 80%;
+}
+form#one-step-checkout-form div.onestepcheckout-shipping-payment-review div.order-review-section ol div.onestepcheckout-rewards div.discount div.discount-form button#onestepcheckout-rewards-add.button {
+  margin-bottom: 20px;
+  margin-left: 15px;
+}
+form#one-step-checkout-form div.onestepcheckout-shipping-payment-review div.order-review-section ol div.onestepcheckout-rewards div.discount div.discount-form {
+  margin-bottom: 25px;
+  border: 1px solid #ebebeb;
+}
+form#one-step-checkout-form div.onestepcheckout-shipping-payment-review div.order-review-section {
+  border: none;
+}
+form#one-step-checkout-form div.onestepcheckout-shipping-payment-review div.order-review-section ol li.payment-method div#onestepcheckout-payment-methods.onestepcheckout-payment-methods {
+  border: 1px solid #ebebeb;
+  border-top: none;
+  width: 101%;
+}
+form#one-step-checkout-form div.onestepcheckout-shipping-payment-review div.order-review-section ol div.onestepcheckout-rewards div.discount div.discount-form span#cancel_block button#onestepcheckout-rewards-cancel.button {
+  margin-top: -21px;
+}

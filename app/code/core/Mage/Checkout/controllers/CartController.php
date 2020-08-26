@@ -74,6 +74,7 @@ class Mage_Checkout_CartController extends Mage_Core_Controller_Front_Action
      */
     protected function _goBack()
     {
+	    $buy_now = $this->getRequest()->getParam('buy_now');
         $returnUrl = $this->getRequest()->getParam('return_url');
         if ($returnUrl) {
 
@@ -82,7 +83,13 @@ class Mage_Checkout_CartController extends Mage_Core_Controller_Front_Action
             }
 
             $this->_getSession()->getMessages(true);
-            $this->getResponse()->setRedirect($returnUrl);
+	    //$this->getResponse()->setRedirect($returnUrl);
+	    if (!empty($buy_now)) {
+		    $this->_redirect('onepagecheckout'); // If you are using onepagecheckout or use this $this->_redirect('checkout/onepage/')
+	    }else{
+		    $this->getResponse()->setRedirect($returnUrl);
+	    }
+
         } elseif (!Mage::getStoreConfig('checkout/cart/redirect_to_cart')
             && !$this->getRequest()->getParam('in_cart')
             && $backUrl = $this->_getRefererUrl()
