@@ -19,11 +19,12 @@ $collection = $this->getReferralCollection();
         <h2 class="legend"><?php echo $this->__('Share with Friends') ?></h2>
         <p><?php echo $this->__('Share the referal link in the social media and get points!') ?></p>
         <div class="rewards-social-buttons">
-            <div class="whatsapp">
-                <div class="whatsapp-share-button" data-href="<?php echo $this->getShareUrl() ?>" data-layout="button"><a href="whatsapp://send?text=<?php echo $this->getShareUrl() ?>">Share on Whatsapp</a></div>
+	    <div class="whatsapp">
+<?php $msg = "Hey, I buy groceries at the lowest price from ROZ-AANA  and get delivery in just 1 hour anywhere in Faridabad. Register using a link below and get 2% cashback on every shopping.  ";?>
+                <div class="whatsapp-share-button" data-href="<?php echo $this->getShareUrl() ?>" data-layout="button"><a href="whatsapp://send?text=<?php echo $msg;echo $this->getShareUrl() ?>">Share on Whatsapp</a></div>
             </div>
             <div class="sms">
-                <div class="sms-share-button" data-href="<?php echo $this->getShareUrl() ?>" data-layout="button"><a href="sms:?&body=<?php echo $this->getShareUrl() ?>">Share via SMS</a></div>
+                <div class="sms-share-button" data-href="<?php echo $this->getShareUrl() ?>" data-layout="button"><a href="sms:?&body=<?php echo $msg;echo $this->getShareUrl() ?>">Share via SMS</a></div>
             </div>
             <div class="fb">
                 <div class="fb-share-button" data-href="<?php echo $this->getShareUrl() ?>" data-layout="button"></div>

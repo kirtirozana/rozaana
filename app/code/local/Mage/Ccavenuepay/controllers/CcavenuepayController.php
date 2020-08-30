@@ -85,17 +85,18 @@ class Mage_Ccavenuepay_CcavenuepayController extends Mage_Core_Controller_Front_
 	    $customerEmail=$order->getCustomerEmail();
 	    $customer=Mage::getModel('customer/customer')->setWebsiteId($websiteId)->loadByEmail($customerEmail);
 	    $session=Mage::getSingleton('customer/session');
-	    echo 32;
 	    $session->setCustomerAsLoggedIn($customer);
 	    $order->setStatus('payment_received');
 	    $order->save();
-	    $this->loadLayout();
+	    //$this->loadLayout();
 	    //$this->getLayout()->getBlock('content')->setTemplate('page/1column.phtml');
 	    //    $block = $this->getLayout()->createBlock('cms/block')->setBlockId('thankyou')->setData('order_id',$orderid)->toHtml(); 
 	    //   $this->getLayout()->getBlock('content')->append($block);
-	    $this->getLayout()->createBlock('cms/block')->setBlockId('thankyou')->toHtml();
-            $this->renderLayout();
- 
+	    //$this->getLayout()->createBlock('cms/block')->setBlockId('thankyou')->toHtml();
+	    //$this->renderLayout();
+	    $orderno=$order->getId();
+	    $order->sendNewOrderEmail();
+ 		echo "We have recieved your order no <a href='https://rozaanaonline.com/sales/order/view/order_id/$orderno/'>$orderid</a>. Click <a href='https://rozaanaonline.com/'>here</a> to continue shopping.";
 
 
     }
@@ -271,6 +272,7 @@ class Mage_Ccavenuepay_CcavenuepayController extends Mage_Core_Controller_Front_
 			 * set the quote as inactive after back from Ccavenuepay
 			 */
 			$session->getQuote()->setIsActive(false)->save();
+			//$this->_redirect('checkout/onepage/success', array('_secure'=>true));
 
 			$this->_redirect('ccavenuepay/ccavenuepay/thankyou', array('_secure'=>true,'order_id'=>$response_array['order_id']));
 		}

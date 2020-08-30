@@ -66,7 +66,7 @@ class App_Mail_Transport_AmazonSES extends Zend_Mail_Transport_Abstract
         
         $this->_accessKey = $config['accessKey'];
         $this->_privateKey = $config['privateKey'];
-        $this->_host = Zend_Uri::factory($host);
+        $this->_host = Zend_Uri::factory('https://email-smtp.ap-south-1.amazonaws.com');
     }
 
 
