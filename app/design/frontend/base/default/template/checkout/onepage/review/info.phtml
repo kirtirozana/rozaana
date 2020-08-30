@@ -25,7 +25,7 @@
  */
 ?>
 <?php echo $this->getChildHtml('items_before'); ?>
-<div id="checkout-review-table-wrapper">
+<div id="checkout-review-table-wrapper" style="height:250px;overflow:auto;">
     <table class="data-table" id="checkout-review-table">
         <?php if ($this->helper('tax')->displayCartBothPrices()): $colspan = $rowspan = 2; else: $colspan = $rowspan = 1; endif; ?>
         <col />

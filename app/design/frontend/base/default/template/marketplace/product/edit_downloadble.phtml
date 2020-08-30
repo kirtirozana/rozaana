@@ -36,9 +36,11 @@ $productId = $this->getRequest ()->getParam ( 'id' );
 /**
  * Checking product id is not equal to empty
  * Initilize product data
-*/
+ */
+$currentStoreId = Mage::app()->getStore()->getId();
+
 if (! empty ( $productId )) {
-$product = $this->getProductData ( $productId );
+$product = $this->getProductData ( $productId,$currentStoreId );
 }
 
 /**

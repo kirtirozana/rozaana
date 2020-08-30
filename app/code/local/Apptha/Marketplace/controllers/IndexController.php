@@ -50,6 +50,63 @@ class Apptha_Marketplace_IndexController extends Mage_Core_Controller_Front_Acti
    $this->loadLayout ();
    $this->renderLayout ();
  }
+ public function riderAction(){
+	 $orderId= $this->getRequest()->getParam('order_id');
+	 $order=Mage::getModel('sales/order')->load($orderId);
+	 $product = [];
+	 foreach ($order->getAllItems() as $item) {
+		 $product[$item->getSku()]=$item->getQtyOrdered();
+	 }
+	 $msg='';
+	 for($i=20;$i<30;$i++)
+	 {
+		 $items=Mage::helper('marketplace/vieworder')->getOrderProductIds($i,$orderId);
+		 if(sizeof($items))
+		 {
+			 $msg=$msg. "<br>";
+			 $msg=$msg. "-------------------------";
+			 //$msg=$msg. "<br>";
+			 //$msg=$msg. "-------------------------";
+			 $msg=$msg. "<br><span style='font-weight:bold'>";
+			 $msg=$msg. Mage::getModel ( 'marketplace/sellerprofile' )->collectprofile($i)->getStoreTitle();
+			 $msg=$msg. "</span><br>";
+			 $msg=$msg. "-------------------------";
+			 $msg=$msg. "<br>";
+			 //$msg=$msg. "-------------------------";
+			 foreach($items as $item)
+			 {
+			 	 $msg=$msg. "<br>";
+				 $p=Mage::getModel('catalog/product')->load($item);
+				 $msg=$msg. "SKU : ".$p->getSku();
+				 $msg=$msg. "<br>";
+				 $msg=$msg. "Product Name : ".$p->getName();
+				 $msg=$msg. "<br>";
+				 $msg=$msg. "Grams : ".$p->getUnit();
+				 $msg=$msg. "<br>";
+				 $msg=$msg. "Price : ".$p->getPrice();
+				 $msg=$msg. "<br>";
+				 $msg=$msg. "Qty : ".$product[$p->getSku()];
+				 $msg=$msg. "<br>";
+				 $msg=$msg. "-------------------------";
+			 }
+			 //echo "<br>";
+			 //echo "-------------------------";
+		 }
+	 }
+			 //$msg=$msg. "<br>";
+			 //$msg=$msg. "-------------------------";
+			 $msg=$msg. "<br>";
+			 $msg=$msg. "Customer Address";
+			 $msg=$msg. "<br>";
+			 $msg=$msg. "-------------------------";
+			 $msg=$msg. "<br><span style='font-weight:bold;color:red'>";
+			 $msg=$msg. $order->getShippingAddress()->getFormated(true,'html');
+			 $msg=$msg. "</span><br>";
+			 $msg=$msg. "-------------------------";
+			 $msg=$msg. "<br>";
+			 echo $msg;
+			 Mage::helper('marketplace/order')->sendTelegramNotificationToRider('1175589276',$orderId);
+ }
  /**
   * Display home page banner images
   *

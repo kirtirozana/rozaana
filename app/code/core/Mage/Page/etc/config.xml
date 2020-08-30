@@ -116,7 +116,7 @@
     <default>
         <design>
             <head translate="default_description" module="page">
-                <default_title>Magento Commerce</default_title>
+                <default_title>Rozaana Online</default_title>
                 <default_description>Default Description</default_description>
                 <default_keywords>Magento, Varien, E-commerce</default_keywords>
                 <default_robots>*</default_robots>

@@ -56,7 +56,11 @@ class Mage_Adminhtml_Block_Sales_Order_Grid extends Mage_Adminhtml_Block_Widget_
 
     protected function _prepareCollection()
     {
-        $collection = Mage::getResourceModel($this->_getCollectionClass());
+	    $collection = Mage::getResourceModel($this->_getCollectionClass());
+	    //$collection->getSelect()->join('sales_flat_order_address', 'main_table.entity_id = sales_flat_order_address.parent_id' ,array('email'=> 'email' ));
+	   $collection->getSelect()->join('sales_flat_order', 'main_table.entity_id = sales_flat_order.entity_id' ,array('shipping_delivery_date'=> 'shipping_delivery_date','shipping_delivery_time'=>'shipping_delivery_time'));
+
+
         $this->setCollection($collection);
         return parent::_prepareCollection();
     }
@@ -113,6 +117,18 @@ class Mage_Adminhtml_Block_Sales_Order_Grid extends Mage_Adminhtml_Block_Widget_
             'type'  => 'currency',
             'currency' => 'order_currency_code',
         ));
+        $this->addColumn('shipping_delivery_date', array(
+            'header' => Mage::helper('sales')->__('shipping_delivery_date'),
+            'index' => 'shipping_delivery_date',
+            'type'  => 'date',
+            'width' => '40px',
+        ));
+        $this->addColumn('shipping_delivery_time', array(
+            'header' => Mage::helper('sales')->__('shipping_delivery_time'),
+            'index' => 'shipping_delivery_time',
+            'type'  => 'text',
+            'width' => '40px',
+        ));
 
         $this->addColumn('status', array(
             'header' => Mage::helper('sales')->__('Status'),
@@ -141,6 +157,66 @@ class Mage_Adminhtml_Block_Sales_Order_Grid extends Mage_Adminhtml_Block_Widget_
                     'sortable'  => false,
                     'index'     => 'stores',
                     'is_system' => true,
+            ));
+            $this->addColumn('rider',
+                array(
+                    'header'    => Mage::helper('sales')->__('Rider'),
+                    'width'     => '50px',
+                    'type'      => 'action',
+                    'getter'     => 'getId',
+                    'actions'   => array(
+                        array(
+                            'caption' => Mage::helper('sales')->__('Send To Rider 1'),
+                            'url'     => array('base'=>'marketplace/index/rider'),
+                            'field'   => 'order_id',
+			    'data-column' => 'action',
+			    'target'=>'_blank',
+                        )
+                    ),
+                    'filter'    => false,
+                    'sortable'  => false,
+                    'index'     => 'stores',
+		    'is_system' => true,
+            ));
+            $this->addColumn('rider2',
+                array(
+                    'header'    => Mage::helper('sales')->__('Rider'),
+                    'width'     => '50px',
+                    'type'      => 'action',
+                    'getter'     => 'getId',
+                    'actions'   => array(
+                        array(
+                            'caption' => Mage::helper('sales')->__('Send To Rider 2'),
+                            'url'     => array('base'=>'marketplace/index/ridertwo'),
+                            'field'   => 'order_id',
+			    'data-column' => 'action',
+			    'target'=>'_blank',
+                        )
+                    ),
+                    'filter'    => false,
+                    'sortable'  => false,
+                    'index'     => 'stores',
+		    'is_system' => true,
+            ));
+            $this->addColumn('rider3',
+                array(
+                    'header'    => Mage::helper('sales')->__('Rider'),
+                    'width'     => '50px',
+                    'type'      => 'action',
+                    'getter'     => 'getId',
+                    'actions'   => array(
+                        array(
+                            'caption' => Mage::helper('sales')->__('Send To Rider 3'),
+                            'url'     => array('base'=>'marketplace/index/riderthree'),
+                            'field'   => 'order_id',
+			    'data-column' => 'action',
+			    'target'=>'_blank',
+                        )
+                    ),
+                    'filter'    => false,
+                    'sortable'  => false,
+                    'index'     => 'stores',
+		    'is_system' => true,
             ));
         }
         $this->addRssList('rss/order/new', Mage::helper('sales')->__('New Order RSS'));

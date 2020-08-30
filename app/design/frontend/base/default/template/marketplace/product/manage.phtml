@@ -314,11 +314,11 @@ echo $this->__('Disabled'); ?></option>
                  * Display edit Option
                  */
                 echo $this->__('Edit') ?>"/></a>               
-               <a style="display:none" href="<?php echo Mage::getUrl('marketplace/product/delete/',array('id' => $_product->getId())); ?>" onclick="return confirm('<?php
+               <a  href="<?php echo Mage::getUrl('marketplace/product/switchStock/',array('id' => $_product->getId())); ?>" onclick="return confirm('<?php
                /**
                 * confirming message before delete
                 */
-               echo $this->__('Are you sure want to delete?'); ?>');" > 
+               echo $this->__('Are you sure want to disable?'); ?>');" > 
                 <img src="<?php echo $this->getSkinUrl('marketplace/images/delete.png') ?>" alt="" title="<?php
                 /**
                  * Display delete option

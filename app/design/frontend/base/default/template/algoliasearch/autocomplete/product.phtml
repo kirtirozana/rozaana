@@ -33,7 +33,7 @@ if ($config->isCustomerGroupsEnabled($storeId)) {
         <div class="info">
             {{{_highlightResult.name.value}}}
 
-            <div class="algoliasearch-autocomplete-category">
+            <div class="algoliasearch-autocomplete-category" style="display:none">
                 {{#categories_without_path}}
                     <?php echo $this->__('in'); ?>
                     {{{categories_without_path}}}
@@ -46,17 +46,17 @@ if ($config->isCustomerGroupsEnabled($storeId)) {
                         </span>
                     {{/_highlightResult.color.value}}
                 {{/_highlightResult.color}}
-            <span class="algoliasearch-autocomplete-price">
-                <span class="after_special {{#price<?php echo $priceKey; ?>_original_formated}}promotion{{/price<?php echo $priceKey; ?>_original_formated}}">
-                    {{price<?php echo $priceKey; ?>_formated}}
-                </span>
-
+            </div>
+            <div class="algoliasearch-autocomplete-price">
+            <span style="font-weight:bold;color:#000">{{{unit}}}</span>
                 {{#price<?php echo $priceKey; ?>_original_formated}}
-                    <span class="before_special">
+                    <span class="before_special" style="padding-left:50px">
                         {{price<?php echo $priceKey; ?>_original_formated}}
                     </span>
                 {{/price<?php echo $priceKey; ?>_original_formated}}
-            </span>
+                <span class="after_special {{#price<?php echo $priceKey; ?>_original_formated}}promotion{{/price<?php echo $priceKey; ?>_original_formated}}">
+                    {{price<?php echo $priceKey; ?>_formated}}
+                </span>
             </div>
 
         </div>

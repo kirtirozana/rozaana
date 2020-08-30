@@ -74,7 +74,7 @@ $currentCategory = Mage::registry('current_category');
 
                         $check_child_class = check_child_par($_category->getId());
                         $collaps = ($check_child_class)? "<span class='show-cat accor'>+</span>" : "";
-                        echo "<li class='".$check_child_class."'>";
+                        echo "<li class='".$check_child_class." cat-".$_category->getId()."'>";
                         echo $collaps."<a href='".$_helper->getCategoryUrl($_category)."'>".$_category->getName();
                         //echo " (".product_count($_category->getId()).")";
                         echo "</a>";

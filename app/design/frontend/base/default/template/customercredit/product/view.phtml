@@ -58,7 +58,7 @@ $currencySymbol = Mage::app()->getLocale()->currency(Mage::app()->getStore()->ge
         ?>
         <div style="float: left;width: 100%;">
             <p class="type1">
-                <label class="required" style="font-size: 15px; font-weight: bold" for="amount"><?php echo $this->__('Enter Credit Value') ?></label>
+                <label class="required" style="font-size: 15px; font-weight: bold" for="amount"><?php echo $this->__('Enter Recharge Value') ?></label>
 
                 <input style="max-width: 135px;" id="credit_amount_range" name="amount" class="input-text required-entry validate-greater-than-zero" onchange="validateInputRange(this);" value="<?php echo number_format(Mage::helper('directory')->currencyConvert($_formData->getCreditPriceAmount(), $baseCurrencyCode, $currentCurrencyCode)/$_creditAmount['storecredit_rate'],2)?>" />
             </p>
@@ -212,3 +212,5 @@ $currencySymbol = Mage::app()->getLocale()->currency(Mage::app()->getStore()->ge
     <p style="float: left;clear: both;padding-bottom: 5px;margin-top: 10px;"></p>
     <?php endif?>
 </div>
+<button type="button" onclick="jQuery('#buy_now').val('buy_now');productAddToCartForm.submit(this)" class="btn btn-block btn-express-buynow"><i class="cart-icon-white m-r-sm v-middle"></i>Recharge</button>
+

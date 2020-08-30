@@ -67,6 +67,7 @@
                 <action method="addItem"><type>skin_js</type><name>js/slideshow.js</name></action>
                 <action method="addItem"><type>skin_js</type><name>js/lib/imagesloaded.js</name></action>
                 <action method="addLinkRel"><rel>stylesheet</rel><href>//fonts.googleapis.com/css?family=Raleway:300,400,500,700,600</href></action>
+                <action method="addLinkRel"><rel>stylesheet</rel><href>https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css</href></action>
                 <action method="addItem"><type>skin_js</type><name>js/minicart.js</name></action>
 
                 <!-- Add stylesheets with no media queries for use in IE 8 and below -->
@@ -79,7 +80,7 @@
 
                 <!-- Sets viewport meta tag using text block -->
                 <block type="core/text" name="head.viewport">
-                    <action method="setText"><text><![CDATA[<meta name="viewport" content="initial-scale=1.0, width=device-width" />]]>&#10;</text></action>
+                    <action method="setText"><text><![CDATA[<meta name="viewport" content="initial-scale=1.0, width=device-width,user-scalable=no,autoRotate:disabled" />]]>&#10;</text></action>
                 </block>
             </block>
 

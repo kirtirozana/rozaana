@@ -99,18 +99,18 @@ if ($helper->enabledLogin()) {
 
     <div class="account-login">
         <div class="page-title">
-            <h1><?php echo $this->__('Login or Create an Account') ?></h1>
+            <h1 style="text-align:center"><?php echo $this->__('Login or Create an Account') ?></h1>
         </div>
         <?php echo $this->getMessagesBlock()->toHtml() ?>
         <form action="<?php echo $this->getPostActionUrl() ?>" method="post" id="login-form">
             <?php echo $this->getBlockHtml('formkey'); ?>
-            <div class="col2-set">
-                <div class="col-1 new-users">
+            <div class="col1-set eree" style="text-align:center">
+                <!--<div class="col-1 new-users ere">
                     <div class="content">
                         <h2><?php echo $this->__('New Customers') ?></h2>
                         <p><?php echo $this->__('By creating an account with our store, you will be able to move through the checkout process faster, store multiple shipping addresses, view and track your orders in your account and more.') ?></p>
                     </div>
-                </div>
+                </div>-->
                 <div class="col-2 registered-users">
                     <div class="content">
                         <h2><?php echo $this->__('Registered Customers') ?></h2>
@@ -145,22 +145,22 @@ if ($helper->enabledLogin()) {
                 </div>
             </div>
             <div class="col2-set">
-                <div class="col-1 new-users">
-                    <div class="buttons-set">
-                        <button type="button"
-                                title="<?php echo Mage::helper('core')->quoteEscape($this->__('Create an Account')) ?>"
-                                class="button"
-                                onclick="window.location='<?php echo Mage::helper('persistent')->getCreateAccountUrl($this->getCreateAccountUrl()) ?>';">
-                            <span><span><?php echo $this->__('Create an Account') ?></span></span></button>
-                    </div>
-                </div>
-                <div class="col-2 registered-users">
+                <div class="registered-users" style="text-align:center">
                     <div class="buttons-set">
                         <a href="<?php echo $this->getForgotPasswordUrl() ?>"
                            class="f-left"><?php echo $this->__('Forgot Your Password?') ?></a>
                         <button type="submit" class="button"
                                 title="<?php echo Mage::helper('core')->quoteEscape($this->__('Login')) ?>" name="send"
                                 id="send2"><span><span><?php echo $this->__('Login') ?></span></span></button>
+                    </div>
+                </div>
+                <div class="col-1 new-users" style="width:100%">
+                    <div class="buttons-set">
+                        <button type="button"
+                                title="<?php echo Mage::helper('core')->quoteEscape($this->__('Create an Account')) ?>"
+                                class="button"
+                                onclick="window.location='<?php echo Mage::helper('persistent')->getCreateAccountUrl($this->getCreateAccountUrl()) ?>';">
+                            <span><span><?php echo $this->__('Create an Account') ?></span></span></button>
                     </div>
                 </div>
             </div>
@@ -183,3 +183,9 @@ $storeurl = Mage::getBaseUrl();
         return '<?php echo $storeurl; ?>';
     }
 </script>
+<style>
+.customer-account-login .col2-set .buttons-set
+{
+text-align:center;
+}
+</style>

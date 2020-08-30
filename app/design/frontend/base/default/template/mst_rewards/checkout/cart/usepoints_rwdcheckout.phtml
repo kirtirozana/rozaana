@@ -11,7 +11,7 @@ if (!$this->getMaxPointsNumberToSpent() || !$this->getIsSpendAllowed()) {
     </li>
 </ul>
 
-<div class="discount" style="background-color: #f4f4f4; padding: 10px;">
+<div class="discount" style="background-color: #f4f4f4; padding: 10px;display:none">
     <h2 <?php if ($this->getIsIntensoTheme()): ?>onclick="overrideIntenso();"<?php endif; ?>><?php echo $this->__('Use Reward Points') ?></h2>
     <div class="discount-form">
         <label for="points_amount"><?php echo $this->__('You have <b>%s</b> available.', Mage::helper('rewards')->formatPoints($this->getBalancePoints())) ?><br>

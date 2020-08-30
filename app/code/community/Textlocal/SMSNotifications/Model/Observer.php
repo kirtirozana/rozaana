@@ -40,6 +40,7 @@ public function NewOrderPlace($observer)
 
 public function salesOrderSaveAfter($observer)
 {
+	return;
 
         $settings = Mage::helper('smsnotifications/data')->getSettings();
         /* array for default order status */
@@ -100,13 +101,14 @@ public function salesOrderSaveAfter($observer)
         if ($order->getCustomerFirstname()) {
             $customer_name = $order->getCustomerFirstname();
             $customer_name .= ' '.$order->getCustomerLastname();
-        } elseif ($billingAdress->getFirstname()) {
+        } /*elseif ($billingAdress->getFirstname()) {
             $customer_name = $billingAdress->getFirstname();
             $customer_name .= ' '.$billingAdress->getLastname();
-        } else {
+	    } else {
             $customer_name = $ShippingAddress->getFirstname();
             $customer_name .= ' '.$ShippingAddress->getLastname();
-        }
+	    }*/
+	else {$customer_name='Dear Customer';}
 
         $order_amount = $order->getBaseCurrencyCode();
         $order_amount  .= ' '.$order->getBaseGrandTotal();

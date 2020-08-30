@@ -391,7 +391,9 @@ return true;
                      * Generate invoice for shippment.
                      */
                     Mage::getModel ( 'sales/order_invoice_api' )->create ( $order->getIncrementId (), $itemsarray, '', 1, 1 );
-                    Mage::getModel ( 'marketplace/order' )->updateSellerOrderItemsBasedOnSellerItems ( $itemsArr, $orderId, 1 );
+		    Mage::getModel ( 'marketplace/order' )->updateSellerOrderItemsBasedOnSellerItems ( $itemsArr, $orderId, 1 );
+		    $order->setStatus('processing');
+		    $order->save();
                     /**
                      * add success message
                      */

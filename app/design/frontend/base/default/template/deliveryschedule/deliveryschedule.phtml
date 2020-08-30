@@ -77,7 +77,7 @@ $currentDay =  Mage::getModel('core/date')->date('D');
          }?>
         </select>
 <div class="delivery" >
-<div class="delivery_schedule_title">
+<div class="delivery_schedule_title" style="display:none";>
 <h6><a id="daysshow-previous" class="daysshow-previous-class" href="#previous" style="display: inline;"><?php echo $this->__('Previous 7 days');?></a>
 <a id="daysshow-next" class="daysshow-next-class" style="display: inline;"><?php echo $this->__('Next 7 days');?></a></h6>
 </div>
@@ -112,15 +112,15 @@ foreach($deliveryScheduleModel as $scheduleTime){
 <div id="slideshow-area" class="slideshow-area-class">
 <div id="slideshow-scroller" class="slideshow-scroller-class" scrollleft="0">
 <div id="slideshow-holder" class="slideshow-holder-class" style="width: 2000px;">
-<?php for($i=1;$i<=4;$i++) {?>
+<?php for($i=1;$i<=2;$i++) {?>
 <div class="slideshow-content contentslider<?php echo $scheduleTypeId; ?>">
 <div class="delivery_schedule_dates_top delivery-schedule-head">
 <ul>
 <?php 
-$weekDays = 7;
+$weekDays = 4;
 $end = $weekDays*$i;
-$start = ($end-$weekDays)+1;
-for($days=$start;$days<=$end;$days++){
+$start = ($end-$weekDays);
+for($days=$start;$days<$end;$days++){
 $currentDate = new Zend_Date(Mage::getModel('core/date')->timestamp());
 $currentDate->addDay($days);
 echo "<li";
@@ -135,7 +135,8 @@ echo ">(".date('D', strtotime($currentDate)).")<span>".date('d/m', strtotime($cu
 </ul>
 </div>
     <div class="delivery_schedule_dates_top select_one">
-<?php 
+<?php
+$k=0;
 foreach($deliveryScheduleModel as $scheduleTime){
     $timeSlotTitle = $scheduleTime->getTitle();
     $timeSlotId = $scheduleTime->getId();
@@ -149,7 +150,7 @@ foreach($deliveryScheduleModel as $scheduleTime){
 ?>    
 <ul>
 <?php 
-for($prices=$start;$prices<=$end;$prices++) 
+for($prices=$start;$prices<$end;$prices++) 
 {
     $currentDate = new Zend_Date(Mage::getModel('core/date')->timestamp());
     $currentDate->addDay($prices);
@@ -196,17 +197,20 @@ if($diasbleRow == 'true'){ ?>
 <li class="disablerow">&nbsp;</li>	
 <?php }else{
     ?>
-    <li class="delivery_schedule_dates_select<?php if($prices%2==0) {
+	    <li id="time-<?php echo date('Y-m-d', strtotime($currentDate));?>-<?php echo $k;?>" class="delivery_schedule_dates_select<?php if($prices%2==0) {
         echo ' oddrow';
     }?>">
     <a href="#select" onclick="selectDdate('<?php echo date('Y-m-d', strtotime($currentDate)); ?>','<?php echo $timeSlotId;?>','<?php echo $displayCost; ?>');jQuery(this).addClass('ddate_day_active');"><?php echo $currencySymbol.$displayCost;?></a>
     </li>
 <?php 
 }
+$j++;
 }?>
 <div class="clear"><span></span></div>
 </ul>
-<?php } ?>
+<?php 
+$k++;
+} ?>
 </div>
 </div>
 <?php } ?>
@@ -231,3 +235,51 @@ if($diasbleRow == 'true'){ ?>
     <?php } ?> 
     </ul> 
 </dd>
+
+	 <script>
+	 function currentdate()
+	 {
+		 var d = new Date();
+
+		 var month = d.getMonth()+1;
+		 var day = d.getDate();
+
+		 var output = d.getFullYear() + '-' +
+			 (month<10 ? '0' : '') + month + '-' +
+			 (day<10 ? '0' : '') + day;
+		 return output;
+	 }
+	 function getHourDiff()
+	 {
+		 var d = new Date();
+		 var n = d.getHours();
+		 return n-10;
+
+	 }
+	 d=currentdate();diff=getHourDiff();
+	 for(i=0;i<diff+2;i++)
+	 {
+		 console.log('time'+d+'-'+i);
+		 jQuery('#time-'+d+'-'+i).html('');
+		 jQuery('#time-'+d+'-'+i).html('<span style="padding:2px">NA</span>');
+		 console.log('hidden3');
+	 }
+		
+	 </script>
+<style>
+.delivery_time
+{
+width:40%
+}
+.delivery_schedule_dates
+{
+width:60%;
+}
+.slideshow-area-class{
+width:auto;
+}
+.delivery_schedule_dates_top ul
+{
+margin-bottom:2px;
+}
+</style>

@@ -35,7 +35,7 @@
 <?php if ($this->isEnableCredit()): ?>
     <form id="customer-credit-form-code" action="<?php echo $this->getUrl('customercredit/checkout/setAmountPost') ?>" method="post">        
         <div class="title-credit">
-            <h2 class="title-credit-label"><?php echo $this->__('Customer Credit') ?></h2>
+            <h2 class="title-credit-label"><?php echo $this->__('Rozaana Wallet') ?></h2>
         </div>
         <?php if (!$this->isLoggedIn()) { ?>            
             <div class="discount">
@@ -45,7 +45,7 @@
                         <div>
                             <div class="checkout-cart-credit-amount">
                                 <p>
-                                    <?php echo $this->__('Please ') . "<a href=\"" . $this->getUrl('customercredit/index/prepareredirect') . "\">" . $this->__('login') . "</a>" . $this->__(' to use customer credit.'); ?>
+                                    <?php echo $this->__('Please ') . "<a href=\"" . $this->getUrl('customercredit/index/prepareredirect') . "\">" . $this->__('login') . "</a>" . $this->__(' to use rozaana wallet.'); ?>
                                 </p>
                             </div>
                         </div>
@@ -92,9 +92,9 @@
                             <?php if ($this->hasCustomerCreditItem()) : ?>
                             <p style="font-weight:bold"><?php echo $this->__('Store Credit cannot be used to purchase Store Credit products ') ?></p>
                             <?php endif; ?>
-                            <p><?php echo $this->__('Your current credit Balance is ') ?><span style="color: #020EBA;"><?php echo $this->getAvaiableCustomerCreditLabel(); ?></span> </p>
+                            <p><?php echo $this->__('Your current Rozaana wallet Balance is ') ?><span style="color: #020EBA;"><?php echo $this->getAvaiableCustomerCreditLabel(); ?></span> </p>
                             <p>
-                                <?php echo $this->__('Enter a credit amount if you want to pay by Customer Credit'); ?>
+                                <?php echo $this->__('Enter a credit amount if you want to pay by Rozaana Wallet'); ?>
                             </p>
                             <div class="input-box">
                                 <input  type="text" class="input-text required-entry validate-number form-control validate-zero-or-greater" id= "checkout-cart-credit-amount-textbox" onchange="checkoutCartCreditAmount()" value="<?php echo number_format($this->getCurrentCreditAmount(),2); ?>" title="<?php echo $this->__('Gift Card Credit') ?>" name="customer_credit" />

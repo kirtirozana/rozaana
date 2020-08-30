@@ -30,8 +30,11 @@
     <div class="add-to-cart">
         <?php if(!$_product->isGrouped()): ?>
         <div class="qty-wrapper">
-            <label for="qty"><?php echo $this->__('Qty:') ?></label>
-            <input type="text" pattern="\d*(\.\d+)?" name="qty" id="qty" maxlength="12" value="<?php echo $this->getProductDefaultQty() * 1 ?>" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Qty')) ?>" class="input-text qty" />
+	    <label for="qty"><?php echo $this->__('Qty:') ?></label>
+		<span id="minus1" class="minus">-</span>
+	    <input type="text" pattern="\d*(\.\d+)?" name="qty" id="qty" maxlength="12" value="<?php echo $this->getProductDefaultQty() * 1 ?>" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Qty')) ?>" class="input-text qty" style="float:none"/>
+		<span id="add1" class="plus">+</span>
+
         </div>
         <?php endif; ?>
         <div class="add-to-cart-buttons">
@@ -40,3 +43,39 @@
         </div>
     </div>
 <?php endif; ?>
+<script type="text/javascript">
+	jQuery('#<?php echo $_product->getId();?>-upt, #<?php echo $_product->getId();?>-dec').on("click",function(){
+	console.log('hihi');
+	});
+
+jQuery(document).ready(function(){
+	console.log('papa');
+	//jQuery("#qty").prepend('<input type="button" value="+" id="minus1" class="minus"   />');
+	//jQuery("#qty").append('<input type="button" value="-" id="add1" class="plus" />');
+    jQuery(".plus").click(function()
+    {
+        var currentVal = parseInt(jQuery("#qty").val());
+
+        if (!currentVal || currentVal=="" || currentVal == "NaN") currentVal = 0;
+
+        jQuery("#qty").val(currentVal + 1);
+    });
+
+    jQuery(".minus").click(function()
+    {
+	    var currentVal = parseInt(jQuery("#qty").val());
+	    console.log(currentVal);
+        if (currentVal == "NaN") currentVal = 0;
+        if (currentVal > 0)
+        {
+            jQuery("#qty").val(currentVal - 1);
+        }
+    });
+	});
+</script>
+<style>
+.plus, .minus
+{
+padding:5px;
+}
+</style>

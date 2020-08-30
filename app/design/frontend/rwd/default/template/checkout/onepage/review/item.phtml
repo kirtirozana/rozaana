@@ -26,7 +26,7 @@
 ?>
 <?php $_item = $this->getItem()?>
 <tr>
-    <td><h3 class="product-name aaaaa"><?php echo $this->escapeHtml($this->getProductName());echo " ";echo $_item->getProduct()->getUnit(); ?></h3>
+<td><h3 class="product-name aaaaa"><?php echo $this->escapeHtml($this->getProductName());echo " "; ?><br/><span><?php echo $_item->getProduct()->getUnit();?></span></h3>
         <?php if ($_options = $this->getOptionList()):?>
         <dl class="item-options">
             <?php foreach ($_options as $_option) : ?>

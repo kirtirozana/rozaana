@@ -77,6 +77,28 @@ class Mage_Ccavenuepay_CcavenuepayController extends Mage_Core_Controller_Front_
      * When a customer chooses Ccavenuepay on Checkout/Payment page
      *
      */
+    public function thankyouAction()
+    {
+	    $websiteId = Mage::app()->getWebsite()->getId();
+	    $orderid=$this->getRequest()->getParam('order_id');
+	    $order=Mage::getModel('sales/order')->loadByIncrementId($orderid);
+	    $customerEmail=$order->getCustomerEmail();
+	    $customer=Mage::getModel('customer/customer')->setWebsiteId($websiteId)->loadByEmail($customerEmail);
+	    $session=Mage::getSingleton('customer/session');
+	    echo 32;
+	    $session->setCustomerAsLoggedIn($customer);
+	    $order->setStatus('payment_received');
+	    $order->save();
+	    $this->loadLayout();
+	    //$this->getLayout()->getBlock('content')->setTemplate('page/1column.phtml');
+	    //    $block = $this->getLayout()->createBlock('cms/block')->setBlockId('thankyou')->setData('order_id',$orderid)->toHtml(); 
+	    //   $this->getLayout()->getBlock('content')->append($block);
+	    $this->getLayout()->createBlock('cms/block')->setBlockId('thankyou')->toHtml();
+            $this->renderLayout();
+ 
+
+
+    }
     public function redirectAction()
     {
 		$session = Mage::getSingleton('checkout/session');
@@ -180,8 +202,9 @@ class Mage_Ccavenuepay_CcavenuepayController extends Mage_Core_Controller_Front_
 		if(isset($response_array['tracking_id']))	$tracking_id	= $response_array['tracking_id'];
 		if(isset($response_array['order_status']))	$order_status	= $response_array['order_status'];
 		if(isset($response_array['currency']))	$currency = $response_array['currency'];
-		if(isset($response_array['mer_amount']))	$amount = round($response_array['mer_amount'], 2);
-
+		if(isset($response_array['amount']))	$amount = number_format($response_array['amount'], 2, '.', '');
+		echo "here1";
+		var_dump($response_array);
 		$order_history_comments ='';
 		$order_history_keys =array('tracking_id','failure_message','payment_mode','card_name','status_code','status_message','bank_ref_no');
 		foreach($order_history_keys as $order_history_key)
@@ -189,7 +212,7 @@ class Mage_Ccavenuepay_CcavenuepayController extends Mage_Core_Controller_Front_
 			if((isset($response_array[$order_history_key]))  && trim($response_array[$order_history_key])!='')
 			{
 				if(trim($response_array[$order_history_key]) == 'null' ) continue;
-				$order_history_comments .= $order_history_key." : ".$response_array[$order_history_key] . ' | ';
+				$order_history_comments .= $order_history_key." : ".$response_array[$order_history_key];
 			}
 		}
 
@@ -200,10 +223,12 @@ class Mage_Ccavenuepay_CcavenuepayController extends Mage_Core_Controller_Front_
 
 		if($order_status == "Success")
 		{
+		echo "here2";
 			$order = Mage::getModel('sales/order')->loadByIncrementId($session->getLastRealOrderId());
 
-			$order_total = round($order->getGrandTotal(), 2);
+			$order_total = number_format($order->getGrandTotal(), 2, '.', '');
             $orderId = $order->getIncrementId();
+		echo $orderId;
 
 			$passed_status = Mage::getStoreConfig('payment/ccavenuepay/payment_success_status');
 			$message = Mage::helper('Ccavenuepay')->__('Your payment is authorized.');
@@ -236,8 +261,10 @@ class Mage_Ccavenuepay_CcavenuepayController extends Mage_Core_Controller_Front_
                 $order->addStatusHistoryComment($order_history_comments, $passed_status);
                 $session->addError('Security Error. Illegal access detected.');
             }
+		echo "here3";
 
 			$order->save();
+		echo "here4";
 
 			$session->setQuoteId($session->getCcavenuepayStandardQuoteId(true));
 			/**
@@ -245,15 +272,19 @@ class Mage_Ccavenuepay_CcavenuepayController extends Mage_Core_Controller_Front_
 			 */
 			$session->getQuote()->setIsActive(false)->save();
 
-			$this->_redirect('checkout/onepage/success', array('_secure'=>true));
+			$this->_redirect('ccavenuepay/ccavenuepay/thankyou', array('_secure'=>true,'order_id'=>$response_array['order_id']));
 		}
 		else 
 		{
+		echo "here5";
 			if ($order_status === "Aborted") {
+		echo "here6";
 			    $error_message = 'CCAvenue Payment has been cancelled and the transaction has been declined.';
-			} else if ($order_status === "Failure" || $order_status === "Initiated") {
+			} else if ($order_status === "Failure") {
+		echo "here7";
 			    $error_message = 'Thank you for shopping with us. However, the transaction has been declined.';
 			} else {
+		echo "here8";
 			    $error_message = 'Security Error. Illegal access detected.';
 			}
 			$order_history_comments_array[] = $error_message;

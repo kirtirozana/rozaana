@@ -19,6 +19,12 @@ $collection = $this->getReferralCollection();
         <h2 class="legend"><?php echo $this->__('Share with Friends') ?></h2>
         <p><?php echo $this->__('Share the referal link in the social media and get points!') ?></p>
         <div class="rewards-social-buttons">
+            <div class="whatsapp">
+                <div class="whatsapp-share-button" data-href="<?php echo $this->getShareUrl() ?>" data-layout="button"><a href="whatsapp://send?text=<?php echo $this->getShareUrl() ?>">Share on Whatsapp</a></div>
+            </div>
+            <div class="sms">
+                <div class="sms-share-button" data-href="<?php echo $this->getShareUrl() ?>" data-layout="button"><a href="sms:?&body=<?php echo $this->getShareUrl() ?>">Share via SMS</a></div>
+            </div>
             <div class="fb">
                 <div class="fb-share-button" data-href="<?php echo $this->getShareUrl() ?>" data-layout="button"></div>
             </div>
@@ -32,7 +38,7 @@ $collection = $this->getReferralCollection();
         </div>
         <div style="clear:both;"></div>
         <br>
-        <p><?php echo $this->__('Your referral link') ?> <input type="text" value="<?php echo $this->getShareUrl()?>" style="width: 500px" readonly></p>
+        <p style="margin-top:40px;"><?php echo $this->__('Your referral link') ?> <input type="text" value="<?php echo $this->getShareUrl()?>" style="width: 500px" readonly></p>
 
     </div>
 

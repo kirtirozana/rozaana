@@ -45,8 +45,9 @@ $productId = $this->getRequest ()->getParam ( 'id' );
  * Checking product id is not equal to empty
  * Initilize product data
  */
+$currentStoreId = Mage::app()->getStore()->getId();
 if (! empty ( $productId )) {
-    $product = $this->getProductData ( $productId );
+    $product = $this->getProductData ( $productId,$currentStoreId );
 }
 /**
  * Initilising product custom options like
@@ -294,7 +295,7 @@ echo $this->__('Product Categories'); ?></h2>
 <div class="field">
 <label for="name" class="required"> <em>*</em> <?php echo $this->__('Name'); ?></label>
 <div class="input-box">
-<input id="name" disabled name="product[name]"
+<input id="name" readonly="readonly" name="product[name]"
 value="<?php
 /**
  * Check the product name is not equal to empty
@@ -318,7 +319,7 @@ echo $this->__('Description'); ?> </label>
 <div class="input-box">
 <textarea id="description" name="product[description]"
 class="required-entry textarea" rows="7" cols="75"
-style="width: 710px;" disabled><?php
+style="width: 710px;" readonly="readonly"><?php
 /**
  * Check the product description is not equal to empty
  * if so display product description
@@ -339,7 +340,7 @@ style="width: 710px;" disabled><?php
 echo $this->__('Short Description'); ?> </label>
 <div class="input-box">
 <textarea id="short_description"
-name="product[short_description]" disabled
+name="product[short_description]" readonly="readonly"
 class="required-entry textarea" rows="7" cols="75"
 style="width: 710px;"><?php
 /**
@@ -367,7 +368,7 @@ style="width: 710px;"><?php
     ?>>
 <label for="weight" class="required"> <em>*</em><?php echo $this->__('Weight'); ?> </label>
 <div class="input-box">
-<input id="weight" name="product[weight]" disabled
+<input id="weight" name="product[weight]" readonly="readonly"
 value="<?php
 /**
  * Check the product weight is set
@@ -402,7 +403,7 @@ type="text"
 echo $this->__('SKU'); ?> </label>
 <div class="input-box">
 <input id="sku_for_avail" name="sku_for_avail" type="hidden" value="<?php echo $productSku; ?>" />
-<input disabled id="sku" onblur="validateSkuForAddProduct();" name="product[sku]"
+<input readonly="readonly" id="sku" onblur="validateSkuForAddProduct();" name="product[sku]"
 value="<?php echo $productSku; ?>"
 class="input-text required-entry" type="text" />
 <div id="category-loading" style="display: none">

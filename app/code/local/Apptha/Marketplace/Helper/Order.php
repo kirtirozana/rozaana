@@ -38,8 +38,36 @@ class Apptha_Marketplace_Helper_Order extends Mage_Core_Helper_Abstract{
      * @return void
      */
 
+	public function sendTelegramNotificationToRider($riderId,$orderId)
+	{
+		$sellerId=22;
+		echo 445;
+		//$orderid=Mage::getModel('sales/order')->loadByIncrementId($incrementId)->getId();
+		$incrementId=Mage::getModel('sales/order')->load($orderId)->getIncrementId();
+		$msg="Attention!! You have received an order!! ";
+		$msg=$msg."Click Here : ";
+		$msg=$msg."<a href='https://rozaanaonline.com/marketplace/index/rider/order_id/$orderId/'>".$incrementId."</a>";
+		$telegramCode='telegramid_'.$sellerId;
+		$chat_id = Mage::getModel('core/variable')->loadByCode($telegramCode)->getPlainValue();
+		$WebsiteURL = "https://api.telegram.org/bot1296688987:AAGSFTX6C3ARrtXBQQu5CMsJd8RJ_8-ok3I";
+		//$Update = file_get_contents($WebsiteURL."/sendMessage?chat_id=$chat_id&text=$msg&parse_mode=html");
+		$params=[
+			'chat_id'=>$chat_id, 
+			'text'=>$msg,
+			'parse_mode'=>'html',
+		];
+		$ch = curl_init($WebsiteURL . '/sendMessage');
+		curl_setopt($ch, CURLOPT_HEADER, false);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, ($params));
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		$result = curl_exec($ch);
+		curl_close($ch);
+	}
 	public function sendTelegramNotification($sellerId,$incrementId)
 	{
+		$sellerId=22;
 		$orderid=Mage::getModel('sales/order')->loadByIncrementId($incrementId)->getId();
 		$msg="Attention!! You have received an order!! ";
 		$msg=$msg."Click Here : ";

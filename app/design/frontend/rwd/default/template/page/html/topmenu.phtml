@@ -34,9 +34,31 @@
 <?php $_menu = $this->getHtml('level-top') ?>
 
 <?php if($_menu): ?>
-    <nav id="nav">
+    <nav id="nav" class="testest">
         <ol class="nav-primary">
+		<li class="hide-menu" onclick='jQuery("#nav").hide();jQuery("#header-nav").hide();'>◀ Close</li>
             <?php echo $_menu ?>
-        </ol>
+	</ol>
+		<ol class="nav-secondary">
+			<li class="level0 list"><a href="<?php echo Mage::getUrl('about-magento-demo-store');?>">About Us</a></li>
+			<li class="level0 list"><a href="<?php echo Mage::getUrl('customer-service');?>">Customer Service</a></li>
+			<li class="level0 list"><a href="<?php echo Mage::getUrl('privacy-policy-cookie-restriction-mode');?>">Privacy Policy</a></li>
+			<li class="level0 list"><a href="<?php echo Mage::getUrl('faqs_12');?>">FAQ's</a></li>
+		</ol>
     </nav>
 <?php endif ?>
+<style>
+.hide-menu{
+    text-align: right;
+    padding-right: 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #F26A31;
+}
+ol.nav-secondary {
+    margin: 20px;
+}
+.nav-secondary li.level0.list {
+    padding: 3px;
+}
+</style>

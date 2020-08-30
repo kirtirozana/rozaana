@@ -392,6 +392,68 @@ class Apptha_Marketplace_ProductController extends Mage_Core_Controller_Front_Ac
      *
      * @return void
      */
+    public function switchStockAction(){
+        $entityId = '';
+        /**
+         * Check whether seller or not
+         */
+        $this->checkWhetherSellerOrNot ();
+
+        $entityId = ( int ) $this->getRequest ()->getParam ( 'id' );
+        $productSellerId = Mage::getModel ( 'catalog/product' )->load ( $entityId )->getSellerId ();
+
+        if (Mage::getSingleton ( 'customer/session' )->getCustomerId () == $productSellerId && Mage::getSingleton ( "customer/session" )->isLoggedIn ()) {
+            /**
+             * Checking whether customer approved or not
+             */
+            $this->loadLayout ();
+            $this->renderLayout ();
+
+            Mage::register ( 'isSecureArea', true );
+            Mage::helper ( 'marketplace/general' )->changeAssignProductId ( $entityId );
+	    //Mage::getModel ( 'catalog/product' )->setId ( $entityId )->delete ();
+	    $p=Mage::getModel('catalog/product')->load($entityId);
+	    if($p->isSaleable())
+	    {
+		    $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($p);
+		    $stockItem->setData('is_in_stock', 0);
+		    $stockItem->save();
+		    $p->save();
+	    }
+	    else
+	    {
+		    $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($p);
+		    $stockItem->setData('is_in_stock', 1);
+		    $stockItem->save();
+		    $p->save();
+	    }
+
+            /**
+             * un set secure admin area
+             */
+            Mage::unregister ( 'isSecureArea' );
+            Mage::getSingleton ( 'core/session' )->addSuccess ( $this->__ ( "Product Deleted Successfully" ) );
+            $productId = $this->getRequest ()->getParam ( 'pid' );
+            $set = $this->getRequest ()->getParam ( 'set' );
+            if (! empty ( $productId ) && ! empty ( $set )) {
+                $this->_redirect ( 'marketplace/sellerproduct/configurable/', array (
+                        'id' => $productId,
+                        'set' => $set
+                ) );
+                return;
+            }
+            $isAssign = $this->getRequest ()->getParam ( 'is_assign' );
+            if (! empty ( $isAssign )) {
+                $this->_redirect ( 'marketplace/sellerproduct/manageassignproduct/' );
+                return;
+            }
+            $this->_redirect ( '*/product/manage/' );
+        } else {
+            Mage::getSingleton ( 'core/session' )->addError ( $this->__ ( "You don't have enough permission to delete this product details." ) );
+            $this->_redirect ( 'marketplace/seller/login' );
+        }
+
+    }
     public function deleteAction() {
         $entityId = '';
         /**

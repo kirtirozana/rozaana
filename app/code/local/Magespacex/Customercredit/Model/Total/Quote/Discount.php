@@ -98,7 +98,7 @@ class Magespacex_Customercredit_Model_Total_Quote_Discount extends Mage_Sales_Mo
         }
         $baseItemsPrice = $baseDiscountTotal;
         if ($helper->getSpendConfig('shipping')) {
-            $shippingDiscount = $address->getBaseShippingAmount() + $address->getBaseShippingTaxAmount() - $address->getBaseShippingDiscountAmount() - $address->getMagespacexBaseDiscountForShipping();
+            $shippingDiscount = $address->getBaseShippingAmount() + $address->getBaseShippingTaxAmount() - $address->getBaseShippingDiscountAmount() - $address->getMagespacexBaseDiscountForShipping()+$address->getDeliveryCost();
             $baseDiscountTotal += $shippingDiscount;
         }
         
@@ -122,7 +122,6 @@ class Magespacex_Customercredit_Model_Total_Quote_Discount extends Mage_Sales_Mo
         $address->setBaseGrandTotal($address->getBaseGrandTotal() - $baseCustomercreditDiscount);
         $address->setCustomercreditDiscount($customercreditDiscount);
         $address->setBaseCustomercreditDiscount($baseCustomercreditDiscount);
-        
         //distribute discount
         $this->_prepareDiscountCreditForAmount($address, $rate, $baseCustomercreditForShipping);
         return $this;

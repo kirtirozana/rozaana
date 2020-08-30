@@ -45,13 +45,14 @@
             <?php else: ?>
                 <span><?php echo $this->__('Remove Item') ?></span>
             <?php endif; ?>
-        <p class="product-name"><?php if ($this->hasProductUrl()): ?><a href="<?php echo $this->getProductUrl() ?>"><?php endif; ?><?php echo $this->escapeHtml($this->getProductName()) ?><?php if ($this->hasProductUrl()): ?></a><?php endif; ?></p>
+    <p class="product-name aha2"><?php if ($this->hasProductUrl()): ?><a href="<?php echo $this->getProductUrl() ?>"><?php endif; ?><?php echo $this->escapeHtml($this->getProductName()) ?><?php if ($this->hasProductUrl()): ?></a><?php endif; ?> </p><p><?php $p=$_item->getProduct()->getResource()->getAttribute('unit')->getFrontend()->getValue($_item->getProduct());echo " $p";?></p>
 
         <table class="info-wrapper">
             <tbody>
                 <tr>
                     <th><?php echo $this->__('Price'); ?></th>
-                    <td>
+		    <td>
+			<span class="cart-discount-price cross" style="text-decoration:line-through;color:#aaa;"><?php echo "₹";echo $_item->getProduct()->getResource()->getAttribute('price')->getFrontend()->getValue($_item->getProduct())+0;?></span>
                         <?php if ($canApplyMsrp): ?>
 
                             <span class="map-cart-sidebar-item"><?php echo $this->__('See price before order confirmation.'); ?></span>
@@ -134,7 +135,8 @@
                 </tr>
                 <tr class="qty-wrapper">
                     <th><?php echo $this->__('Qty'); ?></th>
-                    <td>
+		    <td>
+			<!--<span class="minus-<?php echo $_item->getId(); ?>">-</span>-->
                         <input
                             id="qinput-<?php echo $_item->getId(); ?>"
                             data-link="<?php echo $this->getAjaxUpdateUrl() ?>"
@@ -144,6 +146,7 @@
                             value="<?php echo $this->getQty()?>"
                             <?php if ($this->isOnCheckoutPage()) echo 'disabled'; ?>
                             />
+			<!--<span class="plus-<?php echo $_item->getId(); ?>">+</span>-->
 
                         <button id="qbutton-<?php echo $_item->getId(); ?>"
                                 data-item-id="<?php echo $_item->getId(); ?>"
@@ -189,3 +192,15 @@
 
     </div>
 </li>
+    <script>
+    jQuery().ready(function(){
+	    jQuery(".plus-<?php echo $_item->getId(); ?>").click(function(){
+			var val= jQuery("#qinput-<?php echo $_item->getId(); ?>").val();
+		    console.log(val);
+			jQuery("#qinput-<?php echo $_item->getId(); ?>").val(parseInt(val)+1);
+			val= jQuery("#qinput-<?php echo $_item->getId(); ?>").val();
+			jQuery("#qinput-<?php echo $_item->getId(); ?>").focus();
+		    console.log(val);
+    });
+    });
+    </script>
