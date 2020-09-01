@@ -161,9 +161,11 @@ switch ($select_filter) {
                 <?php
                 if ($_orders->getSize()):
                     foreach ($_orders as $order):
-                        $getOrderId = $order->getOrderId();
+			    $getOrderId = $order->getOrderId();
                         $getSellerId = $order->getSellerId();
-                        $orderDetails = Mage::getModel('sales/order')->load($getOrderId);
+			$orderDetails = Mage::getModel('sales/order')->load($getOrderId);
+			$ooStatus=$orderDetails->getStatus();
+			if($ooStatus=="payment_pending"){continue;}
                         $getProductDetails = $this->getProductDetails($getOrderId,$getSellerId);
                         $orderPrdouctIds = Mage::helper('marketplace/vieworder')->getOrderProductIds(Mage::getSingleton('customer/session')->getId(),$getOrderId);
                         

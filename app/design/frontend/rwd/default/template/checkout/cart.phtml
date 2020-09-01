@@ -34,7 +34,7 @@
 <?php $_priceDisplay = ($this->helper('tax')->displayCartBothPrices()) ? 'display-both-prices' : 'display-single-price'; ?>
 <div class="cart <?php echo $_priceDisplay; ?>">
     <div class="page-title title-buttons">
-        <h1><?php echo $this->__('Shopping Cart') ?></h1>
+        <h1><?php echo $this->__('Shopping Cart.') ?></h1>
         <?php if(!$this->hasError()): ?>
         <ul class="checkout-types top">
         <?php foreach ($this->getMethods('top_methods') as $method): ?>
@@ -175,3 +175,30 @@
     </div>
     <?php echo $this->getChildHtml('crosssell') ?>
 </div>
+
+
+<script type="text/javascript">
+console.log("hello6");
+jQuery(document).ready(function(){
+
+var pin = jQuery("#postcode").val();
+if(pin==="")
+{
+	jQuery("#postcode").val("110010");
+	var pin = jQuery("#postcode").val();
+	console.log('hehe1');
+	console.log(pin);
+	coShippingMethodForm.submit();
+}
+
+if(jQuery("#s_method_tablerate_bestway").length)
+{
+    var ifchecked = jQuery("#s_method_tablerate_bestway").is(":checked");
+    if(!ifchecked)
+    {
+    	jQuery("#s_method_tablerate_bestway").click();
+    	jQuery("#co-shipping-method-form button").click();
+    }
+}
+});
+    </script>

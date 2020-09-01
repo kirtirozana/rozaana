@@ -41,7 +41,6 @@ class Apptha_Marketplace_Helper_Order extends Mage_Core_Helper_Abstract{
 	public function sendTelegramNotificationToRider($riderId,$orderId)
 	{
 		$sellerId=22;
-		echo 445;
 		//$orderid=Mage::getModel('sales/order')->loadByIncrementId($incrementId)->getId();
 		$incrementId=Mage::getModel('sales/order')->load($orderId)->getIncrementId();
 		$msg="Attention!! You have received an order!! ";
@@ -67,7 +66,7 @@ class Apptha_Marketplace_Helper_Order extends Mage_Core_Helper_Abstract{
 	}
 	public function sendTelegramNotification($sellerId,$incrementId)
 	{
-		$sellerId=22;
+		//$sellerId=22;
 		$orderid=Mage::getModel('sales/order')->loadByIncrementId($incrementId)->getId();
 		$msg="Attention!! You have received an order!! ";
 		$msg=$msg."Click Here : ";

@@ -36,10 +36,12 @@
         </div>
         <?php if ($this->canDisplayContainer()): ?>
         </div>
-        <?php endif ?>
+	<?php endif ?>
+	<?php echo $_item->getProduct()->getUnit();?>
     </td>
-    <td class="a-center"><?php echo $_item->getStatus() ?></td>
-    <td class="a-right"><?php echo $this->displayPriceAttribute('original_price') ?></td>
+    <td class="a-center"><?php echo $_item->getStatus();?></td>
+    <!--<td class="a-right"><?php echo $this->displayPriceAttribute('original_price') ?></td>-->
+    <td class="a-right"><?php echo Mage::helper('core')->currency($_item->getProduct()->getPrice()); ?></td>
     <td class="a-right">
         <?php if ($this->helper('tax')->displaySalesBothPrices() || $this->helper('tax')->displaySalesPriceExclTax()): ?>
             <span class="price-excl-tax">

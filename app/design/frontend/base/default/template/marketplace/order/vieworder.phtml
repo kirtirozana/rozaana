@@ -347,7 +347,7 @@ $flagForUpdateInvoice = 1;
 }
 ?>	     	
 	        <tr>
-	            <td><?php echo $item->getName(); ?></td>
+	            <td><?php echo $item->getName();echo " ";echo $item->getProduct()->getUnit();  ?></td>
 	            <td class="a-center">
 	            	<?php echo round($item->getQtyOrdered(),2); ?>
 	            	<input type="hidden" style="width: 30px;"class="input-text qty-item" name="shipment[items][<?php echo $item->getId(); ?>]" value="<?php echo $item->getQtyOrdered(); ?>" >
