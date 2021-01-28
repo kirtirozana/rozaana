@@ -343,7 +343,8 @@ $product->$specificationFunction ( $productData [$dataKey] );
     public function sendCancelOrderBuyerNotification($order) {
         /**
          * Get email template for buyer notification
-         */
+	 */
+	    return;
         $templateIdValueBuyer = ( int ) Mage::getStoreConfig ( 'marketplace/admin_approval_seller_registration/cancel_notification_buyer_template_selection' );
         /**
          * Get order Id from order

@@ -45,6 +45,18 @@
         $_code = $_method->getCode();
 ?>
     <dt id="dt_method_<?php echo $_code ?>">
+	<?php 
+			   //cod verification starts
+    $attr_cod = array();
+    $cartItems = Mage::getSingleton('checkout/session')->getQuote()->getAllItems();
+    foreach ($cartItems as $item) {
+        $attr_cod[] = Mage::getModel('catalog/product')->load($item->getProduct()->getId())->getSku();
+
+    }
+    var_dump($attr_cod);
+    if(in_array('WALLET', $attr_cod) && $_code == 'cashondelivery') {continue; }
+    //cod verification ends
+	?>
     <?php if(!$oneMethod): ?>
         <input id="p_method_<?php echo $_code ?>" value="<?php echo $_code ?>" type="radio" name="payment[method]" title="<?php echo $this->escapeHtml($_method->getTitle()) ?>" onclick="payment.switchMethod('<?php echo $_code ?>')"<?php if($this->getSelectedMethodCode()==$_code): ?> checked="checked"<?php endif; ?> class="radio" />
     <?php else: ?>

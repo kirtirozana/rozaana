@@ -41,6 +41,17 @@ $paymentmethods = Mage::getStoreConfig('onestepcheckout/general/default_payment_
 ?>
 <dl class="sp-methods" id="checkout-payment-method-load">
 <?php foreach ($this->getMethods() as $_method): $_code = $_method->getCode() ?>
+<?php
+    //cod verification starts
+    $attr_cod = array();
+    $cartItems = Mage::getSingleton('checkout/session')->getQuote()->getAllItems();
+    foreach ($cartItems as $item) {
+        $attr_cod[] = Mage::getModel('catalog/product')->load($item->getProduct()->getId())->getSku();
+
+    }
+    if(in_array('WALLET', $attr_cod) && $_code == 'cashondelivery') {continue; }
+    //cod verification ends
+?>
     <dt>
     <?php if( sizeof($this->getMethods()) > 1 ): ?>
         <input id="p_method_<?php echo $_code ?>" value="<?php echo $_code ?>" type="radio" name="payment[method]" title="<?php echo $this->htmlEscape($_method->getTitle()) ?>" onclick="payment.switchMethod('<?php echo $_code ?>')"<?php if($_code==$paymentmethods): ?> checked="checked" <?php endif; ?>  class="radio validate-one-required-by-name" />
