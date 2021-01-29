@@ -213,7 +213,8 @@ class Mirasvit_Rewards_Model_Observer_Order extends Mirasvit_Rewards_Model_Obser
      * @return void
      */
     public function orderCancelAfter($observer)
-    {
+    {	
+	return;
         $order = $observer->getEvent()->getOrder();
         if ($this->_isOrderPaidNow($order)) {
             if ($order->getCustomerId()) {

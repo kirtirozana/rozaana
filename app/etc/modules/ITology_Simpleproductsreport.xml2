@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <ITology_Simpleproductsreport>
+            <active>true</active>
+            <codePool>local</codePool>
+            <depends>
+                <Mage_Reports />
+            </depends>
+        </ITology_Simpleproductsreport>
+    </modules>
+</config>

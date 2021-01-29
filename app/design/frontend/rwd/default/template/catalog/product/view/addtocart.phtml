@@ -25,14 +25,17 @@
  */
 ?>
 <?php $_product = $this->getProduct(); ?>
+<?php $singleQty=Mage::getModel('core/variable')->loadByCode('single_qty_products')->getValue('plain');?>
+<?php     $array[] = str_getcsv($singleQty);
+?>
 <?php $buttonTitle = Mage::helper('core')->quoteEscape($this->__('Add to Cart')); ?>
 <?php if($_product->isSaleable()): ?>
     <div class="add-to-cart">
-        <?php if(!$_product->isGrouped()): ?>
-        <div class="qty-wrapper">
+	<?php if(!$_product->isGrouped()): ?>
+	<div class="qty-wrapper" style="<?php if(in_array($_product->getId(),$array[0])){echo 'display:none';}?>">
 	    <label for="qty"><?php echo $this->__('Qty:') ?></label>
 		<span id="minus1" class="minus">-</span>
-	    <input type="text" pattern="\d*(\.\d+)?" name="qty" id="qty" maxlength="12" value="<?php echo $this->getProductDefaultQty() * 1 ?>" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Qty')) ?>" class="input-text qty" style="float:none"/>
+		<input type="text" pattern="\d*(\.\d+)?" name="qty" id="qty" maxlength="12" value="<?php echo $this->getProductDefaultQty() * 1 ?>" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Qty')) ?>" class="input-text qty" style="float:none" <?php if(in_array($_product->getId(),$array[0])){echo "readonly";}?>/>
 		<span id="add1" class="plus">+</span>
 
         </div>
@@ -45,7 +48,6 @@
 <?php endif; ?>
 <script type="text/javascript">
 	jQuery('#<?php echo $_product->getId();?>-upt, #<?php echo $_product->getId();?>-dec').on("click",function(){
-	console.log('hihi');
 	});
 
 jQuery(document).ready(function(){

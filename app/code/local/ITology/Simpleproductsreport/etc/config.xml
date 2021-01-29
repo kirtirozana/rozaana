@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <ITology_Simpleproductsreport>
+            <version>1.0.0</version>
+        </ITology_Simpleproductsreport>
+    </modules>
+    <global>
+        <blocks>
+            <itology_simpleproductsreport>
+                <class>ITology_Simpleproductsreport_Block</class>
+            </itology_simpleproductsreport>
+        </blocks>
+        <models>
+            <itology_simpleproductsreport>
+                <class>ITology_Simpleproductsreport_Model</class>
+                <resourceModel>itology_simpleproductsreport_resource</resourceModel>
+            </itology_simpleproductsreport>
+            <itology_simpleproductsreport_resource>
+                <class>ITology_Simpleproductsreport_Model_Resource</class>
+            </itology_simpleproductsreport_resource>
+        </models>
+        <helpers>
+            <itology_simpleproductsreport>
+                <class>ITology_Simpleproductsreport_Helper</class>
+            </itology_simpleproductsreport>
+        </helpers>
+    </global>
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <ITology_Simpleproductsreport_Adminhtml after="Mage_Adminhtml">ITology_Simpleproductsreport_Adminhtml</ITology_Simpleproductsreport_Adminhtml>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
+</config>

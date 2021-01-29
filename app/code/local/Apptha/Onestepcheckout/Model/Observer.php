@@ -100,4 +100,53 @@ class Apptha_Onestepcheckout_Model_Observer extends Varien_Object
             }
  
  }
+ public function checkfunction2($observer)
+{
+	if ($observer->getEvent()->getControllerAction()->getFullActionName() == 'checkout_cart_add') {
+		
+		$productId = Mage::app()->getRequest()->getParam('product');
+		$productQuantity = Mage::getModel("cataloginventory/stock_item")->loadByProduct($productId);
+		$product = Mage::getModel('catalog/product')->load($productId);
+		Mage::log("test");
+		Mage::log($productQuantity->getMaxSaleQty());
+        if (Mage::app()->getRequest()->getParam('qty') > $productQuantity->getMaxSaleQty()) {
+            Mage::getSingleton('core/session')->addNotice('The maximum quantity allowed for purchase is 1.');
+            Mage::app()->getResponse()->setRedirect($product->getProductUrl());
+	}
+	
+    }
+
+ }
+
+ public function checkfunction($obj) {
+	 //check if qty is more then 1
+	 $productId=$obj->getProduct()->getId();
+	 $productQuantity = Mage::getModel("cataloginventory/stock_item")->loadByProduct($productId);
+	 $productQuantityMax=$productQuantity->getMaxSaleQty();
+	 Mage::log($productId);
+	 Mage::log($productQuantityMax);
+    if($obj->getProduct()->getQty() >= $productQuantityMax/10) {
+    //set notice to inform the visitor that there is a maximum
+    Mage::getSingleton('core/session')->addNotice('The maximum quantity allowed for purchase isss 1.');
+
+    //get the event
+    $event = $obj->getEvent();
+
+    //get the product we have added
+    $product = $event->getProduct();
+
+    //get the quote item
+    $quoteItem = $event->getQuoteItem();
+
+    //change the qty to 1 allowed
+    $quoteItem->setQty(1);
+    Mage:log('herhehere');
+
+    //recalc totals
+    $quoteItem->getQuote()->collectTotals();
+
+    //save the item
+    $quoteItem->getQuote()->save();
+    }
+ }
 }

@@ -660,7 +660,8 @@ class Apptha_Onestepcheckout_IndexController extends Mage_Core_Controller_Front_
         $quote = $this->getOnepage()->getQuote();
         $couponCode = (string)$this->getRequest()->getParam('code');
 
-        if ($this->getRequest()->getParam('remove') == 1) {
+	if ($this->getRequest()->getParam('remove') == 1) {
+		Mage::getSingleton("checkout/session")->unsetData('cart_coupon_code');
             $couponCode = '';
         }
 

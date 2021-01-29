@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package>
+    <name>Meetanshi_Restrictzip</name>
+    <version>1.0.0</version>
+    <stability>stable</stability>
+    <license uri="http://opensource.org/licenses/osl-3.0.php">OSL v3.0</license>
+    <channel>community</channel>
+    <extends/>
+    <summary>Meetanshi_Restrictzip</summary>
+    <description>Meetanshi_Restrictzip</description>
+    <notes>Meetanshi_Restrictzip</notes>
+    <authors><author><name>Meetanshi</name><user>Meetanshi</user><email>support@meetanshi.com</email></author></authors>
+    <date>2018-10-10</date>
+    <time>11:59:13</time>
+    <contents><target name="magelocal"><dir><dir name="Meetanshi"><dir name="Restrictzip"><dir><dir name="Helper"><file name="Data.php" hash="2bba99b4a253ee0ddae58f2e56da6a58"/></dir><dir name="Model"><dir name="Attribute"><dir name="Data"><file name="Postcode.php" hash="7f9eb4459662bbcd240b81ed17c62938"/></dir></dir><file name="Import.php" hash="e9445f3aa8f7189c13177e73eac35714"/><dir name="Mysql4"><dir name="Restrictzip"><file name="Collection.php" hash="d32981489c2612e44366884521a2bafb"/></dir><file name="Restrictzip.php" hash="98edc0911dc4f2c78a8b5fcf945ffb10"/></dir><file name="Restrictzip.php" hash="7c8dfd06e15b775f4f2d29c12765e85c"/><file name="Upload.php" hash="86bfaef3c459b3dcaf762574e861db68"/></dir><dir name="controllers"><file name="RestrictzipController.php" hash="87bb52c78c1b7e995110675b91e3eec2"/></dir><dir name="etc"><file name="adminhtml.xml" hash="5fad87bf427347d29d6db7fcb87a4628"/><file name="config.xml" hash="7b6c2109a111af16f6db00198372b992"/><file name="system.xml" hash="025589c079daac8efe4c04d66593d12c"/></dir><dir name="sql"><dir name="restrictzip_setup"><file name="mysql4-install-1.0.0.php" hash="db1c8a13d3f68495e9204478eedbe8f4"/></dir></dir></dir></dir></dir></dir></target><target name="mageetc"><dir><dir name="modules"><file name="Meetanshi_Restrictzip.xml" hash="81d07b3cfa3c1d7c46eaf722147090ee"/></dir></dir></target><target name="magedesign"><dir><dir name="frontend"><dir name="base"><dir name="default"><dir name="layout"><file name="restrictzip.xml" hash="eae62da351167bc6f3dc5f115da87d1f"/></dir><dir name="template"><dir name="restrictzip"><file name="restrictzip.phtml" hash="acaf0b5353e20155cb7c4852bffdf2c3"/></dir></dir></dir></dir></dir></dir></target><target name="mageskin"><dir><dir name="frontend"><dir name="base"><dir name="default"><dir name="meetanshi"><file name="loading.gif" hash="c5630964b217b964ed650d2ababa7187"/></dir></dir></dir></dir></dir></target><target name="mageweb"><dir name="\"><file name="sample_import.csv" hash="2bec01500242e51b1766b08bfbaea56f"/></dir></target></contents>
+    <compatible/>
+    <dependencies><required><php><min>5.2.0</min><max>7.1.0</max></php></required></dependencies>
+</package>

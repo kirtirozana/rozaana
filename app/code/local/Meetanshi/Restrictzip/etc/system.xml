@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<config>
+	<tabs>
+        <meetanshi translate="label">
+            <label><![CDATA[<img src="https://meetanshi.com/media/logo.png" alt="Meetanshi" height="15" style="vertical-align:middle;"/>]]></label>
+            <sort_order>30</sort_order>
+        </meetanshi>
+    </tabs>
+	<sections>
+		<restrictzip translate="label" module="restrictzip">
+            <label>Restrict Zip Codes</label>
+            <tab>meetanshi</tab>
+            <sort_order>10</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+			<groups>
+				<restrictzip translate="label" module="restrictzip">
+					<label>Configuration</label>
+					<frontend_type>text</frontend_type>
+					<sort_order>1000</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>1</show_in_website>
+					<show_in_store>1</show_in_store>
+					<fields>
+						<active translate="label">
+							<label>Restrict Zip Codes</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_enabledisable</source_model>
+							<sort_order>10</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</active>
+						<showdelivery translate="label">
+							<label>Show Estimated Delivery Time </label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<sort_order>20</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</showdelivery>
+						<title translate="label">
+							<label>Zip Code Checker Message</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>25</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</title>
+						<delsuc translate="label">
+							<label>Delivery Availability Message</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>30</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</delsuc>
+						<delerr translate="label">
+							<label>Delivery Unavailability Message</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>40</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</delerr>
+						<import translate="label">
+							<label>Import Zip Codes CSV</label>
+							<frontend_type>import</frontend_type>
+							<backend_model>restrictzip/upload</backend_model>
+							<sort_order>50</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+							<comment><![CDATA[Upload a CSV file with all the ZIP Codes to allow along with estimated delivery time. You can find sample CSV in the extension package. ]]></comment>
+						</import>
+					</fields>
+				</restrictzip>
+			</groups>
+		</restrictzip>
+	</sections>
+</config>

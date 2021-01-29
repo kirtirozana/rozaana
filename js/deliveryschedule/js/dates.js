@@ -29,10 +29,12 @@
 /**
  * SelectDdate() - used to highlight the selected slot 
  */
-function selectDdate(date, dtime, cost){
+function selectDdate(date, dtime, cost,k){
         document.getElementById('shipping_delivery_date').value = date;
         document.getElementById('shipping_delivery_time').value = dtime;
         document.getElementById('shipping_delivery_cost').value = cost;
+        document.getElementById('roz_shipping_delivery_date').innerHTML = formatDate(date);
+        document.getElementById('roz_shipping_delivery_time').innerHTML = formatTime(dtime,k);
         jQuery('#slideshow-holder ul li a').removeClass('ddate_day_active');
     }
 /**
@@ -42,4 +44,27 @@ function selectScheduleType(current){
     jQuery('#current_slot_slide').val(current);
     jQuery('.delivery_schedule_time').attr('style','display:none;');
     jQuery('#slidediv_'+current).attr('style','display:block;');
+}
+
+
+
+function formatDate(date) {
+    var d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2) 
+        month = '0' + month;
+    if (day.length < 2) 
+        day = '0' + day;
+
+    return [day, month,year].join('-');
+}
+
+
+
+function formatTime(time,k) 
+{   var nodelistValue = document.querySelectorAll(".delivery_time > p");
+    return nodelistValue[k].innerHTML;
 }

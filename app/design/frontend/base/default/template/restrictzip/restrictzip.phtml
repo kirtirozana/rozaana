@@ -1,0 +1,162 @@
+<div id="meetanshi-restrictzip">
+    <ul class="messages cod-available">
+        <li class="success-msg">
+            <ul>
+                <li>
+                    <span>
+					<?php echo $this->__(Mage::helper('restrictzip')->getSuccessMsg()) ?> 
+                    </span>
+                </li>
+            </ul>
+        </li>
+    </ul>
+	<ul class="messages cod-available">
+        <li class="success-msg"   style="display:<?php echo Mage::helper('restrictzip')->isShowDelivery();?>">
+            <ul>
+                <li><span id="extpected_delivery_time"> </span>
+                </li>
+            </ul>
+        </li>
+    </ul>
+    <ul class="messages cod-not-available">
+        <li class="error-msg">
+            <ul>
+                <li><span>
+                        <?php echo $this->__(Mage::helper('restrictzip')->getErrorMsg()) ?>
+                    </span>
+                </li>
+            </ul>
+        </li>
+    </ul>
+    <ul class="messages cod-validation">
+        <li class="error-msg">
+            <ul>
+                <li><span><?php echo $this->__('Please enter a ZIP code.')?></span></li>
+            </ul>
+        </li>
+    </ul>
+    <ul class="messages cod-error">
+        <li class="error-msg">
+            <ul>
+                <li>
+                    <span>
+                        <?php echo $this->__('There was a problem while checking for COD availability. 
+                        Please try again after some time.')?>
+                    </span>
+                </li>
+            </ul>
+        </li>
+    </ul>
+    <h4>
+        <?php echo $this->__(Mage::helper('restrictzip')->getTitle())?>
+    </h4>
+    <label for="meetanshi-zip"><?php echo $this->__('ZIP Code')?></label>
+    <input id="meetanshi-zip" type="text" name="zip_code" value="" maxlength="10" class="input-text"/>
+
+    <button class="button check-zip" type="button" class="button"><span><span><?php echo $this->__('Check')?></span></span></button>
+
+    <img src="<?php echo $this->getSkinUrl('meetanshi/loading.gif'); ?>" width="20" height="20"
+         alt="" class="loading-spinner"/>
+</div>
+<script type="text/javascript">
+    var meetanshi_restrictzip_ajax_url = '<?php echo $this->getUrl('restrictzip/restrictzip'); ?>';
+</script>
+
+<style>
+#meetanshi-restrictzip {
+	padding: 15px;
+	border: 1px solid #CCC;
+	margin-bottom: 15px;
+}
+#meetanshi-restrictzip .input-text {
+  height: 38px;
+  width: 100px;
+}
+.button.check-zip {
+  height: 38px;
+}
+#meetanshi-restrictzip .cod-available,
+#meetanshi-restrictzip .cod-not-available,
+#meetanshi-restrictzip .cod-validation,
+#meetanshi-restrictzip .cod-error,
+#meetanshi-restrictzip .loading-spinner {
+	display: none;
+}
+</style>
+
+
+<script>
+document.observe( 'dom:loaded', function() {
+
+	$$( '#meetanshi-restrictzip .check-zip' ).invoke( 'observe', 'click', function( e ) {
+		var the_zip_code = $( 'meetanshi-zip' ).value;
+		if ( the_zip_code == '' ) {
+			$$( '#meetanshi-restrictzip .cod-available' ).each( function (e) { e.setStyle({ display: 'none' }); } );
+			$$( '#meetanshi-restrictzip .cod-not-available' ).each( function (e) { e.setStyle({ display: 'none' }); } );
+			$$( '#meetanshi-restrictzip .cod-validation' ).each( function (e) { e.setStyle({ display: 'block' }); } );
+			$$( '#meetanshi-restrictzip .cod-error' ).each( function (e) { e.setStyle({ display: 'none' }); } );
+
+			return;
+		}
+
+		$$( '#meetanshi-restrictzip .loading-spinner' ).each( function (e) { e.setStyle({ display: 'inline-block' }); } );
+		$$( '#meetanshi-restrictzip .cod-available' ).each( function (e) { e.setStyle({ display: 'none' }); } );
+		$$( '#meetanshi-restrictzip .cod-not-available' ).each( function (e) { e.setStyle({ display: 'none' }); } );
+		$$( '#meetanshi-restrictzip .cod-validation' ).each( function (e) { e.setStyle({ display: 'none' }); } );
+		$$( '#meetanshi-restrictzip .cod-error' ).each( function (e) { e.setStyle({ display: 'none' }); } );
+
+		// Send an AJAX request
+		new Ajax.Request( meetanshi_restrictzip_ajax_url, {
+			method: 'post',
+			parameters: { zip_code: the_zip_code },
+			asynchronous: true,
+			onSuccess: function( response ) {
+				var json_response = response.responseText.evalJSON();
+				
+				
+				if ( json_response.status == 'success' ) {
+					if ( json_response.allowed_zip == true ) {
+						$$( '#meetanshi-restrictzip .cod-available' ).each( function (e) { e.setStyle({ display: 'block' }); } );
+						
+						$$( '#meetanshi-restrictzip .cod-not-available' ).each( function (e) { e.setStyle({ display: 'none' }); } );
+						$$( '#meetanshi-restrictzip .cod-validation' ).each( function (e) { e.setStyle({ display: 'none' }); } );
+						$$( '#meetanshi-restrictzip .cod-error' ).each( function (e) { e.setStyle({ display: 'none' }); } );
+						
+						document.getElementById("extpected_delivery_time").innerHTML = "Estimated Delivery Time : "+json_response.estimate_delivery_time;						
+					}
+					else {
+						$$( '#meetanshi-restrictzip .cod-available' ).each( function (e) { e.setStyle({ display: 'none' }); } );
+						$$( '#meetanshi-restrictzip .cod-not-available' ).each( function (e) { e.setStyle({ display: 'block' }); } );
+						$$( '#meetanshi-restrictzip .cod-validation' ).each( function (e) { e.setStyle({ display: 'none' }); } );
+						$$( '#meetanshi-restrictzip .cod-error' ).each( function (e) { e.setStyle({ display: 'none' }); } );
+					}
+				}
+				else {
+					$$( '#meetanshi-restrictzip .cod-available' ).each( function (e) { e.setStyle({ display: 'none' }); } );
+					$$( '#meetanshi-restrictzip .cod-not-available' ).each( function (e) { e.setStyle({ display: 'none' }); } );
+					$$( '#meetanshi-restrictzip .cod-validation' ).each( function (e) { e.setStyle({ display: 'none' }); } );
+					$$( '#meetanshi-restrictzip .cod-error' ).each( function (e) { e.setStyle({ display: 'block' }); } );
+				}
+
+				$$( '#meetanshi-restrictzip .loading-spinner' ).each( function (e) { e.setStyle({ display: 'none' }); } );
+			},
+			onException: function( request, ex ) {
+				//alert( ex.toSource() );
+			},
+			onFailure: function() {
+				$$( '#meetanshi-restrictzip .cod-available' ).each( function (e) { e.setStyle({ display: 'none' }); } );
+				$$( '#meetanshi-restrictzip .cod-not-available' ).each( function (e) { e.setStyle({ display: 'none' }); } );
+				$$( '#meetanshi-restrictzip .cod-validation' ).each( function (e) { e.setStyle({ display: 'none' }); } );
+				$$( '#meetanshi-restrictzip .cod-error' ).each( function (e) { e.setStyle({ display: 'block' }); } );
+
+				$$( '#meetanshi-restrictzip .loading-spinner' ).each( function (e) { e.setStyle({ display: 'none' }); } );
+			}
+		});
+
+
+		e.stop();
+	});
+
+});
+
+</script>

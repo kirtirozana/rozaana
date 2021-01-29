@@ -158,7 +158,6 @@
                     <?php if($slide->getData('hosted_url') != "" || $slide->getData('filename') != "") { ?>
                         <li><?php if($slide->getUrl()) {?><a
                     href="<?php echo $slide->getUrl(); ?>"
-                    title="<?php echo $slide->getUrl(); ?>"
                     target="<?php if($slide->getUrlTarget() == "new_window") { echo "_blank"; 
                    } ?>"><?php 
                        } ?><img
@@ -244,7 +243,6 @@
                     <?php if($slide->getData('hosted_thumb') != "" || $slide->getData('filename') != "") { ?>
                             <li><?php if($slide->getUrl()) {?><a
                     href="<?php echo $slide->getUrl(); ?>"
-                    title="<?php echo $slide->getUrl(); ?>"
                     target="<?php if($slide->getUrlTarget() == "new_window") { echo "_blank"; 
                    } ?>"><?php 
                            } ?><img

@@ -961,7 +961,7 @@ class Mage_Checkout_Model_Type_Onepage
      */
     protected function _setCartCouponCode()
     {
-        if ($couponCode = $this->getCheckout()->getCartCouponCode()) {
+        if ($couponCode = $this->getCheckout()->getQuote()->getCartCouponCode()) {
             $this->getQuote()->setCouponCode($couponCode);
         }
         return $this;

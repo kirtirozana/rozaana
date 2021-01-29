@@ -267,6 +267,7 @@ Review.prototype = {
     loadingbox: function () {
          var translate = Translator.translate('processing').stripTags();
         $("review-please").update(' <div class="please-wait-loading">&nbsp;</div><span class="load-wait">'+translate+'</span>')
+
     var form = $('review-btn');
     form.disabled='true';
   

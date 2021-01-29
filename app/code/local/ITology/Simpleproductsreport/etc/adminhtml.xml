@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<config>
+    <menu>
+        <report>
+            <children>
+                <products>
+                    <children>
+                        <bestsellers>
+                            <sort_order>10</sort_order>
+                        </bestsellers>
+                        <sold>
+                            <sort_order>20</sort_order>
+                        </sold>
+                        <simple_sold translate="title" module="itology_simpleproductsreport">
+                            <title>Total by Simple Products</title>
+                            <action>adminhtml/simpleproductsreport/index</action>
+                            <sort_order>30</sort_order>
+                        </simple_sold>
+                        <viewed translate="title" module="reports">
+                            <sort_order>40</sort_order>
+                        </viewed>
+                        <lowstock translate="title" module="reports">
+                            <sort_order>50</sort_order>
+                        </lowstock>
+                    </children>
+                </products>
+            </children>
+        </report>
+    </menu>
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <report>
+                        <children>
+                            <products>
+                                <children>
+                                    <simple_sold translate="title">
+                                        <title>Total by Simple Products</title>
+                                    </simple_sold>
+                                </children>
+                            </products>
+                        </children>
+                    </report>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+</config>

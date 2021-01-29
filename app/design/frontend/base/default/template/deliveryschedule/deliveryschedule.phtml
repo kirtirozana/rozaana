@@ -200,7 +200,7 @@ if($diasbleRow == 'true'){ ?>
 	    <li id="time-<?php echo date('Y-m-d', strtotime($currentDate));?>-<?php echo $k;?>" class="delivery_schedule_dates_select<?php if($prices%2==0) {
         echo ' oddrow';
     }?>">
-    <a href="#select" onclick="selectDdate('<?php echo date('Y-m-d', strtotime($currentDate)); ?>','<?php echo $timeSlotId;?>','<?php echo $displayCost; ?>');jQuery(this).addClass('ddate_day_active');"><?php echo $currencySymbol.$displayCost;?></a>
+    <a href="#select" onclick="selectDdate('<?php echo date('Y-m-d', strtotime($currentDate)); ?>','<?php echo $timeSlotId;?>','<?php echo $displayCost; ?>','<?php echo $k;?>');jQuery(this).addClass('ddate_day_active');"><?php echo $currencySymbol.$displayCost;?></a>
     </li>
 <?php 
 }
@@ -223,6 +223,7 @@ $k++;
 <?php $increment++;
  } ?>
 </div>
+    <div><p style="font-weight: 600;font-size: 16px;padding: 5px 12px 0px;color: green;">Delivery Date & Time : <span id="roz_shipping_delivery_date"></span> , <span id="roz_shipping_delivery_time"></span></p></div>
     <ul class="checkout-shipping-schedule">
     <input type="hidden" id="shipping_delivery_date" name="shipping_delivery_date" class="required-entry"/>
     <input type="hidden" id="shipping_delivery_time" name="shipping_delivery_time"/>
@@ -259,10 +260,10 @@ $k++;
 	 d=currentdate();diff=getHourDiff();
 	 for(i=0;i<diff+2;i++)
 	 {
-		 console.log('time'+d+'-'+i);
+		 //console.log('time'+d+'-'+i);
 		 jQuery('#time-'+d+'-'+i).html('');
 		 jQuery('#time-'+d+'-'+i).html('<span style="padding:2px">NA</span>');
-		 console.log('hidden3');
+		 //console.log('hidden3');
 	 }
 		
 	 </script>
