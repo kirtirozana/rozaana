@@ -234,11 +234,6 @@ Object.extend(Validation, {
                 advice.addClassName('advice-absolute');
             }
         }
-
-        console.log(advice.id);
-        console.log('#'+advice.id);
-        $('#'+advice.id).focus();
-        $('#'+advice.id).addClassName('puneet');
     },
     hideAdvice : function(elm, advice){
         if (advice != null) {
@@ -287,8 +282,8 @@ Object.extend(Validation, {
                     advice = this.createAdvice(name, elm, useTitle);
                 }
                 this.showAdvice(elm, advice, name);
-                console.log('hi');
-                console.log("elemeID--"+elemeID);
+                //console.log('hi');
+                //console.log("elemeID--"+elemeID);
                 this.updateCallback(elm, 'failed');
             //}
             elm[prop] = 1;
@@ -425,7 +420,7 @@ Validation.addAllThese([
 	['validate-select', 'Please select an option.', function(v) {
                 return ((v != "none") && (v != null) && (v.length != 0));
             }],
-    ['required-entry', 'This is a required fields. please select time and date slot', function(v) {
+    ['required-entry', 'This is a required fields.', function(v) {
                 return !Validation.get('IsEmpty').test(v);
             }],
     ['validate-number', 'Please enter a valid number in this field.', function(v) {
