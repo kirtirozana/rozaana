@@ -96,7 +96,7 @@ class Mage_Ccavenuepay_CcavenuepayController extends Mage_Core_Controller_Front_
 	    //$this->renderLayout();
 	    $orderno=$order->getId();
 	    $order->sendNewOrderEmail();
- 		echo "<div class='thank'>We have recieved your order no <a href='https://rozaanaonline.com/sales/order/view/order_id/$orderno/'>$orderid</a>. Click <a href='https://rozaanaonline.com/'>here</a> to continue shopping.</div>";
+ 		echo "<div class='thank' style='text-align: center; margin-top: 300px; font-size: 33px;'>We have recieved your order no <a href='https://rozaanaonline.com/sales/order/view/order_id/$orderno/'>$orderid</a>. Click <a href='https://rozaanaonline.com/'>here</a> to continue shopping.</div>";
 
 
     }
