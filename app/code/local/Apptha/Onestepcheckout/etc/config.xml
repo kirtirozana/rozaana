@@ -70,7 +70,16 @@
                         <method>save_newsletter_checkout</method>
                     </onestepcheckout>
                 </observers>
-            </checkout_type_onepage_save_order>
+	</checkout_type_onepage_save_order>
+	<checkout_cart_product_add_after>
+		<observers>
+                    <onestepcheckout>
+				<type>singleton</type>
+                        	<class>onestepcheckout/observer</class>
+				<method>checkfunction</method>
+                    </onestepcheckout>
+		</observers>
+	</checkout_cart_product_add_after>
         </events>
          <secure_url>
             <checkout_cart>/checkout/cart</checkout_cart>
