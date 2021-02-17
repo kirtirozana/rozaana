@@ -41,7 +41,8 @@ $getGroupId = Mage::helper('marketplace')->getGroupId();
 $customer = Mage::getSingleton("customer/session")->getCustomer();
  $customerStatus = $customer->getCustomerstatus();
 ?>
-<div class="block block-account">
+
+<div class="block block-account" id="market-sandy">
     <div class="block-title">
         <strong><span><?php echo Mage::helper('marketplace')->__('Market Place') ?></span></strong>
     </div>
