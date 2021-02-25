@@ -45,4 +45,112 @@
             <?php echo $this->renderTotals(); ?>
         </tbody>
     </table>
+    <div class="shopping-cart-price-block">
+         <?php $quote = Mage::getModel('checkout/session')->getQuote();
+            $quoteData= $quote->getData();
+            
+            $appliedRuleIds = Mage::getSingleton('checkout/session')->getQuote()->getAppliedRuleIds();
+            $shopping_cart_rule_ids = array('15','16','17','27');
+            $appliedRuleIds = explode(',', $appliedRuleIds);
+            $result_id = array_values(array_intersect($shopping_cart_rule_ids,$appliedRuleIds));
+
+            if(!empty($result_id[0]))
+            {
+                $oRule = Mage::getModel('salesrule/rule')->load($result_id[0]);
+                $shopping_rule_condition = unserialize($oRule->getConditionsSerialized());
+
+                $min_shopping_price = $shopping_rule_condition['conditions'][0]['value'];
+                $max_shopping_price = $shopping_rule_condition['conditions'][1]['value'];
+
+                if($result_id[0] == 15)
+                {
+                    $oRule = Mage::getModel('salesrule/rule')->load('16');
+                    $shopping_rule_condition = unserialize($oRule->getConditionsSerialized());
+                    $discount_percentage = "7%";
+                    $condition_max_eligible_shopping = $shopping_rule_condition['conditions'][0]['value'];
+                    
+                $min_price = abs($quoteData['subtotal'] - $condition_max_eligible_shopping);
+                $message =  "Add " .$this->helper('checkout')->formatPrice($min_price) ." more to get <span class='more_discount_percentage'>" .$discount_percentage ."</span> off";
+                }
+                else if($result_id[0] == 16)
+                {
+                    $oRule = Mage::getModel('salesrule/rule')->load('17');
+                    $shopping_rule_condition = unserialize($oRule->getConditionsSerialized());
+                    $discount_percentage = "10%";
+                    $condition_max_eligible_shopping = $shopping_rule_condition['conditions'][0]['value'];
+                    
+                $min_price = abs($quoteData['subtotal'] - $condition_max_eligible_shopping);
+                $message =  "Add " .$this->helper('checkout')->formatPrice($min_price) ." more to get <span class='more_discount_percentage'>" .$discount_percentage ."</span> off";
+                }
+                else if($result_id[0] == 17 && $quoteData['subtotal'] < 1500 )
+                {
+                    $oRule = Mage::getModel('salesrule/rule')->load('17');
+                    $shopping_rule_condition = unserialize($oRule->getConditionsSerialized());
+                    $discount_percentage = "10%";
+                    $condition_max_eligible_shopping = $shopping_rule_condition['conditions'][0]['value'];
+                    
+                $min_price = abs($quoteData['subtotal'] - $condition_max_eligible_shopping);
+                $message =  "Add " .$this->helper('checkout')->formatPrice($min_price) ." more to get <span class='more_discount_percentage'>" .$discount_percentage ."</span> off";
+                }
+                else if($result_id[0] == 17 && $quoteData['subtotal'] > 1500 )
+                {
+                    $percentage = 100;
+
+                    $min_shopping_price = 0;
+                    $max_shopping_price = 1501;
+                    $message = "You have succesfully Qualified for maxium current discount available in the store";
+                }
+                else if($result_id[0] == 27)
+                {
+                    $oRule = Mage::getModel('salesrule/rule')->load('15');
+                    $shopping_rule_condition = unserialize($oRule->getConditionsSerialized());
+                    $discount_percentage = "5%";
+                    $condition_max_eligible_shopping = $shopping_rule_condition['conditions'][0]['value'];
+                    
+                $min_price = abs($quoteData['subtotal'] - $condition_max_eligible_shopping);
+                $message =  "Add " .$this->helper('checkout')->formatPrice($min_price) ." more to get <span class='more_discount_percentage'>" .$discount_percentage ."</span> off";
+                }            
+            }
+            else
+            {
+                $oRule = Mage::getModel('salesrule/rule')->load('15');
+                $shopping_rule_condition = unserialize($oRule->getConditionsSerialized());
+                $discount_percentage = "5%";
+                $condition_max_eligible_shopping = $shopping_rule_condition['conditions'][0]['value'];
+                $min_price = abs($quoteData['subtotal'] - $condition_max_eligible_shopping);
+                $message =  "Add " .$this->helper('checkout')->formatPrice($min_price) ." more to get <span class='more_discount_percentage'>" .$discount_percentage ."</span> off";
+                $max_shopping_price = 500;
+                $min_shopping_price = 5;
+
+            }
+
+            if($quoteData['subtotal'] > 1500)
+            {
+                $percentage = 100;
+            }else
+            {
+                $range = $max_shopping_price - $min_shopping_price;
+                $correctedStartValue = $quoteData['subtotal'] - $min_shopping_price;
+                $percentage = ($correctedStartValue * 100) / $range;
+            }
+        ?>
+        <div class="shopping_cart_rule">
+            <div class="range">
+                <span class="min-range"><?php echo $this->helper('checkout')->formatPrice($min_shopping_price);?></span>
+                <span class="max-range"><?php echo $this->helper('checkout')->formatPrice($max_shopping_price);?></span>
+            </div>
+            <div class="progress">
+                <div class="progress-bar purchase" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" style="width:<?php echo round($percentage,0,PHP_ROUND_HALF_UP)."%"; ?>">
+                </div>
+            </div>
+            <div class="info-block">
+                <div class="block-info"><?php echo $message; ?> </div>
+            </div>
+        </div>
+    </div>
+
 <?php endif; ?>
+
+
+
+
