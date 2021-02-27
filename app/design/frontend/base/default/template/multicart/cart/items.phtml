@@ -397,14 +397,18 @@ if(empty($_cartQty)) {
             </p>
         </div>
     <div class="shopping-cart-price-block">
-         <?php $quote = Mage::getModel('checkout/session')->getQuote();
+         <?php 
+          Mage::getSingleton('checkout/session')->unsetAll();
+          $quote = Mage::getModel('checkout/session')->getQuote();
+            
             $quoteData= $quote->getData();
             
             $appliedRuleIds = Mage::getSingleton('checkout/session')->getQuote()->getAppliedRuleIds();
-            $shopping_cart_rule_ids = array('15','16','17','27');
+            $shopping_cart_rule_ids = array('15','16','17');
             $appliedRuleIds = explode(',', $appliedRuleIds);
             $result_id = array_values(array_intersect($shopping_cart_rule_ids,$appliedRuleIds));
 
+            
             if(!empty($result_id[0]))
             {
                 $oRule = Mage::getModel('salesrule/rule')->load($result_id[0]);
@@ -464,20 +468,19 @@ if(empty($_cartQty)) {
             }
             else
             {
-                $oRule = Mage::getModel('salesrule/rule')->load('15');
-                $shopping_rule_condition = unserialize($oRule->getConditionsSerialized());
-                $discount_percentage = "5%";
-                $condition_max_eligible_shopping = $shopping_rule_condition['conditions'][0]['value'];
-                $min_price = abs($quoteData['subtotal'] - $condition_max_eligible_shopping);
-                $message =  "Add " .$this->helper('checkout')->formatPrice($min_price) ." more to get <span class='more_discount_percentage'>" .$discount_percentage ."</span> off";
-                $max_shopping_price = 500;
-                $min_shopping_price = 5;
-
+              $oRule = Mage::getModel('salesrule/rule')->load('15');
+              $shopping_rule_condition = unserialize($oRule->getConditionsSerialized());
+              $discount_percentage = "5%";
+              $condition_max_eligible_shopping = $shopping_rule_condition['conditions'][0]['value'];
+              $min_price = abs($quoteData['subtotal'] - $condition_max_eligible_shopping);
+              $message =  "Add " .$this->helper('checkout')->formatPrice($min_price) ." more to get <span class='more_discount_percentage'>" .$discount_percentage ."</span> off";
+              $max_shopping_price = 501;
+              $min_shopping_price = 5;
             }
 
             if($quoteData['subtotal'] > 1500)
             {
-                $percentage = 100;
+              $percentage = 100;
             }else
             {
                 $range = $max_shopping_price - $min_shopping_price;

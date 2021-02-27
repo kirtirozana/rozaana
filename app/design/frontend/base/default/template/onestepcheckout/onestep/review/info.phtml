@@ -64,11 +64,13 @@
         </tbody>
     </table>
      <div class="shopping-cart-price-block">
-         <?php $quote = Mage::getModel('checkout/session')->getQuote();
+         <?php 
+            Mage::getSingleton('checkout/session')->unsetAll();
+            $quote = Mage::getModel('checkout/session')->getQuote();
             $quoteData= $quote->getData();
             
             $appliedRuleIds = Mage::getSingleton('checkout/session')->getQuote()->getAppliedRuleIds();
-            $shopping_cart_rule_ids = array('15','16','17','27');
+            $shopping_cart_rule_ids = array('15','16','17');
             $appliedRuleIds = explode(',', $appliedRuleIds);
             $result_id = array_values(array_intersect($shopping_cart_rule_ids,$appliedRuleIds));
 
@@ -114,7 +116,7 @@
                 {
                     $percentage = 100;
 
-                    $min_shopping_price = 5;
+                    $min_shopping_price = 0;
                     $max_shopping_price = 1501;
                     $message = "You have succesfully Qualified for maxium current discount available in the store";
                 }
