@@ -120,6 +120,7 @@
                 $discount_percentage = "5%";
                 $condition_max_eligible_shopping = $shopping_rule_condition['conditions'][0]['value'];
                 $min_price = abs($quoteData['subtotal'] - $condition_max_eligible_shopping);
+                echo $quoteData['subtotal'] ."-" .$condition_max_eligible_shopping;
                 $message =  "Add " .$this->helper('checkout')->formatPrice($min_price) ." more to get <span class='more_discount_percentage'>" .$discount_percentage ."</span> off";
                 $max_shopping_price = 500;
                 $min_shopping_price = 5;

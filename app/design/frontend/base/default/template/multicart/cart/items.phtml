@@ -405,21 +405,23 @@ if(empty($_cartQty)) {
               if ($quoteData['subtotal'] < 501) {
                 $max_shopping_price = 500;
                 $min_shopping_price = 5;
-                //$correctedStartValue = $quoteData['subtotal'] - $min_shopping_price;
+                $min_shopping_price_rule = 501;
                 $discount_percentage = "5%";
                 # code...
               }
-              else if ($quoteData['subtotal']  < 1001) {
+              else if ($quoteData['subtotal']  <= 1001) {
                 
                 $max_shopping_price = 1000;
                 $min_shopping_price = 501;
+                $min_shopping_price_rule = 1001;
                 //$correctedStartValue = $quoteData['subtotal'] - $min_shopping_price;
                 $discount_percentage = "7%";
                 # code...
               }
-              else if ($quoteData['subtotal']  < 1501) {
+              else if ($quoteData['subtotal']  <= 1501) {
                 $max_shopping_price = 1500;
                 $min_shopping_price = 1001;
+                $min_shopping_price_rule = 1501;
                 $discount_percentage = "10%";
                 //$correctedStartValue = $quoteData['subtotal'] - $min_shopping_price;
                 # code...
@@ -430,9 +432,6 @@ if(empty($_cartQty)) {
                 $min_shopping_price = 5;
               }
               
-                
-
-            
             if($quoteData['subtotal'] > 1500)
             {
               $percentage = 100;
@@ -440,9 +439,10 @@ if(empty($_cartQty)) {
             }
             else
             {
-              $correctedStartValue = $quoteData['subtotal'];
-              $percentage = ($correctedStartValue * 100) / $max_shopping_price;
-              $min_price = abs($max_shopping_price + 1 - $quoteData['subtotal'] );
+              $range = $max_shopping_price - $min_shopping_price;
+              $correctedStartValue = $quoteData['subtotal'] - $min_shopping_price;
+              $percentage = ($correctedStartValue * 100) / $range;
+              $min_price = abs($quoteData['subtotal'] - $min_shopping_price_rule);
               $message =  "Add " .$this->helper('checkout')->formatPrice($min_price) ." more to get <span class='more_discount_percentage'>" .$discount_percentage ."</span> off";
             }
         ?>
