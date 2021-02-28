@@ -47,7 +47,7 @@
     </table>
     <div class="shopping-cart-price-block">
          <?php 
-            Mage::getSingleton('checkout/session')->unsetAll();
+            
             $quote = Mage::getModel('checkout/session')->getQuote();
             $quoteData= $quote->getData();
             

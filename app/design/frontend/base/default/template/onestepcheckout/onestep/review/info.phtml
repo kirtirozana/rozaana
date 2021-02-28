@@ -65,7 +65,7 @@
     </table>
      <div class="shopping-cart-price-block">
          <?php 
-            Mage::getSingleton('checkout/session')->unsetAll();
+            
             $quote = Mage::getModel('checkout/session')->getQuote();
             $quoteData= $quote->getData();
             
@@ -149,9 +149,9 @@
                 $percentage = 100;
             }else
             {
-                $range = $max_shopping_price - $min_shopping_price;
-                $correctedStartValue = $quoteData['subtotal'] - $min_shopping_price;
-                $percentage = ($correctedStartValue * 100) / $range;
+                //$range = $max_shopping_price - $min_shopping_price;
+                $correctedStartValue = $quoteData['subtotal'];
+                $percentage = ($correctedStartValue * 100) / $max_shopping_price;
             }
         ?>
         <div class="shopping_cart_rule">

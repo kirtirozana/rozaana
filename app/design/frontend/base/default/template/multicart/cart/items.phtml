@@ -348,10 +348,10 @@ if(empty($_cartQty)) {
          */        ?>
             <ul id="cart-sidebar" class="mini-products-list">
             <?php   
-        /**
+       	/**
          * Get Product Url
         */
-        ?>
+		?>
         <?php foreach($_items as $_item): 
                 $productId=$_item->getProductId();
                 $products = Mage::getModel('catalog/product')->load($productId);
@@ -396,96 +396,54 @@ if(empty($_cartQty)) {
                 <?php endif; ?>
             </p>
         </div>
-    <div class="shopping-cart-price-block">
+      <div class="shopping-cart-price-block">
          <?php 
-          Mage::getSingleton('checkout/session')->unsetAll();
-          $quote = Mage::getModel('checkout/session')->getQuote();
-            
+
+            $quote = Mage::getModel('checkout/session')->getQuote();
             $quoteData= $quote->getData();
-            
-            $appliedRuleIds = Mage::getSingleton('checkout/session')->getQuote()->getAppliedRuleIds();
-            $shopping_cart_rule_ids = array('15','16','17');
-            $appliedRuleIds = explode(',', $appliedRuleIds);
-            $result_id = array_values(array_intersect($shopping_cart_rule_ids,$appliedRuleIds));
+              
+              if ($quoteData['subtotal'] < 501) {
+                $max_shopping_price = 500;
+                $min_shopping_price = 5;
+                //$correctedStartValue = $quoteData['subtotal'] - $min_shopping_price;
+                $discount_percentage = "5%";
+                # code...
+              }
+              else if ($quoteData['subtotal']  < 1001) {
+                
+                $max_shopping_price = 1000;
+                $min_shopping_price = 501;
+                //$correctedStartValue = $quoteData['subtotal'] - $min_shopping_price;
+                $discount_percentage = "7%";
+                # code...
+              }
+              else if ($quoteData['subtotal']  < 1501) {
+                $max_shopping_price = 1500;
+                $min_shopping_price = 1001;
+                $discount_percentage = "10%";
+                //$correctedStartValue = $quoteData['subtotal'] - $min_shopping_price;
+                # code...
+              }
+              else
+              {
+                $max_shopping_price = 1501;
+                $min_shopping_price = 5;
+              }
+              
+                
 
             
-            if(!empty($result_id[0]))
-            {
-                $oRule = Mage::getModel('salesrule/rule')->load($result_id[0]);
-                $shopping_rule_condition = unserialize($oRule->getConditionsSerialized());
-
-                $min_shopping_price = $shopping_rule_condition['conditions'][0]['value'];
-                $max_shopping_price = $shopping_rule_condition['conditions'][1]['value'];
-
-                if($result_id[0] == 15)
-                {
-                    $oRule = Mage::getModel('salesrule/rule')->load('16');
-                    $shopping_rule_condition = unserialize($oRule->getConditionsSerialized());
-                    $discount_percentage = "7%";
-                    $condition_max_eligible_shopping = $shopping_rule_condition['conditions'][0]['value'];
-                    
-                $min_price = abs($quoteData['subtotal'] - $condition_max_eligible_shopping);
-                $message =  "Add " .$this->helper('checkout')->formatPrice($min_price) ." more to get <span class='more_discount_percentage'>" .$discount_percentage ."</span> off";
-                }
-                else if($result_id[0] == 16)
-                {
-                    $oRule = Mage::getModel('salesrule/rule')->load('17');
-                    $shopping_rule_condition = unserialize($oRule->getConditionsSerialized());
-                    $discount_percentage = "10%";
-                    $condition_max_eligible_shopping = $shopping_rule_condition['conditions'][0]['value'];
-                    
-                $min_price = abs($quoteData['subtotal'] - $condition_max_eligible_shopping);
-                $message =  "Add " .$this->helper('checkout')->formatPrice($min_price) ." more to get <span class='more_discount_percentage'>" .$discount_percentage ."</span> off";
-                }
-                else if($result_id[0] == 17 && $quoteData['subtotal'] < 1500 )
-                {
-                    $oRule = Mage::getModel('salesrule/rule')->load('17');
-                    $shopping_rule_condition = unserialize($oRule->getConditionsSerialized());
-                    $discount_percentage = "10%";
-                    $condition_max_eligible_shopping = $shopping_rule_condition['conditions'][0]['value'];
-                    
-                $min_price = abs($quoteData['subtotal'] - $condition_max_eligible_shopping);
-                $message =  "Add " .$this->helper('checkout')->formatPrice($min_price) ." more to get <span class='more_discount_percentage'>" .$discount_percentage ."</span> off";
-                }
-                else if($result_id[0] == 17 && $quoteData['subtotal'] > 1500 )
-                {
-                    $percentage = 100;
-
-                    $min_shopping_price = 5;
-                    $max_shopping_price = 1501;
-                    $message = "You have succesfully Qualified for maxium current discount available in the store";
-                }
-                else if($result_id[0] == 27)
-                {
-                    $oRule = Mage::getModel('salesrule/rule')->load('15');
-                    $shopping_rule_condition = unserialize($oRule->getConditionsSerialized());
-                    $discount_percentage = "5%";
-                    $condition_max_eligible_shopping = $shopping_rule_condition['conditions'][0]['value'];
-                    
-                $min_price = abs($quoteData['subtotal'] - $condition_max_eligible_shopping);
-                $message =  "Add " .$this->helper('checkout')->formatPrice($min_price) ." more to get <span class='more_discount_percentage'>" .$discount_percentage ."</span> off";
-                }            
-            }
-            else
-            {
-              $oRule = Mage::getModel('salesrule/rule')->load('15');
-              $shopping_rule_condition = unserialize($oRule->getConditionsSerialized());
-              $discount_percentage = "5%";
-              $condition_max_eligible_shopping = $shopping_rule_condition['conditions'][0]['value'];
-              $min_price = abs($quoteData['subtotal'] - $condition_max_eligible_shopping);
-              $message =  "Add " .$this->helper('checkout')->formatPrice($min_price) ." more to get <span class='more_discount_percentage'>" .$discount_percentage ."</span> off";
-              $max_shopping_price = 501;
-              $min_shopping_price = 5;
-            }
-
             if($quoteData['subtotal'] > 1500)
             {
               $percentage = 100;
-            }else
+              $message = "You have succesfully Qualified for maxium current discount available in the store";
+            }
+            else
             {
-                $range = $max_shopping_price - $min_shopping_price;
-                $correctedStartValue = $quoteData['subtotal'] - $min_shopping_price;
-                $percentage = ($correctedStartValue * 100) / $range;
+              $correctedStartValue = $quoteData['subtotal'];
+              $percentage = ($correctedStartValue * 100) / $max_shopping_price;
+              $min_price = abs($max_shopping_price + 1 - $quoteData['subtotal'] );
+              $message =  "Add " .$this->helper('checkout')->formatPrice($min_price) ." more to get <span class='more_discount_percentage'>" .$discount_percentage ."</span> off";
             }
         ?>
         <div class="shopping_cart_rule">
