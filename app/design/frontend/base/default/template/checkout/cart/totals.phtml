@@ -52,6 +52,7 @@
             $quoteData= $quote->getData();
             
             $appliedRuleIds = Mage::getSingleton('checkout/session')->getQuote()->getAppliedRuleIds();
+            $rule_status = true;
             $shopping_cart_rule_ids = array('15','16','17');
             $appliedRuleIds = explode(',', $appliedRuleIds);
             $result_id = array_values(array_intersect($shopping_cart_rule_ids,$appliedRuleIds));
@@ -115,15 +116,40 @@
             }
             else
             {
-                $oRule = Mage::getModel('salesrule/rule')->load('15');
-                $shopping_rule_condition = unserialize($oRule->getConditionsSerialized());
-                $discount_percentage = "5%";
-                $condition_max_eligible_shopping = $shopping_rule_condition['conditions'][0]['value'];
-                $min_price = abs($quoteData['subtotal'] - $condition_max_eligible_shopping);
-                echo $quoteData['subtotal'] ."-" .$condition_max_eligible_shopping;
-                $message =  "Add " .$this->helper('checkout')->formatPrice($min_price) ." more to get <span class='more_discount_percentage'>" .$discount_percentage ."</span> off";
-                $max_shopping_price = 500;
-                $min_shopping_price = 5;
+                $categories_not_allowed_rules = array(7,26,27);
+                $cartItems = $quote->getAllVisibleItems();
+                $new_arr = array();
+
+                foreach ($cartItems as $item) {
+                    $productId = $item->getProductId();
+                    $productSku = $item->getSku();
+                    $_product = Mage::getModel('catalog/product')->load($productId);
+                    $productCats = $_product->getCategoryIds();
+                    
+                    if (array_intersect($categories_not_allowed_rules,$productCats)) {
+                        $rule_status = false;
+                        $message = "Your cart contain only vegetable and fruits and these category of product are not consider for any discount";
+                    }
+                    else
+                    {
+                        $rule_status = true;
+                        break;
+                    }
+                    // Do something more
+                }
+
+                if($rule_status)
+                {
+                    $oRule = Mage::getModel('salesrule/rule')->load('15');
+                    $shopping_rule_condition = unserialize($oRule->getConditionsSerialized());
+                    $discount_percentage = "5%";
+                    $condition_max_eligible_shopping = $shopping_rule_condition['conditions'][0]['value'];
+                    $min_price = abs($quoteData['subtotal'] - $condition_max_eligible_shopping);
+               
+                    $message =  "Add " .$this->helper('checkout')->formatPrice($min_price) ." more to get <span class='more_discount_percentage'>" .$discount_percentage ."</span> off";
+                    $max_shopping_price = 500;
+                    $min_shopping_price = 5;
+                }
 
             }
 
@@ -138,6 +164,8 @@
             }
         ?>
         <div class="shopping_cart_rule">
+           <?php  if($rule_status)
+                { ?>
             <div class="range">
                 <span class="min-range"><?php echo $this->helper('checkout')->formatPrice($min_shopping_price);?></span>
                 <span class="max-range"><?php echo $this->helper('checkout')->formatPrice($max_shopping_price);?></span>
@@ -146,6 +174,7 @@
                 <div class="progress-bar purchase" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" style="width:<?php echo round($percentage,0,PHP_ROUND_HALF_UP)."%"; ?>">
                 </div>
             </div>
+        <?php } ?>
             <div class="info-block">
                 <div class="block-info"><?php echo $message; ?> </div>
             </div>
