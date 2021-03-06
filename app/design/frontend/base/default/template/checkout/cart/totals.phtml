@@ -182,3 +182,15 @@
     </div>
 
 <?php endif; ?>
+
+
+<script>
+jQuery(".cart-table tbody tr").each(function(){
+    var discount_price =  jQuery(this).find('td.product-cart-price').find('span.cart-price').find('span:eq(0)').text();
+    var price =  jQuery(this).find('td.product-cart-price').find('span.cart-price').find('span:eq(1)').text();
+    if(discount_price == price)
+    {
+        jQuery(this).find('td.product-cart-price').find('span.cart-price').find('span:eq(0)').css('display','none');
+    }
+})
+</script>

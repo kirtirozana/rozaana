@@ -209,3 +209,17 @@
 </script>
 
 
+
+
+<script>
+jQuery(".onestepcheckout-summary tbody tr").each(function(){
+    var discount_price =  jQuery(this).find('td').find('span.cart-price').find('span:eq(0)').find('span.price').text();
+    var price =  jQuery(this).find('td').find('span.cart-price').find('span:eq(2)').text();
+    if(discount_price == price)
+    {
+        jQuery(this).find('td').find('span.cart-price').find('span:eq(0)').find('span.price').css('display','none');
+    }
+})
+</script>
+
+

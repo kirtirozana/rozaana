@@ -528,3 +528,15 @@ if(empty($_cartQty)) {
  <?php endif ?>
 </div>
 <?php }?> 
+
+
+<script>
+jQuery("ul.mini-products-list li").each(function(){
+  var discount_price = jQuery(this).find('.product-details').find('table.info-wrapper tbody').find('tr td').find('span.cart-discount-price').text();
+  var price = jQuery(this).find('.product-details').find('table.info-wrapper tbody').find('tr td').find('span.price').text();
+  if(discount_price == price)
+  {
+    jQuery(this).find('.product-details').find('table.info-wrapper tbody').find('tr td').find('span.cart-discount-price').css('display','none');
+  }
+})
+</script>
