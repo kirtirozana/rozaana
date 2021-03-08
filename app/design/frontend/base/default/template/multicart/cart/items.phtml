@@ -540,23 +540,5 @@ jQuery("ul.mini-products-list li").each(function(){
   }
 })
 
-jQuery(document).ready(function(){
-  jQuery('#header-cart').on('click', function (event) {
-    event.stopPropagation();
-  });
 
-  jQuery('body').click(function(e){
-    e.stopPropagation();
-    if(jQuery('div.header-minicart').find('a').hasClass('skip-active') && !jQuery('#header-cart').hasClass('roz'))
-    {
-      jQuery('#header-cart').addClass('roz');
-    }
-    else
-    {
-      
-      jQuery('#header-cart').removeClass('skip-active');
-      jQuery('#header-cart').removeClass('roz');
-    }
-  })
-})
 </script>
