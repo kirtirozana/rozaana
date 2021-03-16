@@ -348,10 +348,10 @@ if(empty($_cartQty)) {
          */        ?>
             <ul id="cart-sidebar" class="mini-products-list">
             <?php   
-       	/**
+        /**
          * Get Product Url
         */
-		?>
+    ?>
         <?php foreach($_items as $_item): 
                 $productId=$_item->getProductId();
                 $products = Mage::getModel('catalog/product')->load($productId);
@@ -396,6 +396,104 @@ if(empty($_cartQty)) {
                 <?php endif; ?>
             </p>
         </div>
+      <div class="shopping-cart-price-block">
+         <?php 
+
+          
+
+            $quote = Mage::getModel('checkout/session')->getQuote();
+            $quoteData= $quote->getData();
+
+            $categories_not_allowed_rules = array(7,26,27);
+                $cartItems = $quote->getAllVisibleItems();
+                $new_arr = array();
+
+                foreach ($cartItems as $item) {
+                    $productId = $item->getProductId();
+                    $productSku = $item->getSku();
+                    $_product = Mage::getModel('catalog/product')->load($productId);
+                    $productCats = $_product->getCategoryIds();
+                    
+                    if (array_intersect($categories_not_allowed_rules,$productCats)) {
+                        $rule_status = false;
+                        $message = "Your cart contain only vegetable and fruits and these category of product are not consider for any discount";
+                    }
+                    else
+                    {
+                        $rule_status = true;
+                        break;
+                    }
+                    // Do something more
+                }
+              
+              if($rule_status)
+              {
+              if ($quoteData['subtotal'] < 501) {
+                $max_shopping_price = 500;
+                $min_shopping_price = 5;
+                $min_shopping_price_rule = 501;
+                $discount_percentage = "5%";
+                # code...
+              }
+              else if ($quoteData['subtotal']  <= 1001) {
+                
+                $max_shopping_price = 1000;
+                $min_shopping_price = 501;
+                $min_shopping_price_rule = 1001;
+                //$correctedStartValue = $quoteData['subtotal'] - $min_shopping_price;
+                $discount_percentage = "7%";
+                # code...
+              }
+              else if ($quoteData['subtotal']  <= 1501) {
+                $max_shopping_price = 1500;
+                $min_shopping_price = 1001;
+                $min_shopping_price_rule = 1501;
+                $discount_percentage = "10%";
+                //$correctedStartValue = $quoteData['subtotal'] - $min_shopping_price;
+                # code...
+              }
+              else
+              {
+                $max_shopping_price = 1501;
+                $min_shopping_price = 5;
+              }
+              
+            if($quoteData['subtotal'] > 1500)
+            {
+              $percentage = 100;
+              $message = "Congratulations! You're eligible for a maximum discount of <span class='maximus_discount'>10%</span>";
+            }
+            else
+            {
+              $range = $max_shopping_price - $min_shopping_price;
+              $correctedStartValue = $quoteData['subtotal'] - $min_shopping_price;
+              $percentage = ($correctedStartValue * 100) / $range;
+              $min_price = abs($quoteData['subtotal'] - $min_shopping_price_rule);
+              $message =  "Add " .$this->helper('checkout')->formatPrice($min_price) ." more to get <span class='more_discount_percentage'>" .$discount_percentage ."</span> off";
+            }
+          }
+          else
+          {
+            $message = '<span><i class="fa fa-info-circle" aria-hidden="true" style="color:red;"></i></span> There is no discount on Fruits & Vegetables category';
+          }
+        ?>
+        <div class="shopping_cart_rule">
+           <?php  if($rule_status)
+                { ?>
+            <div class="range">
+                <span class="min-range"><?php echo $this->helper('checkout')->formatPrice($min_shopping_price);?></span>
+                <span class="max-range"><?php echo $this->helper('checkout')->formatPrice($max_shopping_price);?></span>
+            </div>
+            <div class="progress">
+                <div class="progress-bar purchase" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" style="width:<?php echo round($percentage,0,PHP_ROUND_HALF_UP)."%"; ?>">
+                </div>
+            </div>
+        <?php } ?>
+            <div class="info-block">
+                <div class="block-info"><?php echo $message; ?> </div>
+            </div>
+        </div>
+    </div>
    <?php
    /**
     *Display onestep Checkout
@@ -405,20 +503,6 @@ if(empty($_cartQty)) {
                 <a class="cart-link" href="<?php echo $this->getUrl('checkout/cart'); ?>">
                     <?php echo $this->__('View Shopping Cart'); ?>
                 </a>
-
-<div class="progress-con">
-
-  <div class="progress">
-    <div class="progress-bar" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" style="width:70%">
-    
-    </div>
-  </div>
-</div>
-
-
-
-
-
                 <ul class="checkout-types minicart">
                     <?php 
                     /**
@@ -443,4 +527,18 @@ if(empty($_cartQty)) {
         <p class="empty"><?php echo $this->__('You have no items in your shopping cart.') ?></p>
  <?php endif ?>
 </div>
-<?php }?>
+<?php }?> 
+
+
+<script>
+jQuery("ul.mini-products-list li").each(function(){
+  var discount_price = jQuery(this).find('.product-details').find('table.info-wrapper tbody').find('tr td').find('span.cart-discount-price').text();
+  var price = jQuery(this).find('.product-details').find('table.info-wrapper tbody').find('tr td').find('span.price').text();
+  if(discount_price == price)
+  {
+    jQuery(this).find('.product-details').find('table.info-wrapper tbody').find('tr td').find('span.cart-discount-price').css('display','none');
+  }
+})
+
+
+</script>
