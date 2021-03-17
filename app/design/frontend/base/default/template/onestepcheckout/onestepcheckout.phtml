@@ -71,10 +71,14 @@ $activateOnestep = Mage::getStoreConfig('onestepcheckout/general/Activate_apptha
         } ?></div>
 
     <!--<div class="logo-onepage"></div>-->
+    <div class="checkout-page">
+    <div class="location-mobile"><i class="fa fa-map-marker" aria-hidden="true"></i>
+          
+          <a>Faridabad</a></div>
     <div class="login-reg clearfix"><?php if (!$this->isCustomerLoggedIn()): ?><a style="padding:0 0 5px 0;display:block;float:left;" href="javascript:lightboxAction('gift-form')" id="lightboxLink" title="<?php echo $this->__('Already Registered? Click here to Login'); ?>"><?php echo $this->__('Already Registered? Click here to Login'); ?></a> <?php endif ?>
         <?php if ($activateIn != 1): ?><a style="padding:0 0 5px 5px;display:block;float:right; text-align: right;" href="<?php echo $this->getUrl('checkout/cart') ?>" title="Edit tor cart"><?php echo $this->__('Forgot an Item? Edit Your Cart') ?></a><?php endif; ?>
             </div>
-
+</div>
             <!---Title and Description of the page -->
 
             <!---popup-box script -->
