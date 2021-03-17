@@ -130,7 +130,15 @@
                 <div class="field">
                     <label for="country" class="required"><em>*</em><?php echo $this->__('Country') ?></label>
                     <div class="input-box" id="huge_code">
-                        <?php echo "India"//$this->getCountryHtmlSelect() ?>
+                    <ul class="pro">
+                        <li>
+
+                <?php echo $this->getCountryHtmlSelect() ?>
+                </li>
+                
+                        </ul>
+                        <input type="text" readonly="readonly" id="region" name="region" value="India" ?>
+                   
                     </div>
                 </div>
             </li>
